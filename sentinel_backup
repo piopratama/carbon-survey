@@ -1,0 +1,728 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict mAuOSFbEVTklW75mOQiJYI6JrALe6Pq8m1WC95Cq2xQ2SIkvitQ75rb7A7BcIfh
+
+-- Dumped from database version 15.8 (Debian 15.8-1.pgdg110+1)
+-- Dumped by pg_dump version 15.15
+
+-- Started on 2026-02-11 01:43:31 UTC
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 8 (class 2615 OID 2200)
+-- Name: public; Type: SCHEMA; Schema: -; Owner: pg_database_owner
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO pg_database_owner;
+
+--
+-- TOC entry 4665 (class 0 OID 0)
+-- Dependencies: 8
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: pg_database_owner
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 283 (class 1259 OID 19724)
+-- Name: projects; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.projects (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    aoi public.geometry(Polygon,4326) NOT NULL,
+    year integer NOT NULL,
+    months integer[] NOT NULL,
+    cloud integer DEFAULT 20,
+    status text DEFAULT 'draft'::text,
+    created_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT projects_status_check CHECK ((status = ANY (ARRAY['draft'::text, 'locked'::text])))
+);
+
+
+ALTER TABLE public.projects OWNER TO postgres;
+
+--
+-- TOC entry 288 (class 1259 OID 19778)
+-- Name: sampling_assignments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sampling_assignments (
+    id integer NOT NULL,
+    sampling_point_id integer NOT NULL,
+    surveyor_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.sampling_assignments OWNER TO postgres;
+
+--
+-- TOC entry 287 (class 1259 OID 19777)
+-- Name: sampling_assignments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.sampling_assignments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.sampling_assignments_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 4666 (class 0 OID 0)
+-- Dependencies: 287
+-- Name: sampling_assignments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.sampling_assignments_id_seq OWNED BY public.sampling_assignments.id;
+
+
+--
+-- TOC entry 285 (class 1259 OID 19738)
+-- Name: sampling_points; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sampling_points (
+    id integer NOT NULL,
+    project_id uuid NOT NULL,
+    geom public.geometry(Point,4326) NOT NULL,
+    status text DEFAULT 'open'::text,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT sampling_points_status_check CHECK ((status = ANY (ARRAY['open'::text, 'locked'::text, 'done'::text])))
+);
+
+
+ALTER TABLE public.sampling_points OWNER TO postgres;
+
+--
+-- TOC entry 284 (class 1259 OID 19737)
+-- Name: sampling_points_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.sampling_points_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.sampling_points_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 4667 (class 0 OID 0)
+-- Dependencies: 284
+-- Name: sampling_points_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.sampling_points_id_seq OWNED BY public.sampling_points.id;
+
+
+--
+-- TOC entry 294 (class 1259 OID 19838)
+-- Name: survey_photos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.survey_photos (
+    id integer NOT NULL,
+    survey_id integer NOT NULL,
+    photo_url text NOT NULL,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.survey_photos OWNER TO postgres;
+
+--
+-- TOC entry 293 (class 1259 OID 19837)
+-- Name: survey_photos_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.survey_photos_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.survey_photos_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 4668 (class 0 OID 0)
+-- Dependencies: 293
+-- Name: survey_photos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.survey_photos_id_seq OWNED BY public.survey_photos.id;
+
+
+--
+-- TOC entry 292 (class 1259 OID 19810)
+-- Name: surveys; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.surveys (
+    id integer NOT NULL,
+    sampling_point_id integer NOT NULL,
+    surveyor_id uuid NOT NULL,
+    tree_species_id integer NOT NULL,
+    survey_date date NOT NULL,
+    dbh_cm numeric NOT NULL,
+    circumference_cm numeric,
+    height_m numeric,
+    biomass numeric,
+    status text DEFAULT 'draft'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    description text,
+    CONSTRAINT surveys_status_check CHECK ((status = ANY (ARRAY['draft'::text, 'submitted'::text, 'verified'::text])))
+);
+
+
+ALTER TABLE public.surveys OWNER TO postgres;
+
+--
+-- TOC entry 291 (class 1259 OID 19809)
+-- Name: surveys_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.surveys_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.surveys_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 4669 (class 0 OID 0)
+-- Dependencies: 291
+-- Name: surveys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.surveys_id_seq OWNED BY public.surveys.id;
+
+
+--
+-- TOC entry 290 (class 1259 OID 19798)
+-- Name: tree_species; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tree_species (
+    id integer NOT NULL,
+    local_name text NOT NULL,
+    scientific_name text NOT NULL,
+    biomass_formula text NOT NULL,
+    wood_density numeric,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.tree_species OWNER TO postgres;
+
+--
+-- TOC entry 289 (class 1259 OID 19797)
+-- Name: tree_species_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tree_species_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tree_species_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 4670 (class 0 OID 0)
+-- Dependencies: 289
+-- Name: tree_species_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tree_species_id_seq OWNED BY public.tree_species.id;
+
+
+--
+-- TOC entry 286 (class 1259 OID 19765)
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    name text NOT NULL,
+    email text NOT NULL,
+    password_hash text NOT NULL,
+    role text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    CONSTRAINT users_role_check CHECK ((role = ANY (ARRAY['admin'::text, 'surveyor'::text])))
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- TOC entry 4455 (class 2604 OID 19781)
+-- Name: sampling_assignments id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sampling_assignments ALTER COLUMN id SET DEFAULT nextval('public.sampling_assignments_id_seq'::regclass);
+
+
+--
+-- TOC entry 4450 (class 2604 OID 19741)
+-- Name: sampling_points id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sampling_points ALTER COLUMN id SET DEFAULT nextval('public.sampling_points_id_seq'::regclass);
+
+
+--
+-- TOC entry 4462 (class 2604 OID 19841)
+-- Name: survey_photos id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.survey_photos ALTER COLUMN id SET DEFAULT nextval('public.survey_photos_id_seq'::regclass);
+
+
+--
+-- TOC entry 4459 (class 2604 OID 19813)
+-- Name: surveys id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.surveys ALTER COLUMN id SET DEFAULT nextval('public.surveys_id_seq'::regclass);
+
+
+--
+-- TOC entry 4457 (class 2604 OID 19801)
+-- Name: tree_species id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tree_species ALTER COLUMN id SET DEFAULT nextval('public.tree_species_id_seq'::regclass);
+
+
+--
+-- TOC entry 4648 (class 0 OID 19724)
+-- Dependencies: 283
+-- Data for Name: projects; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.projects (id, name, aoi, year, months, cloud, status, created_at) FROM stdin;
+3d38c945-efd2-4cd3-8141-1b2821d0db64	Golo Pramuka	0103000020E610000001000000310000002907B30930F85D40B8019F1F460021C039ED293927F85D4007EE409DF20021C02E8D5F7825F85D40444C89247A0121C0C2D9AD6532F85D40C4995FCD010221C050FEEE1D35F85D40ADA580B4FF0121C0C748F60835F85D40ADC266800B0221C04D486B0C3AF85D404F22C2BF080221C0E14389963CF85D4063804413280221C0E6CC76853EF85D40051A6CEA3C0221C0E5982CEE3FF85D404913EF004F0221C06D00362042F85D40043752B6480221C0ED28CE5147F85D404930D5CC5A0221C0FCA9F1D24DF85D40EB8F300C580221C08718AF7955F85D40DA01D715330221C021054F2157F85D40AA66D652400221C0A704C4245CF85D4096EB6D33150221C092921E8656F85D404F05DCF3FC0121C00F80B8AB57F85D40F7E7A221E30121C0A8380EBC5AF85D40C74CA25EF00121C0AC8DB1135EF85D40E36C3A02B80121C0A69C2FF65EF85D402BC24D46950121C0327381CB63F85D40EDBAB722310121C03DB9A64066F85D4078431A15380121C0A9893E1F65F85D4031D120054F0121C04128EFE368F85D4031EE06D15A0121C0B858518369F85D408F71C5C5510121C0C3B81B446BF85D40317A6EA12B0121C0ADDEE17668F85D404EF1B8A8160121C0C4D2C08F6AF85D4092B06F27110121C0B7F0BC546CF85D409276A38FF90021C0BE2F2E5569F85D400A849D62D50021C0ADDEE17668F85D40F6083543AA0021C0D68BA19C68F85D40FC34EECD6F0021C03C6BB75D68F85D40718FA50F5D0021C04089CF9D60F85D40191BBAD91F0021C0C24D469561F85D40A8397991090021C0BE1248895DF85D404D2F3196E9FF20C030BABC395CF85D40F241CF66D5FF20C0A4E36A6457F85D40C51F459DB9FF20C022533E0455F85D400919C8B3CBFF20C09C53C90050F85D408126C286A7FF20C07B4D0F0A4AF85D40B1C1C2499AFF20C073BD6DA642F85D403997E2AAB2FF20C0753FA7203FF85D40F2CD3637A6FF20C05F7F129F3BF85D403997E2AAB2FF20C0613596B036F85D4050A8A78FC0FF20C0514CDE0033F85D407A34D593F9FF20C03A58FFE730F85D40ECDB4944F8FF20C02907B30930F85D40B8019F1F460021C0	2024	{6,7,8}	20	draft	2026-02-10 12:36:43.624236
+\.
+
+
+--
+-- TOC entry 4653 (class 0 OID 19778)
+-- Dependencies: 288
+-- Data for Name: sampling_assignments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.sampling_assignments (id, sampling_point_id, surveyor_id, created_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4650 (class 0 OID 19738)
+-- Dependencies: 285
+-- Data for Name: sampling_points; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.sampling_points (id, project_id, geom, status, created_at) FROM stdin;
+64778	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867
+64779	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867
+64780	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64781	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64782	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64786	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867
+64787	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867
+64788	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867
+64789	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64790	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64791	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64792	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867
+64793	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867
+64794	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867
+64798	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867
+64799	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867
+64800	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867
+64801	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64802	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64803	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64804	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867
+64805	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40747844B1500021C0	open	2026-02-10 12:36:58.657867
+64806	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867
+64807	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867
+64810	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40C50A017E220221C0	open	2026-02-10 12:36:58.657867
+64811	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867
+64812	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867
+64813	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867
+64814	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64815	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64816	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64817	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867
+64818	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867
+64819	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867
+64820	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867
+64873	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000E167E12D67F85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64823	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40C50A017E220221C0	open	2026-02-10 12:36:58.657867
+64824	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867
+64825	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867
+64826	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867
+64827	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64828	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64829	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64830	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867
+64831	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867
+64832	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867
+64833	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867
+64836	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40C50A017E220221C0	open	2026-02-10 12:36:58.657867
+64837	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867
+64838	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867
+64839	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867
+64840	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64841	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64842	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64843	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867
+64844	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867
+64845	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867
+64846	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867
+64849	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40C50A017E220221C0	open	2026-02-10 12:36:58.657867
+64850	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867
+64851	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867
+64852	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867
+64853	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64854	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64855	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64856	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867
+64857	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867
+64858	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867
+64859	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867
+64864	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867
+64865	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D405523C697390121C0	open	2026-02-10 12:36:58.657867
+64866	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64867	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64868	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867
+64869	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D40747844B1500021C0	open	2026-02-10 12:36:58.657867
+64870	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867
+64874	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000E167E12D67F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867
+64875	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000E167E12D67F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867
+64876	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000E167E12D67F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867
+\.
+
+
+--
+-- TOC entry 4446 (class 0 OID 18360)
+-- Dependencies: 222
+-- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4659 (class 0 OID 19838)
+-- Dependencies: 294
+-- Data for Name: survey_photos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.survey_photos (id, survey_id, photo_url, created_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4657 (class 0 OID 19810)
+-- Dependencies: 292
+-- Data for Name: surveys; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.surveys (id, sampling_point_id, surveyor_id, tree_species_id, survey_date, dbh_cm, circumference_cm, height_m, biomass, status, created_at, description) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4655 (class 0 OID 19798)
+-- Dependencies: 290
+-- Data for Name: tree_species; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tree_species (id, local_name, scientific_name, biomass_formula, wood_density, created_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4651 (class 0 OID 19765)
+-- Dependencies: 286
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, name, email, password_hash, role, created_at) FROM stdin;
+0989837f-bbb9-48ff-b5e2-133061cac6a7	Admin Utama	admin@system.local	$2b$12$KIXQ4Z5qj8J8d9U0QZ6M0u6V8z0k9t2K6gE7b2r3p8x1wQ9R8ZK5m	admin	2026-02-10 12:57:48.865591+00
+bb85907a-0585-47aa-bf1f-b2ead3b88214	Surveyor Pertama	surveyor@system.local	$2b$12$5JZp7nZQyZJzH8F0C8N9NueJw0qZpKx7p0E2y7GJ1t1C3xV8H3s8W	surveyor	2026-02-10 12:58:00.457714+00
+\.
+
+
+--
+-- TOC entry 4671 (class 0 OID 0)
+-- Dependencies: 287
+-- Name: sampling_assignments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.sampling_assignments_id_seq', 1, false);
+
+
+--
+-- TOC entry 4672 (class 0 OID 0)
+-- Dependencies: 284
+-- Name: sampling_points_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.sampling_points_id_seq', 64879, true);
+
+
+--
+-- TOC entry 4673 (class 0 OID 0)
+-- Dependencies: 293
+-- Name: survey_photos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.survey_photos_id_seq', 1, false);
+
+
+--
+-- TOC entry 4674 (class 0 OID 0)
+-- Dependencies: 291
+-- Name: surveys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.surveys_id_seq', 1, false);
+
+
+--
+-- TOC entry 4675 (class 0 OID 0)
+-- Dependencies: 289
+-- Name: tree_species_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tree_species_id_seq', 1, false);
+
+
+--
+-- TOC entry 4473 (class 2606 OID 19734)
+-- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.projects
+    ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4483 (class 2606 OID 19784)
+-- Name: sampling_assignments sampling_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sampling_assignments
+    ADD CONSTRAINT sampling_assignments_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4485 (class 2606 OID 19786)
+-- Name: sampling_assignments sampling_assignments_sampling_point_id_surveyor_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sampling_assignments
+    ADD CONSTRAINT sampling_assignments_sampling_point_id_surveyor_id_key UNIQUE (sampling_point_id, surveyor_id);
+
+
+--
+-- TOC entry 4477 (class 2606 OID 19748)
+-- Name: sampling_points sampling_points_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sampling_points
+    ADD CONSTRAINT sampling_points_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4493 (class 2606 OID 19846)
+-- Name: survey_photos survey_photos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.survey_photos
+    ADD CONSTRAINT survey_photos_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4491 (class 2606 OID 19821)
+-- Name: surveys surveys_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.surveys
+    ADD CONSTRAINT surveys_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4487 (class 2606 OID 19808)
+-- Name: tree_species tree_species_local_name_scientific_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tree_species
+    ADD CONSTRAINT tree_species_local_name_scientific_name_key UNIQUE (local_name, scientific_name);
+
+
+--
+-- TOC entry 4489 (class 2606 OID 19806)
+-- Name: tree_species tree_species_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tree_species
+    ADD CONSTRAINT tree_species_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4479 (class 2606 OID 19776)
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 4481 (class 2606 OID 19774)
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4471 (class 1259 OID 19735)
+-- Name: idx_projects_aoi; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_projects_aoi ON public.projects USING gist (aoi);
+
+
+--
+-- TOC entry 4474 (class 1259 OID 19754)
+-- Name: idx_sampling_points_geom; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_sampling_points_geom ON public.sampling_points USING gist (geom);
+
+
+--
+-- TOC entry 4475 (class 1259 OID 19755)
+-- Name: idx_sampling_points_project; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_sampling_points_project ON public.sampling_points USING btree (project_id);
+
+
+--
+-- TOC entry 4495 (class 2606 OID 19787)
+-- Name: sampling_assignments sampling_assignments_sampling_point_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sampling_assignments
+    ADD CONSTRAINT sampling_assignments_sampling_point_id_fkey FOREIGN KEY (sampling_point_id) REFERENCES public.sampling_points(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4496 (class 2606 OID 19792)
+-- Name: sampling_assignments sampling_assignments_surveyor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sampling_assignments
+    ADD CONSTRAINT sampling_assignments_surveyor_id_fkey FOREIGN KEY (surveyor_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4494 (class 2606 OID 19760)
+-- Name: sampling_points sampling_points_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sampling_points
+    ADD CONSTRAINT sampling_points_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4500 (class 2606 OID 19847)
+-- Name: survey_photos survey_photos_survey_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.survey_photos
+    ADD CONSTRAINT survey_photos_survey_id_fkey FOREIGN KEY (survey_id) REFERENCES public.surveys(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4497 (class 2606 OID 19822)
+-- Name: surveys surveys_sampling_point_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.surveys
+    ADD CONSTRAINT surveys_sampling_point_id_fkey FOREIGN KEY (sampling_point_id) REFERENCES public.sampling_points(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 4498 (class 2606 OID 19827)
+-- Name: surveys surveys_surveyor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.surveys
+    ADD CONSTRAINT surveys_surveyor_id_fkey FOREIGN KEY (surveyor_id) REFERENCES public.users(id);
+
+
+--
+-- TOC entry 4499 (class 2606 OID 19832)
+-- Name: surveys surveys_tree_species_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.surveys
+    ADD CONSTRAINT surveys_tree_species_id_fkey FOREIGN KEY (tree_species_id) REFERENCES public.tree_species(id);
+
+
+-- Completed on 2026-02-11 01:43:31 UTC
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict mAuOSFbEVTklW75mOQiJYI6JrALe6Pq8m1WC95Cq2xQ2SIkvitQ75rb7A7BcIfh
+

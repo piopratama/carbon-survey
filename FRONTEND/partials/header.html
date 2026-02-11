@@ -1,0 +1,80 @@
+<script>
+  const token = localStorage.getItem("token");
+  const userData = localStorage.getItem("user");
+
+  // ===============================
+  // ROLE PROTECTION
+  // ===============================
+  if (window.REQUIRED_ROLE) {
+    const allowed = Array.isArray(window.REQUIRED_ROLE)
+      ? window.REQUIRED_ROLE
+      : [window.REQUIRED_ROLE];
+
+    if (!allowed.includes(currentUser.role)) {
+      alert("Unauthorized");
+      window.location.href = "index.html";
+    }
+  }
+</script>
+
+<header class="bg-primary text-white shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark container-fluid">
+    <a class="navbar-brand fw-semibold" href="main.html">
+      AOI Sentinel Survey
+    </a>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- ADMIN ONLY -->
+        <li class="nav-item admin-only">
+          <a class="nav-link" href="main.html">Project</a>
+        </li>
+
+        <li class="nav-item admin-only">
+          <a class="nav-link" href="surveyors.html">Surveyor</a>
+        </li>
+
+        <li class="nav-item admin-only">
+          <a class="nav-link" href="tree_species.html">Tree Species</a>
+        </li>
+
+        <!-- SURVEYOR ONLY -->
+        <li class="nav-item surveyor-only">
+          <a class="nav-link" href="surveyor_main.html">Project</a>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-3">
+        <span class="small text-white-50" id="userInfo"></span>
+        <button class="btn btn-sm btn-light" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const currentUser = userData ? JSON.parse(userData) : null;
+
+  if (currentUser) {
+    document.getElementById("userInfo").innerText =
+      currentUser.name + " (" + currentUser.role + ")";
+
+    // Hide menu sesuai role
+    if (currentUser.role !== "admin") {
+      document.querySelectorAll(".admin-only").forEach((el) => el.remove());
+    }
+
+    if (currentUser.role !== "surveyor") {
+      document.querySelectorAll(".surveyor-only").forEach((el) => el.remove());
+    }
+  }
+
+  // Highlight active link
+  const current = window.location.pathname.split("/").pop();
+
+  document.querySelectorAll(".nav-link").forEach((link) => {
+    if (link.getAttribute("href") === current) {
+      link.classList.add("active");
+    }
+  });
+</script>

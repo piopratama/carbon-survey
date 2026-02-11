@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+earthengine-api
+pydantic
+
+sqlalchemy
+psycopg2-binary
+geoalchemy2
+shapely
+
+python-multipart
+passlib
+python-jose
+bcrypt==4.0.1

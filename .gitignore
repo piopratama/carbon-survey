@@ -1,0 +1,49 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+.env.*
+
+# Local credentials
+credential.txt
+*.pem
+*.key
+
+# ========================
+# Uploads / Generated files
+# ========================
+uploads/
+static/uploads/
+*.log
+
+# ========================
+# Database
+# ========================
+*.sqlite3
+*.db
+
+# ========================
+# IDE
+# ========================
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# ========================
+# Node (if later used)
+# ========================
+node_modules/
+dist/
