@@ -213,3 +213,26 @@ SENTINEL/
 ## 10. License
 
 Research and non-commercial use only.
+
+---
+
+## License & Copyright
+
+© 2026 I Wayan Pio Pratama. All Rights Reserved.
+
+This software and its documentation are the intellectual property of  
+**I Wayan Pio Pratama (2026)**.
+
+This project may not be used, reproduced, distributed, or modified 
+for academic, research, publication, or commercial purposes without 
+proper citation.
+
+If you use this system, methodology, or derived outputs in any publication, 
+you MUST cite it as follows:
+
+### APA 7th Citation Format
+
+Pratama, I. W. P. (2026). *Carbon Survey System* [Software]. GitHub.  
+https://github.com/piopratama/carbon-survey
+
+Failure to provide proper citation constitutes academic misconduct.

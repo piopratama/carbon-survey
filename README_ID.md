@@ -180,3 +180,30 @@ SENTINEL/
 ## 10. Lisensi
 
 Untuk penelitian dan non-komersial.
+
+## Lisensi & Hak Cipta
+
+© 2026 I Wayan Pio Pratama. Seluruh Hak Dilindungi.
+
+Perangkat lunak ini beserta seluruh dokumentasi, struktur basis data,
+algoritma, metodologi, dan turunannya merupakan kekayaan intelektual
+milik **I Wayan Pio Pratama (2026)** dan dilindungi oleh undang-undang
+hak cipta yang berlaku.
+
+Proyek ini tidak diperkenankan untuk digunakan, direproduksi,
+didistribusikan, dimodifikasi, maupun dijadikan dasar karya turunan
+untuk kepentingan akademik, penelitian, publikasi, maupun komersial
+tanpa mencantumkan sitasi yang benar.
+
+Apabila sistem, metodologi, data turunan, maupun hasil analisis dari
+perangkat lunak ini digunakan dalam karya ilmiah, publikasi, laporan
+penelitian, tesis, disertasi, jurnal, atau bentuk publikasi lainnya,
+maka WAJIB mencantumkan sitasi sebagai berikut:
+
+### Format Sitasi APA Edisi ke-7
+
+Pratama, I. W. P. (2026). *Carbon Survey System* [Perangkat Lunak]. GitHub.  
+https://github.com/piopratama/carbon-survey
+
+Kegagalan dalam mencantumkan sitasi yang sesuai dapat dianggap sebagai
+pelanggaran etika akademik dan pelanggaran hak kekayaan intelektual.
