@@ -12,3 +12,4 @@ python-multipart
 passlib
 python-jose
 bcrypt==4.0.1
+python-dotenv
