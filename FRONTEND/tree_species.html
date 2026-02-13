@@ -209,7 +209,7 @@
       /* ========================= */
 
       function validateFormula(formula) {
-        if (!formula) return "Formula is required";
+        if (!formula || !formula.trim()) return null;
 
         formula = formula.trim();
 
@@ -312,7 +312,11 @@
 
       async function saveSpecies() {
         const formula = biomassFormula.value.trim();
-        const formulaError = validateFormula(formula);
+        let formulaError = null;
+
+        if (formula) {
+          formulaError = validateFormula(formula);
+        }
 
         if (formulaError) {
           alert("Formula error: " + formulaError);

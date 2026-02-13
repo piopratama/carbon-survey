@@ -9,20 +9,31 @@ router = APIRouter(prefix="/tree-species", tags=["Tree Species"])
 
 
 # =====================
+# DEFAULT FORMULA (NO HEIGHT)
+# =====================
+
+DEFAULT_BIOMASS_FORMULA = (
+    "exp(-1.803 - 0.976 * log(wood_density) + "
+    "2.673 * log(dbh) - 0.0299 * (log(dbh)**2))"
+)
+
+
+# =====================
 # FORMULA NORMALIZER
 # =====================
 
 def normalize_formula(formula: str) -> str:
     """
     Normalize scientific notation to python-safe formula:
+    - If empty -> use default formula
     - ln() -> log()
     - ^ -> **
-    - remove extra spaces
-    - lowercase function names
+    - lowercase common functions
     """
 
-    if not formula or not formula.strip():
-        raise HTTPException(400, "biomass_formula tidak boleh kosong")
+    # If empty or missing → use default
+    if not formula or not str(formula).strip():
+        return DEFAULT_BIOMASS_FORMULA
 
     f = formula.strip()
 
@@ -32,7 +43,7 @@ def normalize_formula(formula: str) -> str:
     # replace ^ with **
     f = f.replace("^", "**")
 
-    # optional: lowercase common functions
+    # lowercase common functions
     f = re.sub(r'\bEXP\b', 'exp', f, flags=re.IGNORECASE)
     f = re.sub(r'\bLOG\b', 'log', f, flags=re.IGNORECASE)
 
@@ -58,7 +69,9 @@ def get_species(species_id: int, db: Session = Depends(get_db)):
 @router.post("")
 def create_species(payload: dict, db: Session = Depends(get_db)):
 
-    normalized_formula = normalize_formula(payload["biomass_formula"])
+    normalized_formula = normalize_formula(
+        payload.get("biomass_formula")
+    )
 
     species = TreeSpecies(
         local_name=payload["local_name"],
@@ -91,7 +104,9 @@ def update_species(species_id: int, payload: dict, db: Session = Depends(get_db)
     species.scientific_name = payload["scientific_name"]
     species.description = payload.get("description")
 
-    species.biomass_formula = normalize_formula(payload["biomass_formula"])
+    species.biomass_formula = normalize_formula(
+        payload.get("biomass_formula")
+    )
     species.wood_density = payload.get("wood_density")
 
     species.leaf_photo_url = payload.get("leaf_photo_url")

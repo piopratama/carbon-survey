@@ -47,3 +47,5 @@ static/uploads/
 # ========================
 node_modules/
 dist/
+
+/REPORT/

@@ -1009,104 +1009,95 @@
 
         if (!isLocked) {
           actions += `
-      <button class="btn btn-sm btn-dark w-100 mb-1"
-        onclick="openSurveyTreePage(${p.id})">
-        View Trees
-      </button>
-    `;
+            <button class="btn btn-sm btn-dark w-100 mb-1"
+              onclick="openSurveyTreePage(${p.id})">
+              View Trees
+            </button>
+          `;
 
           if (progress === "draft") {
             actions += `
-        <button class="btn btn-sm btn-secondary w-100 mb-1"
-          onclick="openSurveySetup(${p.id})">
-          Setup Survey
-        </button>
-      `;
+              <button class="btn btn-sm btn-secondary w-100 mb-1"
+                onclick="openSurveySetup(${p.id})">
+                Setup Survey
+              </button>
+
+              <button class="btn btn-sm btn-danger w-100"
+                onclick="deletePoint(${p.id})">
+                Delete Sampling Point
+              </button>
+            `;
           }
 
           if (progress !== "draft") {
             actions += `
-        <button class="btn btn-sm btn-secondary w-100 mb-1"
-          onclick="openSurveySetup(${p.id}, true)">
-          Edit Survey
-        </button>
+              <button class="btn btn-sm btn-secondary w-100 mb-1"
+                onclick="openSurveySetup(${p.id}, true)">
+                Edit Survey
+              </button>
 
-        <button class="btn btn-sm btn-primary w-100 mb-1"
-          onclick="openAssignModal(${p.id})">
-          Manage Surveyor
-        </button>
-      `;
-          }
-
-          if (approval === "submitted") {
-            actions += `
-        <button class="btn btn-sm btn-success w-100 mb-1"
-          onclick="approveSurvey(${p.id})">
-          Approve
-        </button>
-
-        <button class="btn btn-sm btn-warning w-100"
-          onclick="rejectSurvey(${p.id})">
-          Reject
-        </button>
-      `;
+              <button class="btn btn-sm btn-primary w-100"
+                onclick="openAssignModal(${p.id})">
+                Manage Surveyor
+              </button>
+            `;
           }
         } else {
           actions = `
-      <span class="text-muted small">
-        Survey terkunci (final)
-      </span>
-    `;
+            <span class="text-muted small">
+              Survey terkunci (final)
+            </span>
+          `;
         }
 
         return `
-    <div style="min-width:280px">
+          <div style="min-width:280px">
 
-      <h6 class="mb-2">Sampling Point #${p.id}</h6>
+            <h6 class="mb-2">Sampling Point #${p.id}</h6>
 
-      <table class="table table-sm table-bordered small mb-2">
-        <tbody>
-          <tr>
-            <th width="110">Progress</th>
-            <td>${progressBadge}</td>
-          </tr>
-          <tr>
-            <th>Approval</th>
-            <td>${approvalBadge}</td>
-          </tr>
-          <tr>
-            <th>Latitude</th>
-            <td>${p.latitude?.toFixed(6)}</td>
-          </tr>
-          <tr>
-            <th>Longitude</th>
-            <td>${p.longitude?.toFixed(6)}</td>
-          </tr>
-          <tr>
-            <th>Surveyor</th>
-            <td>${assigned} / ${maxSurveyor}</td>
-          </tr>
-          <tr>
-            <th>Period</th>
-            <td>${start} - ${end}</td>
-          </tr>
-          <tr>
-            <th>Survey Date</th>
-            <td>${surveyDate}</td>
-          </tr>
-          <tr>
-            <th>Total Biomass</th>
-            <td><strong>${totalBiomass} kg</strong></td>
-          </tr>
-        </tbody>
-      </table>
+            <table class="table table-sm table-bordered small mb-2">
+              <tbody>
+                <tr>
+                  <th width="110">Progress</th>
+                  <td>${progressBadge}</td>
+                </tr>
+                <tr>
+                  <th>Approval</th>
+                  <td>${approvalBadge}</td>
+                </tr>
+                <tr>
+                  <th>Latitude</th>
+                  <td>${p.latitude?.toFixed(6)}</td>
+                </tr>
+                <tr>
+                  <th>Longitude</th>
+                  <td>${p.longitude?.toFixed(6)}</td>
+                </tr>
+                <tr>
+                  <th>Surveyor</th>
+                  <td>${assigned} / ${maxSurveyor}</td>
+                </tr>
+                <tr>
+                  <th>Period</th>
+                  <td>${start} - ${end}</td>
+                </tr>
+                <tr>
+                  <th>Survey Date</th>
+                  <td>${surveyDate}</td>
+                </tr>
+                <tr>
+                  <th>Total Biomass</th>
+                  <td><strong>${totalBiomass} kg</strong></td>
+                </tr>
+              </tbody>
+            </table>
 
-      <div class="d-grid gap-1">
-        ${actions}
-      </div>
+            <div class="d-grid gap-1">
+              ${actions}
+            </div>
 
-    </div>
-  `;
+          </div>
+        `;
       }
 
       async function unlockPoint(pointId) {
