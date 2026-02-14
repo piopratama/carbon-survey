@@ -323,6 +323,15 @@
                   <div id="samplingPreview" class="text-muted small mb-2">
                     No Calculation
                   </div>
+
+                  <div class="d-grid gap-2 mb-2">
+                    <button
+                      class="btn btn-outline-danger btn-sm"
+                      onclick="removeAllSampling()"
+                    >
+                      Remove All Sampling Points
+                    </button>
+                  </div>
                 </div>
 
                 <hr />
@@ -1001,8 +1010,8 @@
         }
 
         const progressBadge = `
-    <span class="badge bg-info">${progress}</span>
-  `;
+          <span class="badge bg-info">${progress}</span>
+        `;
 
         // LOCK RULE
         const isLocked = approval === "approved" || progress === "expired";
@@ -1536,14 +1545,14 @@
 
         data.forEach((s) => {
           listEl.innerHTML += `
-      <div class="d-flex justify-content-between mb-1">
-        <span>${s.name}</span>
-        <button class="btn btn-sm btn-danger"
-          onclick="removeSurveyor(${pointId}, '${s.id}')">
-          Hapus
-        </button>
-      </div>
-    `;
+            <div class="d-flex justify-content-between mb-1">
+              <span>${s.name}</span>
+              <button class="btn btn-sm btn-danger"
+                onclick="removeSurveyor(${pointId}, '${s.id}')">
+                Hapus
+              </button>
+            </div>
+          `;
         });
       }
 
@@ -1603,6 +1612,43 @@
 
       function openSurveyTreePage(pointId) {
         window.location.href = `survey_tree.html?point_id=${pointId}`;
+      }
+
+      async function removeAllSampling() {
+        if (!CURRENT_PROJECT_ID) {
+          alert("Pilih project terlebih dahulu");
+          return;
+        }
+
+        if (
+          !confirm(
+            "Hapus SEMUA sampling point dalam project ini?\n\n" +
+              "Titik yang sudah locked / approved mungkin tidak akan terhapus.",
+          )
+        ) {
+          return;
+        }
+
+        statusEl.textContent = "Menghapus semua sampling point...";
+
+        const res = await fetch(
+          `${API_BASE}/sampling/project/${CURRENT_PROJECT_ID}`,
+          {
+            method: "DELETE",
+          },
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.detail || "Gagal menghapus sampling");
+          statusEl.textContent = "Gagal menghapus sampling.";
+          return;
+        }
+
+        await loadSamplingPoints(CURRENT_PROJECT_ID);
+
+        statusEl.textContent = "Semua sampling berhasil dihapus.";
       }
 
       initPage();

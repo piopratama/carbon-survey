@@ -356,6 +356,42 @@ def delete_sampling_point(point_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"deleted": point_id}
 
+# ===============================
+# DELETE ALL SAMPLING BY PROJECT
+# ===============================
+@router.delete("/project/{project_id}")
+def delete_sampling_by_project(
+    project_id: str,
+    db: Session = Depends(get_db)
+):
+    # cek project ada
+    project = db.execute(
+        text("SELECT id FROM projects WHERE id = :id"),
+        {"id": project_id}
+    ).first()
+
+    if not project:
+        raise HTTPException(404, "Project tidak ditemukan")
+
+    # hapus hanya yang BELUM submitted / approved
+    result = db.execute(
+        text("""
+            DELETE FROM sampling_points
+            WHERE project_id = :pid
+              AND survey_status NOT IN ('submitted', 'approved')
+            RETURNING id
+        """),
+        {"pid": project_id}
+    ).fetchall()
+
+    db.commit()
+
+    return {
+        "project_id": project_id,
+        "deleted_count": len(result),
+        "message": "Sampling berhasil dihapus"
+    }
+
 
 # ===============================
 # PREVIEW COUNT

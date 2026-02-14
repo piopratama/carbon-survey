@@ -148,7 +148,7 @@
 
             <!-- Species Dropdown -->
             <div class="mb-2">
-              <label>Tree Species</label>
+              <label>Tree Species <span class="text-danger">*</span></label>
               <select id="speciesSelect" class="form-select form-select-sm">
                 <option value="">-- Select Species --</option>
               </select>
@@ -178,7 +178,7 @@
             <!-- Measurement Inputs -->
             <div class="row">
               <div class="col-md-4 mb-2">
-                <label>DBH (cm)</label>
+                <label>DBH (cm) <span class="text-danger">*</span></label>
                 <input
                   type="number"
                   id="dbhInput"
@@ -197,7 +197,7 @@
               </div>
 
               <div class="col-md-4 mb-2">
-                <label>Latitude</label>
+                <label>Latitude <span class="text-danger">*</span></label>
                 <input
                   type="number"
                   step="0.000001"
@@ -207,7 +207,7 @@
               </div>
 
               <div class="col-md-4 mb-3">
-                <label>Longitude</label>
+                <label>Longitude <span class="text-danger">*</span></label>
                 <input
                   type="number"
                   step="0.000001"
@@ -636,9 +636,9 @@
 
             reader.onload = function (e) {
               preview.innerHTML = `
-        <img src="${e.target.result}"
-          style="width:100px;height:100px;object-fit:cover;border-radius:8px">
-      `;
+                <img src="${e.target.result}"
+                  style="width:100px;height:100px;object-fit:cover;border-radius:8px">
+              `;
             };
 
             reader.readAsDataURL(this.files[0]);
@@ -653,10 +653,10 @@
         function thumb(url) {
           if (!url) return "";
           return `
-            <img src="${url}" 
-            style="width:40px;height:40px;object-fit:cover;border-radius:6px;cursor:pointer"
-            onclick="showImage('${url}')">
-        `;
+              <img src="${url}" 
+              style="width:40px;height:40px;object-fit:cover;border-radius:6px;cursor:pointer"
+              onclick="showImage('${url}')">
+          `;
         }
 
         async function uploadFile(inputId) {
@@ -682,10 +682,10 @@
           if (!url) return;
 
           container.innerHTML = `
-    <img src="${url}"
-      style="width:100px;height:100px;object-fit:cover;border-radius:8px;cursor:pointer"
-      onclick="showImage('${url}')">
-  `;
+            <img src="${url}"
+              style="width:100px;height:100px;object-fit:cover;border-radius:8px;cursor:pointer"
+              onclick="showImage('${url}')">
+          `;
         }
 
         window.showImage = function (url) {
