@@ -461,6 +461,8 @@ def setup_survey_point(
 
     return {"status": "ready"}
 
+from datetime import date
+
 @router.post("/assign/{point_id}")
 def assign_surveyor(
     point_id: int,
@@ -474,7 +476,12 @@ def assign_surveyor(
 
     point = db.execute(
         text("""
-        SELECT max_surveyors, survey_status, approval_status
+        SELECT 
+            max_surveyors, 
+            survey_status, 
+            approval_status,
+            start_date,
+            end_date
         FROM sampling_points
         WHERE id = :id
         """),
@@ -484,10 +491,41 @@ def assign_surveyor(
     if not point:
         raise HTTPException(404, "Point tidak ditemukan")
 
+    # ===============================
+    # BLOCK IF FINAL
+    # ===============================
     if point["approval_status"] == "approved":
         raise HTTPException(400, "Survey sudah final dan tidak bisa diubah")
 
-    # cek jumlah existing
+    if point["survey_status"] in ["submitted", "approved"]:
+        raise HTTPException(400, "Survey sudah disubmit / approved")
+
+    # ===============================
+    # DATE VALIDATION
+    # ===============================
+    if not point["start_date"] or not point["end_date"]:
+        raise HTTPException(
+            400,
+            "Admin belum mengatur periode survey (start & end date)"
+        )
+
+    today = date.today()
+
+    if today < point["start_date"]:
+        raise HTTPException(
+            400,
+            "Survey belum dimulai"
+        )
+
+    if today > point["end_date"]:
+        raise HTTPException(
+            400,
+            "Periode survey sudah berakhir"
+        )
+
+    # ===============================
+    # CHECK QUOTA
+    # ===============================
     current_count = db.execute(
         text("""
         SELECT COUNT(*)
@@ -500,7 +538,9 @@ def assign_surveyor(
     if current_count >= point["max_surveyors"]:
         raise HTTPException(400, "Kuota sudah penuh")
 
-    # insert assignment
+    # ===============================
+    # INSERT ASSIGNMENT
+    # ===============================
     db.execute(
         text("""
         INSERT INTO sampling_assignments (sampling_point_id, surveyor_id)
@@ -510,17 +550,11 @@ def assign_surveyor(
         {"pid": point_id, "sid": surveyor_id}
     )
 
-    # hitung ulang jumlah surveyor
-    new_count = db.execute(
-        text("""
-        SELECT COUNT(*)
-        FROM sampling_assignments
-        WHERE sampling_point_id = :pid
-        """),
-        {"pid": point_id}
-    ).scalar()
+    # ===============================
+    # UPDATE STATUS
+    # ===============================
+    new_count = current_count + 1
 
-    # tentukan survey_status baru
     if new_count >= point["max_surveyors"]:
         new_status = "full"
     elif new_count > 0:
@@ -543,6 +577,7 @@ def assign_surveyor(
         "status": "assigned",
         "new_survey_status": new_status
     }
+
 
 
 @router.delete("/assign/{point_id}/{surveyor_id}")
@@ -677,6 +712,24 @@ def submit_sampling_point(
     if not joined:
         raise HTTPException(403, "Anda belum join titik ini")
 
+    # ===============================
+    # CEK MINIMAL 1 POHON
+    # ===============================
+    tree_count = db.execute(
+        text("""
+            SELECT COUNT(*)
+            FROM surveys
+            WHERE sampling_point_id = :pid
+        """),
+        {"pid": point_id}
+    ).scalar()
+
+    if tree_count == 0:
+        raise HTTPException(
+            400,
+            "Minimal 1 pohon harus disurvey sebelum submit"
+        )
+
     # update sampling point
     db.execute(
         text("""
@@ -690,7 +743,10 @@ def submit_sampling_point(
 
     db.commit()
 
-    return {"status": "submitted"}
+    return {
+        "status": "submitted",
+        "total_trees": tree_count
+    }
 
 # ===============================
 # GET SINGLE SAMPLING POINT
@@ -755,3 +811,42 @@ def get_sampling_point(
         raise HTTPException(404, "Point not found")
 
     return row
+
+@router.post("/review/{point_id}")
+def review_sampling_point(
+    point_id: int,
+    payload: dict,
+    db: Session = Depends(get_db)
+):
+    action = payload.get("action")  # "approved" or "rejected"
+
+    if action not in ["approved", "rejected"]:
+        raise HTTPException(400, "Action tidak valid")
+
+    point = db.execute(
+        text("""
+            SELECT survey_status
+            FROM sampling_points
+            WHERE id = :pid
+        """),
+        {"pid": point_id}
+    ).mappings().first()
+
+    if not point:
+        raise HTTPException(404, "Point tidak ditemukan")
+
+    if point["survey_status"] != "submitted":
+        raise HTTPException(400, "Point belum disubmit")
+
+    db.execute(
+        text("""
+            UPDATE sampling_points
+            SET survey_status = :status
+            WHERE id = :pid
+        """),
+        {"pid": point_id, "status": action}
+    )
+
+    db.commit()
+
+    return {"status": action}

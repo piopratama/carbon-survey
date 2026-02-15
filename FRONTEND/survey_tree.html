@@ -109,8 +109,8 @@
       </div>
 
       <div class="mt-4 text-end">
-        <button class="btn btn-success" onclick="submitSamplingPoint()">
-          Submit Sampling Point
+        <button class="btn btn-success" onclick="finishSurvey()">
+          Finish Survey
         </button>
       </div>
     </div>
@@ -712,6 +712,36 @@
 
           el.innerHTML = data.map((s) => s.name).join(", ");
         }
+
+        window.finishSurvey = async function () {
+          if (!confirm("Are you sure you want to finish this survey?")) return;
+
+          try {
+            const res = await fetch(`${API_BASE}/sampling/submit/${POINT_ID}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                surveyor_id: currentUser.id,
+              }),
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+              alert(result.detail || "Failed to submit survey");
+              return;
+            }
+
+            alert("Survey successfully submitted!");
+
+            loadPoint(); // refresh status
+            loadTrees(); // optional refresh
+          } catch (err) {
+            console.error("Finish survey error:", err);
+          }
+        };
 
         /* ========================= */
         /* INIT                     */

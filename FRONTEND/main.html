@@ -1016,6 +1016,9 @@
         // LOCK RULE
         const isLocked = approval === "approved" || progress === "expired";
 
+        const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+        const isAdmin = currentUser.role === "admin";
+
         if (!isLocked) {
           actions += `
             <button class="btn btn-sm btn-dark w-100 mb-1"
@@ -1024,7 +1027,20 @@
             </button>
           `;
 
-          if (progress === "draft") {
+          // ADMIN REVIEW SECTION
+          if (isAdmin && progress === "submitted") {
+            actions += `
+              <button class="btn btn-sm btn-success w-100 mb-1"
+                onclick="approvePoint(${p.id})">
+                Approve Survey
+              </button>
+
+              <button class="btn btn-sm btn-warning w-100 mb-1"
+                onclick="rejectPoint(${p.id})">
+                Reject Survey
+              </button>
+            `;
+          } else if (progress === "draft") {
             actions += `
               <button class="btn btn-sm btn-secondary w-100 mb-1"
                 onclick="openSurveySetup(${p.id})">
@@ -1649,6 +1665,40 @@
         await loadSamplingPoints(CURRENT_PROJECT_ID);
 
         statusEl.textContent = "Semua sampling berhasil dihapus.";
+      }
+
+      async function approvePoint(pointId) {
+        if (!confirm("Approve this survey?")) return;
+
+        const res = await fetch(`${API_BASE}/sampling/review/${pointId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "approved" }),
+        });
+
+        if (!res.ok) {
+          alert("Failed to approve");
+          return;
+        }
+
+        await loadSamplingPoints(CURRENT_PROJECT_ID);
+      }
+
+      async function rejectPoint(pointId) {
+        if (!confirm("Reject this survey?")) return;
+
+        const res = await fetch(`${API_BASE}/sampling/review/${pointId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "rejected" }),
+        });
+
+        if (!res.ok) {
+          alert("Failed to reject");
+          return;
+        }
+
+        await loadSamplingPoints(CURRENT_PROJECT_ID);
       }
 
       initPage();
