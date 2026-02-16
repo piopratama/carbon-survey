@@ -2,16 +2,17 @@
 -- PostgreSQL database dump
 --
 
-\restrict VAObhb71YhbPAR4fuQf7aswaI21igrv9vcW5eUevlqxkY5qVbysWlcu9lr13GQP
+\restrict GGLyTJ1DONBsCN51PoKk6WWPpV0QkLBx0q660bC5FL6VNJ7h5XrkhEKMncXE1vO
 
--- Dumped from database version 15.8 (Debian 15.8-1.pgdg110+1)
--- Dumped by pg_dump version 15.15
+-- Dumped from database version 18.2
+-- Dumped by pg_dump version 18.2
 
--- Started on 2026-02-11 11:04:17 UTC
+-- Started on 2026-02-16 19:53:00
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -21,7 +22,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 11 (class 2615 OID 19298)
+-- TOC entry 10 (class 2615 OID 16389)
 -- Name: tiger; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -31,7 +32,7 @@ CREATE SCHEMA tiger;
 ALTER SCHEMA tiger OWNER TO postgres;
 
 --
--- TOC entry 12 (class 2615 OID 19554)
+-- TOC entry 11 (class 2615 OID 16390)
 -- Name: tiger_data; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -41,7 +42,7 @@ CREATE SCHEMA tiger_data;
 ALTER SCHEMA tiger_data OWNER TO postgres;
 
 --
--- TOC entry 10 (class 2615 OID 19120)
+-- TOC entry 12 (class 2615 OID 16391)
 -- Name: topology; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -51,8 +52,8 @@ CREATE SCHEMA topology;
 ALTER SCHEMA topology OWNER TO postgres;
 
 --
--- TOC entry 4856 (class 0 OID 0)
--- Dependencies: 10
+-- TOC entry 6493 (class 0 OID 0)
+-- Dependencies: 12
 -- Name: SCHEMA topology; Type: COMMENT; Schema: -; Owner: postgres
 --
 
@@ -60,7 +61,7 @@ COMMENT ON SCHEMA topology IS 'PostGIS Topology schema';
 
 
 --
--- TOC entry 4 (class 3079 OID 19287)
+-- TOC entry 2 (class 3079 OID 16392)
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -68,8 +69,8 @@ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 
 
 --
--- TOC entry 4857 (class 0 OID 0)
--- Dependencies: 4
+-- TOC entry 6494 (class 0 OID 0)
+-- Dependencies: 2
 -- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -77,7 +78,7 @@ COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance betwe
 
 
 --
--- TOC entry 2 (class 3079 OID 18042)
+-- TOC entry 3 (class 3079 OID 16404)
 -- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -85,8 +86,8 @@ CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 
 
 --
--- TOC entry 4858 (class 0 OID 0)
--- Dependencies: 2
+-- TOC entry 6495 (class 0 OID 0)
+-- Dependencies: 3
 -- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -94,7 +95,7 @@ COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types an
 
 
 --
--- TOC entry 5 (class 3079 OID 19299)
+-- TOC entry 4 (class 3079 OID 17486)
 -- Name: postgis_tiger_geocoder; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -102,8 +103,8 @@ CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
 
 
 --
--- TOC entry 4859 (class 0 OID 0)
--- Dependencies: 5
+-- TOC entry 6496 (class 0 OID 0)
+-- Dependencies: 4
 -- Name: EXTENSION postgis_tiger_geocoder; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -111,7 +112,7 @@ COMMENT ON EXTENSION postgis_tiger_geocoder IS 'PostGIS tiger geocoder and rever
 
 
 --
--- TOC entry 3 (class 3079 OID 19121)
+-- TOC entry 5 (class 3079 OID 17919)
 -- Name: postgis_topology; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -119,8 +120,8 @@ CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
 
 
 --
--- TOC entry 4860 (class 0 OID 0)
--- Dependencies: 3
+-- TOC entry 6497 (class 0 OID 0)
+-- Dependencies: 5
 -- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -128,7 +129,7 @@ COMMENT ON EXTENSION postgis_topology IS 'PostGIS topology spatial types and fun
 
 
 --
--- TOC entry 2029 (class 1247 OID 27940)
+-- TOC entry 1973 (class 1247 OID 18108)
 -- Name: survey_approval_enum; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -142,7 +143,7 @@ CREATE TYPE public.survey_approval_enum AS ENUM (
 ALTER TYPE public.survey_approval_enum OWNER TO postgres;
 
 --
--- TOC entry 2026 (class 1247 OID 27921)
+-- TOC entry 1976 (class 1247 OID 18116)
 -- Name: survey_record_status_enum; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -157,7 +158,7 @@ CREATE TYPE public.survey_record_status_enum AS ENUM (
 ALTER TYPE public.survey_record_status_enum OWNER TO postgres;
 
 --
--- TOC entry 2023 (class 1247 OID 27894)
+-- TOC entry 1979 (class 1247 OID 18126)
 -- Name: survey_status_enum; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -180,7 +181,92 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 283 (class 1259 OID 19724)
+-- TOC entry 301 (class 1259 OID 18566)
+-- Name: project_models; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.project_models (
+    id bigint NOT NULL,
+    project_id uuid,
+    model_type text NOT NULL,
+    features text[] NOT NULL,
+    params jsonb NOT NULL,
+    r_squared double precision,
+    rmse double precision,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.project_models OWNER TO postgres;
+
+--
+-- TOC entry 300 (class 1259 OID 18565)
+-- Name: project_models_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.project_models_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.project_models_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 6498 (class 0 OID 0)
+-- Dependencies: 300
+-- Name: project_models_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.project_models_id_seq OWNED BY public.project_models.id;
+
+
+--
+-- TOC entry 303 (class 1259 OID 18585)
+-- Name: project_outputs; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.project_outputs (
+    id bigint NOT NULL,
+    project_id uuid,
+    output_type text,
+    gee_task_id text,
+    uri text,
+    stats jsonb,
+    created_at timestamp with time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.project_outputs OWNER TO postgres;
+
+--
+-- TOC entry 302 (class 1259 OID 18584)
+-- Name: project_outputs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.project_outputs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.project_outputs_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 6499 (class 0 OID 0)
+-- Dependencies: 302
+-- Name: project_outputs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.project_outputs_id_seq OWNED BY public.project_outputs.id;
+
+
+--
+-- TOC entry 288 (class 1259 OID 18143)
 -- Name: projects; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -200,7 +286,7 @@ CREATE TABLE public.projects (
 ALTER TABLE public.projects OWNER TO postgres;
 
 --
--- TOC entry 288 (class 1259 OID 19778)
+-- TOC entry 289 (class 1259 OID 18157)
 -- Name: sampling_assignments; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -215,7 +301,7 @@ CREATE TABLE public.sampling_assignments (
 ALTER TABLE public.sampling_assignments OWNER TO postgres;
 
 --
--- TOC entry 287 (class 1259 OID 19777)
+-- TOC entry 290 (class 1259 OID 18164)
 -- Name: sampling_assignments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -228,11 +314,11 @@ CREATE SEQUENCE public.sampling_assignments_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.sampling_assignments_id_seq OWNER TO postgres;
+ALTER SEQUENCE public.sampling_assignments_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4861 (class 0 OID 0)
--- Dependencies: 287
+-- TOC entry 6500 (class 0 OID 0)
+-- Dependencies: 290
 -- Name: sampling_assignments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -240,7 +326,7 @@ ALTER SEQUENCE public.sampling_assignments_id_seq OWNED BY public.sampling_assig
 
 
 --
--- TOC entry 285 (class 1259 OID 19738)
+-- TOC entry 291 (class 1259 OID 18165)
 -- Name: sampling_points; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -262,6 +348,19 @@ CREATE TABLE public.sampling_points (
     latitude double precision,
     longitude double precision,
     approval_status public.survey_approval_enum DEFAULT 'none'::public.survey_approval_enum,
+    ndvi double precision,
+    b4 double precision,
+    b8 double precision,
+    sentinel_date date,
+    sentinel_cloud integer,
+    plot_radius_m double precision,
+    plot_area_m2 double precision,
+    agb_kg_per_m2 double precision,
+    evi double precision,
+    sentinel_image_date date,
+    analysis_start_date date,
+    analysis_end_date date,
+    sentinel_image_id text,
     CONSTRAINT sampling_points_status_check CHECK ((status = ANY (ARRAY['open'::text, 'locked'::text, 'done'::text])))
 );
 
@@ -269,7 +368,7 @@ CREATE TABLE public.sampling_points (
 ALTER TABLE public.sampling_points OWNER TO postgres;
 
 --
--- TOC entry 284 (class 1259 OID 19737)
+-- TOC entry 292 (class 1259 OID 18180)
 -- Name: sampling_points_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -282,11 +381,11 @@ CREATE SEQUENCE public.sampling_points_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.sampling_points_id_seq OWNER TO postgres;
+ALTER SEQUENCE public.sampling_points_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4862 (class 0 OID 0)
--- Dependencies: 284
+-- TOC entry 6501 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: sampling_points_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -294,7 +393,7 @@ ALTER SEQUENCE public.sampling_points_id_seq OWNED BY public.sampling_points.id;
 
 
 --
--- TOC entry 294 (class 1259 OID 19838)
+-- TOC entry 293 (class 1259 OID 18181)
 -- Name: survey_photos; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -309,7 +408,7 @@ CREATE TABLE public.survey_photos (
 ALTER TABLE public.survey_photos OWNER TO postgres;
 
 --
--- TOC entry 293 (class 1259 OID 19837)
+-- TOC entry 294 (class 1259 OID 18190)
 -- Name: survey_photos_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -322,11 +421,11 @@ CREATE SEQUENCE public.survey_photos_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.survey_photos_id_seq OWNER TO postgres;
+ALTER SEQUENCE public.survey_photos_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4863 (class 0 OID 0)
--- Dependencies: 293
+-- TOC entry 6502 (class 0 OID 0)
+-- Dependencies: 294
 -- Name: survey_photos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -334,7 +433,7 @@ ALTER SEQUENCE public.survey_photos_id_seq OWNED BY public.survey_photos.id;
 
 
 --
--- TOC entry 292 (class 1259 OID 19810)
+-- TOC entry 295 (class 1259 OID 18191)
 -- Name: surveys; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -362,7 +461,7 @@ CREATE TABLE public.surveys (
 ALTER TABLE public.surveys OWNER TO postgres;
 
 --
--- TOC entry 291 (class 1259 OID 19809)
+-- TOC entry 296 (class 1259 OID 18204)
 -- Name: surveys_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -375,11 +474,11 @@ CREATE SEQUENCE public.surveys_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.surveys_id_seq OWNER TO postgres;
+ALTER SEQUENCE public.surveys_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4864 (class 0 OID 0)
--- Dependencies: 291
+-- TOC entry 6503 (class 0 OID 0)
+-- Dependencies: 296
 -- Name: surveys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -387,7 +486,7 @@ ALTER SEQUENCE public.surveys_id_seq OWNED BY public.surveys.id;
 
 
 --
--- TOC entry 290 (class 1259 OID 19798)
+-- TOC entry 297 (class 1259 OID 18205)
 -- Name: tree_species; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -408,7 +507,7 @@ CREATE TABLE public.tree_species (
 ALTER TABLE public.tree_species OWNER TO postgres;
 
 --
--- TOC entry 289 (class 1259 OID 19797)
+-- TOC entry 298 (class 1259 OID 18215)
 -- Name: tree_species_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -421,11 +520,11 @@ CREATE SEQUENCE public.tree_species_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tree_species_id_seq OWNER TO postgres;
+ALTER SEQUENCE public.tree_species_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4865 (class 0 OID 0)
--- Dependencies: 289
+-- TOC entry 6504 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: tree_species_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -433,7 +532,7 @@ ALTER SEQUENCE public.tree_species_id_seq OWNED BY public.tree_species.id;
 
 
 --
--- TOC entry 286 (class 1259 OID 19765)
+-- TOC entry 299 (class 1259 OID 18216)
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -451,7 +550,23 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO postgres;
 
 --
--- TOC entry 4538 (class 2604 OID 19781)
+-- TOC entry 6191 (class 2604 OID 18569)
+-- Name: project_models id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project_models ALTER COLUMN id SET DEFAULT nextval('public.project_models_id_seq'::regclass);
+
+
+--
+-- TOC entry 6193 (class 2604 OID 18588)
+-- Name: project_outputs id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project_outputs ALTER COLUMN id SET DEFAULT nextval('public.project_outputs_id_seq'::regclass);
+
+
+--
+-- TOC entry 6174 (class 2604 OID 18229)
 -- Name: sampling_assignments id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -459,7 +574,7 @@ ALTER TABLE ONLY public.sampling_assignments ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- TOC entry 4530 (class 2604 OID 19741)
+-- TOC entry 6176 (class 2604 OID 18230)
 -- Name: sampling_points id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -467,7 +582,7 @@ ALTER TABLE ONLY public.sampling_points ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 4545 (class 2604 OID 19841)
+-- TOC entry 6182 (class 2604 OID 18231)
 -- Name: survey_photos id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -475,7 +590,7 @@ ALTER TABLE ONLY public.survey_photos ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 4542 (class 2604 OID 19813)
+-- TOC entry 6184 (class 2604 OID 18232)
 -- Name: surveys id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -483,7 +598,7 @@ ALTER TABLE ONLY public.surveys ALTER COLUMN id SET DEFAULT nextval('public.surv
 
 
 --
--- TOC entry 4540 (class 2604 OID 19801)
+-- TOC entry 6187 (class 2604 OID 18233)
 -- Name: tree_species id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -491,120 +606,338 @@ ALTER TABLE ONLY public.tree_species ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 4839 (class 0 OID 19724)
--- Dependencies: 283
+-- TOC entry 6485 (class 0 OID 18566)
+-- Dependencies: 301
+-- Data for Name: project_models; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.project_models (id, project_id, model_type, features, params, r_squared, rmse, created_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 6487 (class 0 OID 18585)
+-- Dependencies: 303
+-- Data for Name: project_outputs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.project_outputs (id, project_id, output_type, gee_task_id, uri, stats, created_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 6472 (class 0 OID 18143)
+-- Dependencies: 288
 -- Data for Name: projects; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.projects (id, name, aoi, year, months, cloud, status, created_at) FROM stdin;
-3d38c945-efd2-4cd3-8141-1b2821d0db64	Golo Pramuka	0103000020E610000001000000310000002907B30930F85D40B8019F1F460021C039ED293927F85D4007EE409DF20021C02E8D5F7825F85D40444C89247A0121C0C2D9AD6532F85D40C4995FCD010221C050FEEE1D35F85D40ADA580B4FF0121C0C748F60835F85D40ADC266800B0221C04D486B0C3AF85D404F22C2BF080221C0E14389963CF85D4063804413280221C0E6CC76853EF85D40051A6CEA3C0221C0E5982CEE3FF85D404913EF004F0221C06D00362042F85D40043752B6480221C0ED28CE5147F85D404930D5CC5A0221C0FCA9F1D24DF85D40EB8F300C580221C08718AF7955F85D40DA01D715330221C021054F2157F85D40AA66D652400221C0A704C4245CF85D4096EB6D33150221C092921E8656F85D404F05DCF3FC0121C00F80B8AB57F85D40F7E7A221E30121C0A8380EBC5AF85D40C74CA25EF00121C0AC8DB1135EF85D40E36C3A02B80121C0A69C2FF65EF85D402BC24D46950121C0327381CB63F85D40EDBAB722310121C03DB9A64066F85D4078431A15380121C0A9893E1F65F85D4031D120054F0121C04128EFE368F85D4031EE06D15A0121C0B858518369F85D408F71C5C5510121C0C3B81B446BF85D40317A6EA12B0121C0ADDEE17668F85D404EF1B8A8160121C0C4D2C08F6AF85D4092B06F27110121C0B7F0BC546CF85D409276A38FF90021C0BE2F2E5569F85D400A849D62D50021C0ADDEE17668F85D40F6083543AA0021C0D68BA19C68F85D40FC34EECD6F0021C03C6BB75D68F85D40718FA50F5D0021C04089CF9D60F85D40191BBAD91F0021C0C24D469561F85D40A8397991090021C0BE1248895DF85D404D2F3196E9FF20C030BABC395CF85D40F241CF66D5FF20C0A4E36A6457F85D40C51F459DB9FF20C022533E0455F85D400919C8B3CBFF20C09C53C90050F85D408126C286A7FF20C07B4D0F0A4AF85D40B1C1C2499AFF20C073BD6DA642F85D403997E2AAB2FF20C0753FA7203FF85D40F2CD3637A6FF20C05F7F129F3BF85D403997E2AAB2FF20C0613596B036F85D4050A8A78FC0FF20C0514CDE0033F85D407A34D593F9FF20C03A58FFE730F85D40ECDB4944F8FF20C02907B30930F85D40B8019F1F460021C0	2024	{6,7,8}	20	draft	2026-02-10 12:36:43.624236
+24fc1710-0388-49ee-ba7f-0de89c12f58d	Labuan Bajo	0103000020E61000000100000034000000E3512AE109F85D40BC3C9D2B4AF120C009185DDE1CF85D4044A33B889DF120C01D3C139A24F85D407FDAA84E07F220C0459E245D33F85D4086376BF0BEF220C056D80C7041F85D40B22E6EA301F420C08F8EAB915DF85D40513239B533F420C0A3E6ABE463F85D4003EB387EA8F420C08FA850DD5CF85D403B3AAE4676F520C0790261A758F85D40E19A3BFA5FF620C056D80C7041F85D4005357C0BEBF620C0302C7FBE2DF85D40AAF06778B3F620C0319413ED2AF85D408ACBF10A44F720C0575A46EA3DF85D40C5025FD1ADF720C04436902E36F85D40D5E76A2BF6F720C01BA034D428F85D405D4E098849F820C02FC4EA8F30F85D409B559FABADF820C0F78F85E810F85D406380441328FA20C04436902E36F85D4089096AF816FE20C03FFED2A23EF85D40FC8F4C874EFF20C02FDE8FDB2FF85D40D5CA845FEAFF20C01D226E4E25F85D40429946938B0121C0473A03232FF85D409085E810380221C06CCCEB8843F85D40151C5E10910221C0A704C4245CF85D40761893FE5E0221C0C878944A78F85D40E97FB9162D0021C0F1F44A5986F85D40B4006DAB59FF20C00397C79A91F85D406614CB2DADFE20C03D9B559FABF85D40B62BF4C132FE20C014EB54F99EF85D40478D093197FC20C0CC6262F371F85D40A087DA368CFA20C0F2423A3C84F85D4041B62C5F97F920C0534145D5AFF85D4067D65240DAF720C093E52494BEF85D40789CA223B9F420C094675E0EBBF85D406B44300E2EF520C09581035ABAF85D402785798F33F520C0A609DB4FC6F85D4062BCE6559DF520C0BB61DBA2CCF85D40D998D71187F420C0A5BBEB6CC8F85D409AEC9FA701F320C046CD57C9C7F85D40938FDD054AF220C06B8313D1AFF85D403FA88B14CAF220C0460BD0B69AF85D40656D533C2EF220C0205F420587F85D409C1727BEDAF120C0346953758FF85D4075ADBD4F55F120C00D5531957EF85D402009FB7612F120C0E50CC51D6FF85D402009FB7612F120C09278793A57F85D406798DA5207F120C05A10CAFB38F85D408B8D791D71F020C0242A543717F85D407120240B98F020C01E705D3123F85D4067F3380CE6EF20C0A4FE7A8505F85D40C8EF6DFAB3EF20C0C075C58CF0F75D409415C3D501F020C0E3512AE109F85D40BC3C9D2B4AF120C0	2024	{6,7,8}	20	draft	2026-02-14 12:40:00.579617
 \.
 
 
 --
--- TOC entry 4844 (class 0 OID 19778)
--- Dependencies: 288
+-- TOC entry 6473 (class 0 OID 18157)
+-- Dependencies: 289
 -- Data for Name: sampling_assignments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.sampling_assignments (id, sampling_point_id, surveyor_id, created_at) FROM stdin;
-14	64875	670a0a24-7bb0-46c1-8dcb-72a3b5e30c72	2026-02-11 09:44:56.491364+00
-15	64875	bb85907a-0585-47aa-bf1f-b2ead3b88214	2026-02-11 09:44:59.759056+00
+18	68091	bb85907a-0585-47aa-bf1f-b2ead3b88214	2026-02-15 10:50:49.459039+08
+19	68083	bb85907a-0585-47aa-bf1f-b2ead3b88214	2026-02-15 11:12:22.812301+08
 \.
 
 
 --
--- TOC entry 4841 (class 0 OID 19738)
--- Dependencies: 285
+-- TOC entry 6475 (class 0 OID 18165)
+-- Dependencies: 291
 -- Data for Name: sampling_points; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.sampling_points (id, project_id, geom, status, created_at, survey_status, start_date, end_date, description, max_surveyors, started_by, started_at, submitted_at, reviewed_at, latitude, longitude, approval_status) FROM stdin;
-64778	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64779	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64780	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64781	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64782	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000093A3A64E2CF85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64786	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64787	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64788	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64789	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64790	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64791	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64792	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64793	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64794	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E61000001DFC8DAA33F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64798	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64799	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64800	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64801	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64802	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64803	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64804	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64805	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40747844B1500021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64806	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64807	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000A65475063BF85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64810	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40C50A017E220221C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64811	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64812	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64813	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64814	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64815	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64816	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64817	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64818	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64819	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64820	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000031AD5C6242F85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64873	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000E167E12D67F85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64823	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40C50A017E220221C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64824	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64825	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64826	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64827	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64828	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64829	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64830	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64831	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64832	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64833	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000BA0544BE49F85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64836	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40C50A017E220221C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64837	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64838	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64839	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64840	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64841	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64842	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64843	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64844	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64845	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64846	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000435E2B1A51F85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64849	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40C50A017E220221C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64850	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D406FF37844E80121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64851	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40B66FEC0AAE0121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64852	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64853	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64854	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64855	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64856	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64857	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40747844B1500021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64858	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64859	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000CDB6127658F85D40E11AE93DDCFF20C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64864	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D40A77F5BD1730121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64865	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D405523C697390121C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64866	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64868	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D404B85EBEA8A0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64869	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D40747844B1500021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64870	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000560FFAD15FF85D40A0FF9877160021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64874	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000E167E12D67F85D40CA5A2C5EFF0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64867	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000B9A3040260F85D40B7044A72C70021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
-64875	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E6100000E167E12D67F85D4017268E24C50021C0	open	2026-02-10 12:36:58.657867	active	2026-02-11	2026-02-18		5	\N	\N	\N	\N	\N	\N	none
-64876	3d38c945-efd2-4cd3-8141-1b2821d0db64	0101000020E610000065382F9364F85D40C59BF46C6E0021C0	open	2026-02-10 12:36:58.657867	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none
+COPY public.sampling_points (id, project_id, geom, status, created_at, survey_status, start_date, end_date, description, max_surveyors, started_by, started_at, submitted_at, reviewed_at, latitude, longitude, approval_status, ndvi, b4, b8, sentinel_date, sentinel_cloud, plot_radius_m, plot_area_m2, agb_kg_per_m2, evi, sentinel_image_date, analysis_start_date, analysis_end_date, sentinel_image_id) FROM stdin;
+67805	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D409795E93ED5F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67806	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D40C65E92CA60F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67807	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D40087F2956ECF820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67808	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D40CEF6AEE177F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67811	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67814	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D409CF92FF18DF220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67815	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D40F56ABE7B19F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67816	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D40B93A3B06A5F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67817	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D405D69A69030F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67818	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D4056F7FF1ABCF020C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67826	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D400C800F21BFFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67827	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4031079EAD4AFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67828	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D406DDF1A3AD6FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67829	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40390986C661FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67830	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D400685DF52EDFD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67831	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D404D5327DF78FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67832	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4081745D6B04FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67833	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D401AE981F78FFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67834	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D408BB194831BFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67835	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D404ECE950FA7FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67836	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40D23F859B32FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67837	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4092066327BEFA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67838	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4001232FB349FA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67839	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D409795E93ED5F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67840	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40C65E92CA60F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67841	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40087F2956ECF820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67842	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40CEF6AEE177F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67843	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4091C6226D03F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67844	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40C5EE84F88EF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67845	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67848	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67849	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67850	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D409CF92FF18DF220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67851	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40F56ABE7B19F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67852	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40B93A3B06A5F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67853	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D405D69A69030F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67854	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4056F7FF1ABCF020C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67857	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40A78C3D61050221C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67858	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40378524EE900121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67859	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4096CCF97A1C0121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67860	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D403463BD07A80021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67861	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4089496F94330021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67862	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D400C800F21BFFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67863	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4031079EAD4AFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67864	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D406DDF1A3AD6FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67865	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40390986C661FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67866	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D400685DF52EDFD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67867	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D404D5327DF78FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67868	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4081745D6B04FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67869	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D401AE981F78FFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67870	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D408BB194831BFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67871	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D404ECE950FA7FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67872	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40D23F859B32FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67873	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4092066327BEFA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67874	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4001232FB349FA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67875	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D409795E93ED5F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67876	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40C65E92CA60F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67877	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40087F2956ECF820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67878	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40CEF6AEE177F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67879	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4091C6226D03F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67880	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40C5EE84F88EF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67881	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67883	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67884	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67885	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67886	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D409CF92FF18DF220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67887	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40F56ABE7B19F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67888	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D40B93A3B06A5F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67889	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000FEB1376C4DF85D405D69A69030F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67898	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4031079EAD4AFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67899	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D406DDF1A3AD6FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67900	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40390986C661FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67901	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D400685DF52EDFD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67902	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D404D5327DF78FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67903	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4081745D6B04FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67904	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D401AE981F78FFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67905	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D408BB194831BFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67906	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D404ECE950FA7FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67907	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40D23F859B32FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67908	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4092066327BEFA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67909	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4001232FB349FA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67910	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D409795E93ED5F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67911	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40C65E92CA60F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67912	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40087F2956ECF820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67913	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40CEF6AEE177F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67914	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4091C6226D03F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67915	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40C5EE84F88EF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67916	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67917	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40574A140FA6F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67918	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40A07E419A31F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67923	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67924	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67925	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67926	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D409CF92FF18DF220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67927	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40F56ABE7B19F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67928	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40B93A3B06A5F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67929	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D405D69A69030F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67932	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4096CCF97A1C0121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67933	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D403463BD07A80021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67934	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4089496F94330021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67935	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D400C800F21BFFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67936	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4031079EAD4AFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67937	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D406DDF1A3AD6FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67938	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40390986C661FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67939	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D400685DF52EDFD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67940	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D404D5327DF78FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67941	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4081745D6B04FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67942	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D401AE981F78FFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67943	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D408BB194831BFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67944	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D404ECE950FA7FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67945	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40D23F859B32FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67946	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4092066327BEFA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67947	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4001232FB349FA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67948	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D409795E93ED5F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67949	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40C65E92CA60F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67950	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40087F2956ECF820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67951	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40CEF6AEE177F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67952	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4091C6226D03F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67953	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40C5EE84F88EF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67954	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67955	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40574A140FA6F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67956	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40A07E419A31F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67957	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40320D5D25BDF520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67958	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4081F666B048F520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67959	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40023B5F3BD4F420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67960	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D402CDB45C65FF420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67967	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D405D69A69030F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67970	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D400C800F21BFFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67971	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D4031079EAD4AFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67972	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D406DDF1A3AD6FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67973	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40390986C661FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67974	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D400685DF52EDFD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67975	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D404D5327DF78FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67976	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D4081745D6B04FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67977	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D401AE981F78FFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67978	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D408BB194831BFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67979	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D404ECE950FA7FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67980	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40D23F859B32FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67983	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D409795E93ED5F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67984	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40C65E92CA60F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67985	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40087F2956ECF820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67986	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40CEF6AEE177F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67987	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D4091C6226D03F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67988	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40C5EE84F88EF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67989	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67990	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40574A140FA6F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67991	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40A07E419A31F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67992	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40320D5D25BDF520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67993	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D4081F666B048F520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67994	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40023B5F3BD4F420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67995	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D402CDB45C65FF420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67996	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67997	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67998	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67999	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D409CF92FF18DF220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68000	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40F56ABE7B19F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68001	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D40B93A3B06A5F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68002	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000039C5A39379F85D405D69A69030F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68005	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D406DDF1A3AD6FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68006	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40390986C661FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68007	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D400685DF52EDFD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68008	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D404D5327DF78FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68009	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D4081745D6B04FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68010	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D401AE981F78FFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68011	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D408BB194831BFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68012	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D404ECE950FA7FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68015	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40C65E92CA60F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68016	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40087F2956ECF820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68017	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40CEF6AEE177F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68018	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D4091C6226D03F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68019	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40C5EE84F88EF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68020	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68021	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40574A140FA6F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68022	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40A07E419A31F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68023	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40320D5D25BDF520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68024	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D4081F666B048F520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68025	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40023B5F3BD4F420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68026	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D402CDB45C65FF420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68027	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68028	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68029	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68030	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D409CF92FF18DF220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68046	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D40574A140FA6F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68047	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D40A07E419A31F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68048	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D40320D5D25BDF520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68049	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D4081F666B048F520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68050	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D40023B5F3BD4F420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68051	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D402CDB45C65FF420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68052	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68053	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68054	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68055	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D409CF92FF18DF220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68058	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D400685DF52EDFD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68063	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D4091C6226D03F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68064	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D40C5EE84F88EF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68065	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68066	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D40574A140FA6F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68067	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D40A07E419A31F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68068	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D40320D5D25BDF520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68069	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D4081F666B048F520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68070	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D40023B5F3BD4F420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68071	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D402CDB45C65FF420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68072	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68073	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68074	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000071D80FBBA5F85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68081	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000008589DE72B4F85D40A07E419A31F620C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68082	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000008589DE72B4F85D40320D5D25BDF520C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68084	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000008589DE72B4F85D40023B5F3BD4F420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68085	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000008589DE72B4F85D402CDB45C65FF420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68086	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000008589DE72B4F85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68087	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000008589DE72B4F85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68088	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000008589DE72B4F85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68092	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000963AAD2AC3F85D40023B5F3BD4F420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68093	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000963AAD2AC3F85D402CDB45C65FF420C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68094	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000963AAD2AC3F85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68095	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000963AAD2AC3F85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68096	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000963AAD2AC3F85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68075	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004E53C8AEA3F85D40D08786DBA5F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68097	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E610000034E2DABDC1F85D40AA80105699F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68083	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000008589DE72B4F85D4081F666B048F520C0	open	2026-02-14 14:45:15.435877	active	2026-02-15	2026-02-16		5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68091	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000963AAD2AC3F85D4081F666B048F520C0	open	2026-02-14 14:45:15.435877	approved	2026-02-15	2026-02-16		5	\N	\N	2026-02-16 18:36:01.022566+08	\N	\N	\N	none	0.9276568965717091	191.54603580562662	5103.942455242966	2026-02-04	50	10	314.15926535	0.24753680699585887	\N	\N	\N	\N	COPERNICUS/S2_SR_HARMONIZED/20260204T021209_20260204T021823_T50LRR
+67756	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000894DB0D0FBF75D4006EE36493CF020C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67759	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000009F3C2ED503F85D4056F7FF1ABCF020C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67760	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000009F3C2ED503F85D4019E547A547F020C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67761	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000009F3C2ED503F85D401F337E2FD3EF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67764	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000B2EDFC8C12F85D4001232FB349FA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67767	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000B2EDFC8C12F85D405D69A69030F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67768	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000B2EDFC8C12F85D4056F7FF1ABCF020C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67769	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000B2EDFC8C12F85D4019E547A547F020C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67775	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D404ECE950FA7FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67776	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D40D23F859B32FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67777	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D4092066327BEFA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67778	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D4001232FB349FA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67779	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D409795E93ED5F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67780	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D40C65E92CA60F920C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67783	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D40B93A3B06A5F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67784	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D405D69A69030F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67785	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000C69ECB4421F85D4056F7FF1ABCF020C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67790	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D40378524EE900121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67791	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D4096CCF97A1C0121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67792	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D403463BD07A80021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67793	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D4089496F94330021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67798	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D4081745D6B04FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67799	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D401AE981F78FFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67800	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D408BB194831BFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67801	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D404ECE950FA7FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67802	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D40D23F859B32FB20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67803	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D4092066327BEFA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67804	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000D94F9AFC2FF85D4001232FB349FA20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67821	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40A78C3D61050221C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67822	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D40378524EE900121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67823	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4096CCF97A1C0121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67824	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D403463BD07A80021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67825	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000EB0069B43EF85D4089496F94330021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67892	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40A78C3D61050221C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67893	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D40378524EE900121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67894	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4096CCF97A1C0121C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67895	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D403463BD07A80021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67896	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D4089496F94330021C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67897	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E6100000126306245CF85D400C800F21BFFF20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67961	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4076D71A51EBF320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67962	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D405230DEDB76F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67963	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D4037E68F6602F320C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67964	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D409CF92FF18DF220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67965	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40F56ABE7B19F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+67966	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000002514D5DB6AF85D40B93A3B06A5F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68031	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40F56ABE7B19F220C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68032	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000004A76724B88F85D40B93A3B06A5F120C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68035	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D40390986C661FE20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68036	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D400685DF52EDFD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68037	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D404D5327DF78FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68038	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D4081745D6B04FD20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68039	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D401AE981F78FFC20C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68042	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D40CEF6AEE177F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68043	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D4091C6226D03F820C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68044	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D40C5EE84F88EF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
+68045	24fc1710-0388-49ee-ba7f-0de89c12f58d	0101000020E61000005E27410397F85D40DF6FD5831AF720C0	open	2026-02-14 14:45:15.435877	draft	\N	\N	\N	5	\N	\N	\N	\N	\N	\N	none	\N	\N	\N	\N	\N	10	\N	\N	\N	\N	\N	\N	\N
 \.
 
 
 --
--- TOC entry 4497 (class 0 OID 18360)
--- Dependencies: 222
+-- TOC entry 6140 (class 0 OID 16723)
+-- Dependencies: 227
 -- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -613,57 +946,56 @@ COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM
 
 
 --
--- TOC entry 4850 (class 0 OID 19838)
--- Dependencies: 294
+-- TOC entry 6477 (class 0 OID 18181)
+-- Dependencies: 293
 -- Data for Name: survey_photos; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.survey_photos (id, survey_id, photo_url, created_at) FROM stdin;
-1	2	http://127.0.0.1:8000/uploads/surveys/66121007-b904-4219-8cd3-e2c79e7933d4.webp	2026-02-11 10:21:18.382438+00
-2	2	http://127.0.0.1:8000/uploads/surveys/e7248e28-310f-4a20-a379-10c696103184.jpg	2026-02-11 10:21:18.382438+00
-3	2	http://127.0.0.1:8000/uploads/surveys/8bae2606-912a-4c90-8ea4-1e58a47f22d3.jpg	2026-02-11 10:21:18.382438+00
+4	4	http://127.0.0.1:8000/uploads/surveys/4be42ddd-b2da-4490-bcf5-e84083907bdc.jpg	2026-02-15 11:02:25.479147+08
+5	4	http://127.0.0.1:8000/uploads/surveys/01ef4349-2b50-4ba0-a73a-f31b7860aacd.jpg	2026-02-15 11:02:25.479147+08
+6	4	http://127.0.0.1:8000/uploads/surveys/e1ea6ade-f56d-47f2-ac42-42f5a447a6d7.jpg	2026-02-15 11:02:25.479147+08
 \.
 
 
 --
--- TOC entry 4848 (class 0 OID 19810)
--- Dependencies: 292
+-- TOC entry 6479 (class 0 OID 18191)
+-- Dependencies: 295
 -- Data for Name: surveys; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.surveys (id, sampling_point_id, surveyor_id, tree_species_id, survey_date, dbh_cm, circumference_cm, height_m, biomass, created_at, description, reviewed_by, reviewed_at, status, geom, latitude, longitude) FROM stdin;
-3	64875	670a0a24-7bb0-46c1-8dcb-72a3b5e30c72	1	2026-02-11	31	\N	5	82.90619708309369	2026-02-11 10:19:37.852339+00	\N	\N	\N	draft	0101000020E6100000E167E12D67F85D4017268E24C50021C0	-8.50150408015456	119.8812975598553
-2	64875	670a0a24-7bb0-46c1-8dcb-72a3b5e30c72	1	2026-02-11	36	\N	8	77.76598143290376	2026-02-11 10:03:47.764837+00	\N	\N	\N	draft	0101000020E6100000E167E12D67F85D4017268E24C50021C0	-8.50150408015456	119.8812975598553
+4	68091	bb85907a-0585-47aa-bf1f-b2ead3b88214	1	2026-02-15	30	\N	4	77.76598143290376	2026-02-15 11:02:25.409471+08	\N	\N	\N	draft	0101000020E6100000963AAD2AC3F85D4081F666B048F520C0	-8.47907019860145	119.88691203038101
 \.
 
 
 --
--- TOC entry 4846 (class 0 OID 19798)
--- Dependencies: 290
+-- TOC entry 6481 (class 0 OID 18205)
+-- Dependencies: 297
 -- Data for Name: tree_species; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.tree_species (id, local_name, scientific_name, biomass_formula, wood_density, created_at, leaf_photo_url, trunk_photo_url, tree_photo_url, description) FROM stdin;
-1	Jati	Tectona grandis L.f.	exp(-1.803 + 0.976 * log(wood_density * (dbh_cm ** 2)))	0.61	2026-02-11 03:38:07.244114+00	http://127.0.0.1:8000/uploads/tree_species/4e8359de-789a-4699-86e2-b870e484a18b.webp	http://127.0.0.1:8000/uploads/tree_species/15c87397-6f7e-48bc-b9a2-7db3e76025c5.jpg	http://127.0.0.1:8000/uploads/tree_species/9dbbf22b-0f7f-44f3-b753-ea24cbf49139.jpg	Jati (Tectona grandis L.f.) adalah pohon kayu keras tropis bernilai ekonomi tinggi yang banyak dibudidayakan di Indonesia dan Asia Selatan. \n\nSpesies ini memiliki batang lurus silindris dengan kulit batang berwarna coklat keabu-abuan dan bertekstur kasar. Daunnya besar, lebar, berbentuk oval hingga elips dengan permukaan agak kasar. \n\nJati dikenal memiliki kayu berkualitas tinggi, tahan terhadap rayap dan cuaca, serta memiliki kerapatan kayu sedang hingga tinggi (sekitar 0.60–0.75 g/cm³). \n\nDalam konteks estimasi biomassa, jati menunjukkan pola pertumbuhan yang stabil dan sering dimodelkan menggunakan persamaan alometrik berbasis diameter batang (DBH). Spesies ini umum digunakan dalam studi karbon hutan, rehabilitasi lahan, dan sistem agroforestri.
+1	Jati	Tectona grandis L.f.	exp(-1.803 + 0.976 * log(wood_density * (dbh_cm ** 2)))	0.61	2026-02-11 11:38:07.244114+08	http://127.0.0.1:8000/uploads/tree_species/4e8359de-789a-4699-86e2-b870e484a18b.webp	http://127.0.0.1:8000/uploads/tree_species/15c87397-6f7e-48bc-b9a2-7db3e76025c5.jpg	http://127.0.0.1:8000/uploads/tree_species/9dbbf22b-0f7f-44f3-b753-ea24cbf49139.jpg	Jati (Tectona grandis L.f.) adalah pohon kayu keras tropis bernilai ekonomi tinggi yang banyak dibudidayakan di Indonesia dan Asia Selatan. \n\nSpesies ini memiliki batang lurus silindris dengan kulit batang berwarna coklat keabu-abuan dan bertekstur kasar. Daunnya besar, lebar, berbentuk oval hingga elips dengan permukaan agak kasar. \n\nJati dikenal memiliki kayu berkualitas tinggi, tahan terhadap rayap dan cuaca, serta memiliki kerapatan kayu sedang hingga tinggi (sekitar 0.60–0.75 g/cm³). \n\nDalam konteks estimasi biomassa, jati menunjukkan pola pertumbuhan yang stabil dan sering dimodelkan menggunakan persamaan alometrik berbasis diameter batang (DBH). Spesies ini umum digunakan dalam studi karbon hutan, rehabilitasi lahan, dan sistem agroforestri.
 \.
 
 
 --
--- TOC entry 4842 (class 0 OID 19765)
--- Dependencies: 286
+-- TOC entry 6483 (class 0 OID 18216)
+-- Dependencies: 299
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.users (id, name, email, password_hash, role, created_at) FROM stdin;
-670a0a24-7bb0-46c1-8dcb-72a3b5e30c72	Surveyor 2	surveyor2@gmail.com	$2b$12$lIvH/kJoy6E65D9GXkMuAek3Y5zQhvnZhs8vZJ52X65Ujff1sxWzK	surveyor	2026-02-11 09:27:48.366075+00
-0989837f-bbb9-48ff-b5e2-133061cac6a7	Admin Utama	admin@gmail.com	$2b$12$DFWB6vKxrb06RXQb/36pSumrdDsKE3p8mwOhVJSzCQ8deFn8vfX6C	admin	2026-02-10 12:57:48.865591+00
-bb85907a-0585-47aa-bf1f-b2ead3b88214	Surveyor Pertama	surveyor@gmail.com	$2b$12$DFWB6vKxrb06RXQb/36pSumrdDsKE3p8mwOhVJSzCQ8deFn8vfX6C	surveyor	2026-02-10 12:58:00.457714+00
+670a0a24-7bb0-46c1-8dcb-72a3b5e30c72	Surveyor 2	surveyor2@gmail.com	$2b$12$lIvH/kJoy6E65D9GXkMuAek3Y5zQhvnZhs8vZJ52X65Ujff1sxWzK	surveyor	2026-02-11 17:27:48.366075+08
+0989837f-bbb9-48ff-b5e2-133061cac6a7	Admin Utama	admin@gmail.com	$2b$12$DFWB6vKxrb06RXQb/36pSumrdDsKE3p8mwOhVJSzCQ8deFn8vfX6C	admin	2026-02-10 20:57:48.865591+08
+bb85907a-0585-47aa-bf1f-b2ead3b88214	Surveyor Pertama	surveyor@gmail.com	$2b$12$DFWB6vKxrb06RXQb/36pSumrdDsKE3p8mwOhVJSzCQ8deFn8vfX6C	surveyor	2026-02-10 20:58:00.457714+08
 \.
 
 
 --
--- TOC entry 4501 (class 0 OID 19305)
--- Dependencies: 233
+-- TOC entry 6141 (class 0 OID 17492)
+-- Dependencies: 232
 -- Data for Name: geocode_settings; Type: TABLE DATA; Schema: tiger; Owner: postgres
 --
 
@@ -672,8 +1004,8 @@ COPY tiger.geocode_settings (name, setting, unit, category, short_desc) FROM std
 
 
 --
--- TOC entry 4502 (class 0 OID 19637)
--- Dependencies: 278
+-- TOC entry 6142 (class 0 OID 17853)
+-- Dependencies: 277
 -- Data for Name: pagc_gaz; Type: TABLE DATA; Schema: tiger; Owner: postgres
 --
 
@@ -682,8 +1014,8 @@ COPY tiger.pagc_gaz (id, seq, word, stdword, token, is_custom) FROM stdin;
 
 
 --
--- TOC entry 4503 (class 0 OID 19647)
--- Dependencies: 280
+-- TOC entry 6143 (class 0 OID 17865)
+-- Dependencies: 279
 -- Data for Name: pagc_lex; Type: TABLE DATA; Schema: tiger; Owner: postgres
 --
 
@@ -692,8 +1024,8 @@ COPY tiger.pagc_lex (id, seq, word, stdword, token, is_custom) FROM stdin;
 
 
 --
--- TOC entry 4504 (class 0 OID 19657)
--- Dependencies: 282
+-- TOC entry 6144 (class 0 OID 17877)
+-- Dependencies: 281
 -- Data for Name: pagc_rules; Type: TABLE DATA; Schema: tiger; Owner: postgres
 --
 
@@ -702,18 +1034,18 @@ COPY tiger.pagc_rules (id, rule, is_custom) FROM stdin;
 
 
 --
--- TOC entry 4499 (class 0 OID 19123)
--- Dependencies: 227
+-- TOC entry 6146 (class 0 OID 17921)
+-- Dependencies: 283
 -- Data for Name: topology; Type: TABLE DATA; Schema: topology; Owner: postgres
 --
 
-COPY topology.topology (id, name, srid, "precision", hasz) FROM stdin;
+COPY topology.topology (id, name, srid, "precision", hasz, useslargeids) FROM stdin;
 \.
 
 
 --
--- TOC entry 4500 (class 0 OID 19135)
--- Dependencies: 228
+-- TOC entry 6147 (class 0 OID 17940)
+-- Dependencies: 284
 -- Data for Name: layer; Type: TABLE DATA; Schema: topology; Owner: postgres
 --
 
@@ -722,44 +1054,62 @@ COPY topology.layer (topology_id, layer_id, schema_name, table_name, feature_col
 
 
 --
--- TOC entry 4866 (class 0 OID 0)
--- Dependencies: 287
+-- TOC entry 6505 (class 0 OID 0)
+-- Dependencies: 300
+-- Name: project_models_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.project_models_id_seq', 1, false);
+
+
+--
+-- TOC entry 6506 (class 0 OID 0)
+-- Dependencies: 302
+-- Name: project_outputs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.project_outputs_id_seq', 1, false);
+
+
+--
+-- TOC entry 6507 (class 0 OID 0)
+-- Dependencies: 290
 -- Name: sampling_assignments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.sampling_assignments_id_seq', 15, true);
+SELECT pg_catalog.setval('public.sampling_assignments_id_seq', 19, true);
 
 
 --
--- TOC entry 4867 (class 0 OID 0)
--- Dependencies: 284
+-- TOC entry 6508 (class 0 OID 0)
+-- Dependencies: 292
 -- Name: sampling_points_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.sampling_points_id_seq', 64879, true);
+SELECT pg_catalog.setval('public.sampling_points_id_seq', 68101, true);
 
 
 --
--- TOC entry 4868 (class 0 OID 0)
--- Dependencies: 293
+-- TOC entry 6509 (class 0 OID 0)
+-- Dependencies: 294
 -- Name: survey_photos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.survey_photos_id_seq', 3, true);
+SELECT pg_catalog.setval('public.survey_photos_id_seq', 6, true);
 
 
 --
--- TOC entry 4869 (class 0 OID 0)
--- Dependencies: 291
+-- TOC entry 6510 (class 0 OID 0)
+-- Dependencies: 296
 -- Name: surveys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.surveys_id_seq', 3, true);
+SELECT pg_catalog.setval('public.surveys_id_seq', 4, true);
 
 
 --
--- TOC entry 4870 (class 0 OID 0)
--- Dependencies: 289
+-- TOC entry 6511 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: tree_species_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -767,8 +1117,8 @@ SELECT pg_catalog.setval('public.tree_species_id_seq', 1, true);
 
 
 --
--- TOC entry 4871 (class 0 OID 0)
--- Dependencies: 226
+-- TOC entry 6512 (class 0 OID 0)
+-- Dependencies: 282
 -- Name: topology_id_seq; Type: SEQUENCE SET; Schema: topology; Owner: postgres
 --
 
@@ -776,7 +1126,25 @@ SELECT pg_catalog.setval('topology.topology_id_seq', 1, false);
 
 
 --
--- TOC entry 4661 (class 2606 OID 19734)
+-- TOC entry 6307 (class 2606 OID 18578)
+-- Name: project_models project_models_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project_models
+    ADD CONSTRAINT project_models_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 6309 (class 2606 OID 18594)
+-- Name: project_outputs project_outputs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project_outputs
+    ADD CONSTRAINT project_outputs_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 6283 (class 2606 OID 18235)
 -- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -785,7 +1153,7 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 4671 (class 2606 OID 19784)
+-- TOC entry 6285 (class 2606 OID 18237)
 -- Name: sampling_assignments sampling_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -794,7 +1162,7 @@ ALTER TABLE ONLY public.sampling_assignments
 
 
 --
--- TOC entry 4673 (class 2606 OID 19786)
+-- TOC entry 6287 (class 2606 OID 18239)
 -- Name: sampling_assignments sampling_assignments_sampling_point_id_surveyor_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -803,7 +1171,7 @@ ALTER TABLE ONLY public.sampling_assignments
 
 
 --
--- TOC entry 4665 (class 2606 OID 19748)
+-- TOC entry 6293 (class 2606 OID 18241)
 -- Name: sampling_points sampling_points_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -812,7 +1180,7 @@ ALTER TABLE ONLY public.sampling_points
 
 
 --
--- TOC entry 4683 (class 2606 OID 19846)
+-- TOC entry 6295 (class 2606 OID 18243)
 -- Name: survey_photos survey_photos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -821,7 +1189,7 @@ ALTER TABLE ONLY public.survey_photos
 
 
 --
--- TOC entry 4681 (class 2606 OID 19821)
+-- TOC entry 6297 (class 2606 OID 18245)
 -- Name: surveys surveys_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -830,7 +1198,7 @@ ALTER TABLE ONLY public.surveys
 
 
 --
--- TOC entry 4677 (class 2606 OID 19808)
+-- TOC entry 6299 (class 2606 OID 18247)
 -- Name: tree_species tree_species_local_name_scientific_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -839,7 +1207,7 @@ ALTER TABLE ONLY public.tree_species
 
 
 --
--- TOC entry 4679 (class 2606 OID 19806)
+-- TOC entry 6301 (class 2606 OID 18249)
 -- Name: tree_species tree_species_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -848,7 +1216,7 @@ ALTER TABLE ONLY public.tree_species
 
 
 --
--- TOC entry 4675 (class 2606 OID 27938)
+-- TOC entry 6289 (class 2606 OID 18251)
 -- Name: sampling_assignments unique_sampling_assignment; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -857,7 +1225,7 @@ ALTER TABLE ONLY public.sampling_assignments
 
 
 --
--- TOC entry 4667 (class 2606 OID 19776)
+-- TOC entry 6303 (class 2606 OID 18253)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -866,7 +1234,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4669 (class 2606 OID 19774)
+-- TOC entry 6305 (class 2606 OID 18255)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -875,7 +1243,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4659 (class 1259 OID 19735)
+-- TOC entry 6281 (class 1259 OID 18256)
 -- Name: idx_projects_aoi; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -883,7 +1251,7 @@ CREATE INDEX idx_projects_aoi ON public.projects USING gist (aoi);
 
 
 --
--- TOC entry 4662 (class 1259 OID 19754)
+-- TOC entry 6290 (class 1259 OID 18257)
 -- Name: idx_sampling_points_geom; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -891,7 +1259,7 @@ CREATE INDEX idx_sampling_points_geom ON public.sampling_points USING gist (geom
 
 
 --
--- TOC entry 4663 (class 1259 OID 19755)
+-- TOC entry 6291 (class 1259 OID 18258)
 -- Name: idx_sampling_points_project; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -899,7 +1267,25 @@ CREATE INDEX idx_sampling_points_project ON public.sampling_points USING btree (
 
 
 --
--- TOC entry 4686 (class 2606 OID 19787)
+-- TOC entry 6318 (class 2606 OID 18579)
+-- Name: project_models project_models_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project_models
+    ADD CONSTRAINT project_models_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 6319 (class 2606 OID 18595)
+-- Name: project_outputs project_outputs_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project_outputs
+    ADD CONSTRAINT project_outputs_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 6310 (class 2606 OID 18259)
 -- Name: sampling_assignments sampling_assignments_sampling_point_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -908,7 +1294,7 @@ ALTER TABLE ONLY public.sampling_assignments
 
 
 --
--- TOC entry 4687 (class 2606 OID 19792)
+-- TOC entry 6311 (class 2606 OID 18264)
 -- Name: sampling_assignments sampling_assignments_surveyor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -917,7 +1303,7 @@ ALTER TABLE ONLY public.sampling_assignments
 
 
 --
--- TOC entry 4684 (class 2606 OID 19760)
+-- TOC entry 6312 (class 2606 OID 18269)
 -- Name: sampling_points sampling_points_project_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -926,7 +1312,7 @@ ALTER TABLE ONLY public.sampling_points
 
 
 --
--- TOC entry 4685 (class 2606 OID 27932)
+-- TOC entry 6313 (class 2606 OID 18274)
 -- Name: sampling_points sampling_points_started_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -935,7 +1321,7 @@ ALTER TABLE ONLY public.sampling_points
 
 
 --
--- TOC entry 4691 (class 2606 OID 19847)
+-- TOC entry 6314 (class 2606 OID 18279)
 -- Name: survey_photos survey_photos_survey_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -944,7 +1330,7 @@ ALTER TABLE ONLY public.survey_photos
 
 
 --
--- TOC entry 4688 (class 2606 OID 19822)
+-- TOC entry 6315 (class 2606 OID 18284)
 -- Name: surveys surveys_sampling_point_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -953,7 +1339,7 @@ ALTER TABLE ONLY public.surveys
 
 
 --
--- TOC entry 4689 (class 2606 OID 19827)
+-- TOC entry 6316 (class 2606 OID 18289)
 -- Name: surveys surveys_surveyor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -962,7 +1348,7 @@ ALTER TABLE ONLY public.surveys
 
 
 --
--- TOC entry 4690 (class 2606 OID 19832)
+-- TOC entry 6317 (class 2606 OID 18294)
 -- Name: surveys surveys_tree_species_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -970,11 +1356,11 @@ ALTER TABLE ONLY public.surveys
     ADD CONSTRAINT surveys_tree_species_id_fkey FOREIGN KEY (tree_species_id) REFERENCES public.tree_species(id);
 
 
--- Completed on 2026-02-11 11:04:17 UTC
+-- Completed on 2026-02-16 19:53:01
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict VAObhb71YhbPAR4fuQf7aswaI21igrv9vcW5eUevlqxkY5qVbysWlcu9lr13GQP
+\unrestrict GGLyTJ1DONBsCN51PoKk6WWPpV0QkLBx0q660bC5FL6VNJ7h5XrkhEKMncXE1vO
 

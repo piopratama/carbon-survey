@@ -1,0 +1,389 @@
+<script>
+  window.REQUIRED_ROLE = "admin";
+</script>
+
+<!doctype html>
+<html lang="en">
+<head>
+
+<script>
+  fetch("partials/head.html")
+    .then(r => r.text())
+    .then(html => {
+      document.head.insertAdjacentHTML("beforeend", html);
+    });
+</script>
+
+<style>
+  #map { width:100%; height:100%; }
+  .container-fluid, .row { height:100%; }
+</style>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<div id="header"></div>
+
+<div class="container-fluid flex-grow-1">
+<div class="row h-100">
+
+<!-- ================= MAP ================= -->
+<div class="col-md-8 col-lg-9 p-0">
+  <div id="map"></div>
+</div>
+
+<!-- ================= PANEL ================= -->
+<div class="col-md-4 col-lg-3 bg-light border-start overflow-auto">
+<div class="p-3">
+
+<div class="card shadow-sm mb-3">
+<div class="card-body">
+
+<h6>Analysis</h6>
+
+<select id="projectSelect"
+class="form-select form-select-sm mb-2"
+onchange="selectProject()">
+<option value="">-- Select Project --</option>
+</select>
+
+<label class="small">Survey Start Date</label>
+<input type="date"
+id="startDate"
+class="form-control form-control-sm mb-2" />
+
+<label class="small">Survey End Date</label>
+<input type="date"
+id="endDate"
+class="form-control form-control-sm mb-3" />
+
+<div class="d-grid gap-2">
+  <button class="btn btn-outline-primary btn-sm"
+  onclick="loadSurveys()">
+  Load Surveys
+  </button>
+
+  <hr>
+
+  <h6>Closest Sentinel Scenes</h6>
+  <div id="sentinelScenes"
+  class="small text-muted mb-3">
+  Load surveys first
+  </div>
+
+  <button class="btn btn-primary btn-sm"
+  onclick="runExtract()">
+  Extract Sentinel
+  </button>
+</div>
+
+<div id="status"
+class="text-muted small mt-2">
+Select project & date range
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="footer"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/project_state.js"></script>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+
+const map = L.map("map").setView([-2,118],5);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+let CURRENT_PROJECT_ID = null;
+let projectMap = {};
+let projectAOILayer = null;
+let SELECTED_IMAGE_ID = null;
+let sentinelLayer = null;
+
+// ================= POINT LAYER =================
+let pointsLayer = L.geoJSON(null,{
+  pointToLayer:(f,latlng)=>L.circleMarker(latlng,{radius:6}),
+  onEachFeature:(feature,layer)=>{
+
+  const p = feature.properties;
+
+  const surveyDate = p.submitted_at
+    ? new Date(p.submitted_at).toLocaleDateString()
+    : "-";
+
+  const biomass = Number(p.total_biomass ?? 0).toFixed(2);
+
+  const sentinelSection = p.ndvi
+    ? `
+      <div class="mt-2 pt-2 border-top">
+        <div class="fw-semibold text-success mb-1">
+          Sentinel Data
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <span>NDVI</span>
+          <span class="fw-bold text-success">
+            ${Number(p.ndvi).toFixed(3)}
+          </span>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <span>Acquisition</span>
+          <span>${p.sentinel_date}</span>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <span>Cloud</span>
+          <span>${p.sentinel_cloud}%</span>
+        </div>
+      </div>
+    `
+    : `
+      <div class="mt-2 pt-2 border-top text-muted small">
+        Sentinel not extracted yet
+      </div>
+    `;
+
+  layer.bindPopup(`
+    <div style="min-width:240px">
+
+      <div class="fw-bold mb-2">
+        Point #${p.id}
+      </div>
+
+      <div class="mb-2">
+        <div class="d-flex justify-content-between">
+          <span>Survey Date</span>
+          <span>${surveyDate}</span>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <span>Total Biomass</span>
+          <span class="fw-bold">${biomass} kg</span>
+        </div>
+      </div>
+
+      ${sentinelSection}
+
+    </div>
+  `);
+}
+}).addTo(map);
+
+// ================= LOAD PROJECTS =================
+async function loadProjects(){
+  const res = await fetch(`${API_BASE}/projects`);
+  const projects = await res.json();
+  const select = document.getElementById("projectSelect");
+
+  projects.forEach(p=>{
+    projectMap[p.id]=p;
+    const opt=document.createElement("option");
+    opt.value=p.id;
+    opt.textContent=p.name;
+    select.appendChild(opt);
+  });
+}
+
+// ================= SELECT PROJECT =================
+function selectProject(){
+  CURRENT_PROJECT_ID =
+    document.getElementById("projectSelect").value;
+
+  if(!CURRENT_PROJECT_ID) return;
+
+  const project=projectMap[CURRENT_PROJECT_ID];
+
+  if(projectAOILayer) map.removeLayer(projectAOILayer);
+
+  projectAOILayer=L.geoJSON(
+    {type:"Feature",geometry:project.aoi}
+  ).addTo(map);
+
+  map.fitBounds(projectAOILayer.getBounds());
+
+  document.getElementById("status")
+  .innerText="Select date range then Load Surveys";
+}
+
+// ================= LOAD SURVEYS =================
+async function loadSurveys(){
+
+  if(!CURRENT_PROJECT_ID)
+    return alert("Select project");
+
+  const start=document.getElementById("startDate").value;
+  const end=document.getElementById("endDate").value;
+
+  if(!start||!end)
+    return alert("Select date range");
+
+  const res =
+  await fetch(`${API_BASE}/sampling/points/${CURRENT_PROJECT_ID}`);
+
+  const geojson=await res.json();
+
+  const filteredFeatures = geojson.features.filter(f=>{
+      if(f.properties.survey_status!=="approved")
+        return false;
+
+      const d=f.properties.submitted_at;
+      if(!d) return false;
+
+      return d>=start && d<=end;
+  });
+
+  const filtered={
+    type:"FeatureCollection",
+    features:filteredFeatures
+  };
+
+  pointsLayer.clearLayers();
+  pointsLayer.addData(filtered);
+
+  document.getElementById("status")
+  .innerText=`Loaded ${filtered.features.length} surveys`;
+
+  await loadSentinelScenes(start,end);
+}
+
+// ================= LOAD SENTINEL SCENES =================
+async function loadSentinelScenes(start,end){
+
+  const res = await fetch(
+    `${API_BASE}/sentinel/list-closest-scenes/${CURRENT_PROJECT_ID}`,
+    {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        start_date:start,
+        end_date:end,
+        cloud:50
+      })
+    }
+  );
+
+  const scenes = await res.json();
+
+  const container =
+    document.getElementById("sentinelScenes");
+
+  if(!scenes.length){
+    container.innerHTML="<div>No scenes found</div>";
+    return;
+  }
+
+  container.innerHTML=`
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Date</th>
+          <th>Days</th>
+          <th>Cloud %</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${scenes.map(s=>`
+          <tr>
+            <td>
+              <input type="radio"
+                name="scene"
+                value="${s.image_id}"
+                onchange="SELECTED_IMAGE_ID='${s.image_id}'">
+            </td>
+            <td>${s.date}</td>
+            <td>${s.date_diff}</td>
+            <td>${s.cloud}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+// ================= RUN EXTRACT =================
+async function runExtract(){
+
+  if(!CURRENT_PROJECT_ID)
+    return alert("Select project");
+
+  if(!SELECTED_IMAGE_ID)
+    return alert("Select Sentinel scene first");
+
+  const start=document.getElementById("startDate").value;
+  const end=document.getElementById("endDate").value;
+
+  document.getElementById("status")
+  .innerText="Extracting Sentinel...";
+
+  const res=await fetch(
+    `${API_BASE}/sentinel/extract/${CURRENT_PROJECT_ID}`,
+    {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        image_id:SELECTED_IMAGE_ID,
+        start_date:start,
+        end_date:end,
+        cloud:50
+      })
+    }
+  );
+
+  const data=await res.json();
+
+  if(!res.ok){
+    alert(data.detail);
+    return;
+  }
+
+  alert(`Processed: ${data.processed_points}`);
+
+  await showSentinelImage(SELECTED_IMAGE_ID);
+
+  loadSurveys();
+}
+
+// ================= SHOW SENTINEL RGB =================
+async function showSentinelImage(imageId){
+
+  if(sentinelLayer){
+    map.removeLayer(sentinelLayer);
+  }
+
+  const res = await fetch(
+    `${API_BASE}/sentinel/preview-image`,
+    {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ image_id:imageId })
+    }
+  );
+
+  const data = await res.json();
+
+  sentinelLayer = L.tileLayer(
+    data.tile_url,
+    { opacity:0.7 }
+  ).addTo(map);
+
+  document.getElementById("status")
+  .innerText="Sentinel imagery loaded";
+}
+
+loadProjects();
+</script>
+
+</body>
+</html>

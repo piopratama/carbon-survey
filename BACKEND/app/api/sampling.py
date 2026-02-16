@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.db.session import SessionLocal
+from datetime import date
 
 router = APIRouter(prefix="/sampling", tags=["Sampling"])
 
@@ -94,6 +95,7 @@ def generate_sampling(
 # LIST SAMPLING POINTS (WITH LAT/LNG)
 # ===============================
 @router.get("/points/{project_id}")
+@router.get("/points/{project_id}")
 def list_sampling_points(project_id: str, db: Session = Depends(get_db)):
 
     rows = db.execute(
@@ -107,6 +109,11 @@ def list_sampling_points(project_id: str, db: Session = Depends(get_db)):
               sp.description,
               sp.max_surveyors,
               sp.created_at,
+              sp.submitted_at,
+
+              sp.ndvi,
+              sp.sentinel_date,
+              sp.sentinel_cloud,
 
               ST_AsGeoJSON(sp.geom)::json AS geometry,
               ST_Y(sp.geom) AS latitude,
@@ -134,7 +141,6 @@ def list_sampling_points(project_id: str, db: Session = Depends(get_db)):
             LEFT JOIN users u
               ON u.id = sa.surveyor_id
 
-            -- FIXED: aggregate biomass separately to avoid duplication
             LEFT JOIN (
                 SELECT
                     sampling_point_id,
@@ -155,6 +161,10 @@ def list_sampling_points(project_id: str, db: Session = Depends(get_db)):
               sp.description,
               sp.max_surveyors,
               sp.created_at,
+              sp.submitted_at,
+              sp.ndvi,
+              sp.sentinel_date,
+              sp.sentinel_cloud,
               sp.geom,
               b.total_biomass
 
@@ -180,10 +190,15 @@ def list_sampling_points(project_id: str, db: Session = Depends(get_db)):
                 "latitude": float(r["latitude"]),
                 "longitude": float(r["longitude"]),
                 "total_biomass": float(r["total_biomass"] or 0),
+
                 "start_date": str(r["start_date"]) if r["start_date"] else None,
                 "end_date": str(r["end_date"]) if r["end_date"] else None,
-                "description": r["description"],
-                "created_at": r["created_at"].isoformat() if r["created_at"] else None
+                "created_at": r["created_at"].isoformat() if r["created_at"] else None,
+                "submitted_at": r["submitted_at"].isoformat() if r["submitted_at"] else None,
+
+                "ndvi": float(r["ndvi"]) if r["ndvi"] is not None else None,
+                "sentinel_date": str(r["sentinel_date"]) if r["sentinel_date"] else None,
+                "sentinel_cloud": r["sentinel_cloud"]
             }
         })
 
@@ -445,6 +460,7 @@ def setup_survey_point(
                 end_date = :end_date,
                 description = :description,
                 max_surveyors = :max_surveyors,
+                plot_radius_m = :plot_radius_m,
                 survey_status = 'ready'
             WHERE id = :id
         """),
@@ -453,7 +469,8 @@ def setup_survey_point(
             "start_date": payload.get("start_date"),
             "end_date": payload.get("end_date"),
             "description": payload.get("description"),
-            "max_surveyors": payload.get("max_surveyors", 5)
+            "max_surveyors": payload.get("max_surveyors", 5),
+            "plot_radius_m": payload.get("plot_radius_m", 10)  # 🔥 NEW
         }
     )
 
@@ -461,7 +478,6 @@ def setup_survey_point(
 
     return {"status": "ready"}
 
-from datetime import date
 
 @router.post("/assign/{point_id}")
 def assign_surveyor(
@@ -825,7 +841,7 @@ def review_sampling_point(
 
     point = db.execute(
         text("""
-            SELECT survey_status
+            SELECT survey_status, plot_radius_m
             FROM sampling_points
             WHERE id = :pid
         """),
@@ -838,15 +854,61 @@ def review_sampling_point(
     if point["survey_status"] != "submitted":
         raise HTTPException(400, "Point belum disubmit")
 
-    db.execute(
-        text("""
-            UPDATE sampling_points
-            SET survey_status = :status
-            WHERE id = :pid
-        """),
-        {"pid": point_id, "status": action}
-    )
+    # =========================================
+    # IF APPROVED → CALCULATE BIOMASS DENSITY
+    # =========================================
+    if action == "approved":
+
+        # 1️ Aggregate total biomass
+        total_biomass = db.execute(
+            text("""
+                SELECT COALESCE(SUM(biomass), 0)
+                FROM surveys
+                WHERE sampling_point_id = :pid
+            """),
+            {"pid": point_id}
+        ).scalar()
+
+        if not point["plot_radius_m"]:
+            raise HTTPException(
+                400,
+                "plot_radius_m belum diisi"
+            )
+
+        # 2️ Compute plot area
+        radius = float(point["plot_radius_m"])
+        plot_area = 3.1415926535 * radius * radius
+
+        # 3️ Compute biomass density
+        agb_density = float(total_biomass) / plot_area if plot_area > 0 else 0
+
+        # 4️ Update sampling point
+        db.execute(
+            text("""
+                UPDATE sampling_points
+                SET survey_status = 'approved',
+                    plot_area_m2 = :area,
+                    agb_kg_per_m2 = :density
+                WHERE id = :pid
+            """),
+            {
+                "pid": point_id,
+                "area": plot_area,
+                "density": agb_density
+            }
+        )
+
+    else:
+        db.execute(
+            text("""
+                UPDATE sampling_points
+                SET survey_status = 'rejected'
+                WHERE id = :pid
+            """),
+            {"pid": point_id}
+        )
 
     db.commit()
 
     return {"status": action}
+
