@@ -208,7 +208,11 @@ def train_carbon_model(project_id: str, db: Session = Depends(get_db)):
 # ===============================
 @router.post("/generate/{project_id}")
 def generate_carbon_map(project_id: str, db: Session = Depends(get_db)):
-    # get project aoi + sentinel params
+    import ee
+
+    # =============================
+    # 1️ Get project info
+    # =============================
     proj = db.execute(
         text("""
             SELECT
@@ -226,7 +230,9 @@ def generate_carbon_map(project_id: str, db: Session = Depends(get_db)):
     if not proj:
         raise HTTPException(404, "Project tidak ditemukan")
 
-    # get latest model
+    # =============================
+    # 2️ Get latest trained model
+    # =============================
     model = db.execute(
         text("""
             SELECT id, model_type, features, params
@@ -239,19 +245,20 @@ def generate_carbon_map(project_id: str, db: Session = Depends(get_db)):
     ).mappings().first()
 
     if not model:
-        raise HTTPException(400, "Belum ada model. Jalankan /carbon/train/{project_id} dulu.")
+        raise HTTPException(400, "Belum ada model. Jalankan training dulu.")
 
     if model["model_type"] != "linear_regression":
         raise HTTPException(400, "Saat ini hanya support linear_regression")
 
     params = model["params"]
     intercept = float(params["intercept"])
-    coef_map = params["coefficients"]  # dict feature->coef
+    coef_map = params["coefficients"]
 
-    # build EE geometry
+    # =============================
+    # 3️ Build Earth Engine geometry
+    # =============================
     aoi = ee.Geometry(proj["aoi"])
 
-    # You already have this service
     from app.services.gee import get_sentinel_composite
 
     composite, ndvi = get_sentinel_composite(
@@ -261,29 +268,38 @@ def generate_carbon_map(project_id: str, db: Session = Depends(get_db)):
         cloud=proj["cloud"] or 20,
     )
 
-    # Ensure we have the bands needed
-    # ndvi you already compute; for evi we can compute here
-    # NOTE: Sentinel-2 SR: B2,B4,B8 are available
-    b2 = composite.select("B2")
-    b4 = composite.select("B4")
-    b8 = composite.select("B8")
+    # =============================
+    # 4️ FIX: Scale Sentinel-2 SR bands
+    # =============================
+    # Sentinel-2 SR bands are scaled by 10000
+    # Convert to reflectance 0–1 first
 
-    # EVI = 2.5 * (NIR - RED) / (NIR + 6*RED - 7.5*BLUE + 1)
+    b2 = composite.select("B2").divide(10000)
+    b4 = composite.select("B4").divide(10000)
+    b8 = composite.select("B8").divide(10000)
+
+    # =============================
+    # 5️ Compute EVI (correct formula)
+    # =============================
     evi = b8.subtract(b4).multiply(2.5).divide(
-        b8.add(b4.multiply(6)).subtract(b2.multiply(7.5)).add(1)
+        b8.add(b4.multiply(6))
+          .subtract(b2.multiply(7.5))
+          .add(1)
     ).rename("EVI")
 
-    # Compose feature image with consistent names:
+    # =============================
+    # 6️ Build feature image
+    # =============================
     feat_img = ee.Image.cat([
         ndvi.rename("NDVI"),
-        evi.rename("EVI"),
+        evi,
         b4.rename("B4"),
         b8.rename("B8"),
     ])
 
-    # Carbon prediction:
-    # y = intercept + sum(coef[f]*band)
-    # Map your DB features to our band names:
+    # =============================
+    # 7️ Carbon prediction
+    # =============================
     band_lookup = {
         "ndvi": "NDVI",
         "evi": "EVI",
@@ -292,16 +308,21 @@ def generate_carbon_map(project_id: str, db: Session = Depends(get_db)):
     }
 
     pred = ee.Image.constant(intercept)
+
     for f, coef in coef_map.items():
         band = band_lookup.get(f)
         if not band:
             raise HTTPException(400, f"Feature tidak dikenali: {f}")
-        pred = pred.add(feat_img.select(band).multiply(float(coef)))
+
+        pred = pred.add(
+            feat_img.select(band).multiply(float(coef))
+        )
 
     pred = pred.rename("AGB_kg_m2").clip(aoi)
 
-    # Export to Drive by default (simple + works everywhere)
-    # If you use Cloud Storage instead, we can switch.
+    # =============================
+    # 8️ Export to Drive
+    # =============================
     task = ee.batch.Export.image.toDrive(
         image=pred,
         description=f"carbon_{project_id}",
@@ -311,9 +332,12 @@ def generate_carbon_map(project_id: str, db: Session = Depends(get_db)):
         scale=10,
         maxPixels=1e13
     )
+
     task.start()
 
-    # store to project_outputs
+    # =============================
+    # 9️ Save output record
+    # =============================
     out = db.execute(
         text("""
             INSERT INTO project_outputs (project_id, output_type, gee_task_id, stats)

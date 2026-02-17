@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ML Feature Dataset</title>
+
+    <script>
+        fetch("partials/head.html")
+            .then(r => r.text())
+            .then(html => {
+                document.head.insertAdjacentHTML("beforeend", html);
+            });
+    </script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<div id="header"></div>
+
+<div class="container-fluid flex-grow-1">
+<div class="row">
+<div class="col-12 p-4">
+
+<div class="card shadow-sm">
+<div class="card-body">
+
+<h5 class="mb-3">ML Feature Dataset</h5>
+
+<div id="summary" class="mb-3 small text-muted">
+  Loading...
+</div>
+
+<div id="tableContainer">
+  Loading...
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="footer"></div>
+
+<!-- MUST load project_state FIRST -->
+<script src="js/project_state.js"></script>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+
+/* ---------------------- LOAD PARTIALS ---------------------- */
+
+async function loadPartial(id, file) {
+    try {
+        const res = await fetch(file);
+        const html = await res.text();
+        document.getElementById(id).innerHTML = html;
+    } catch (err) {
+        console.error("Failed to load partial:", file);
+    }
+}
+
+loadPartial("header", "partials/header.html");
+loadPartial("footer", "partials/footer.html");
+
+/* ---------------------- PROJECT ID ---------------------- */
+
+const params = new URLSearchParams(window.location.search);
+let projectId = params.get("project_id");
+
+if (!projectId && typeof getCurrentProject === "function") {
+    projectId = getCurrentProject();
+}
+
+/* ---------------------- MAIN ---------------------- */
+
+if (!projectId) {
+    document.getElementById("summary").innerText = "";
+    document.getElementById("tableContainer").innerHTML =
+        "<div class='text-danger'>No project selected</div>";
+} else {
+    loadReport();
+}
+
+/* ---------------------- FETCH DATA ---------------------- */
+
+async function loadReport() {
+
+    try {
+        const res = await fetch(
+            `${API_BASE}/projects/${projectId}/feature-report`
+        );
+
+        if (!res.ok) {
+            throw new Error("API error");
+        }
+
+        const data = await res.json();
+
+        renderTable(data);
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("summary").innerText = "";
+        document.getElementById("tableContainer").innerHTML =
+            "<div class='text-danger'>Failed to load data</div>";
+    }
+}
+
+/* ---------------------- RENDER TABLE ---------------------- */
+
+function renderTable(data) {
+
+    if (!data || !data.length) {
+        document.getElementById("summary").innerText = "";
+        document.getElementById("tableContainer").innerHTML =
+            "<div class='text-muted'>No approved sampling data</div>";
+        return;
+    }
+
+    const table = `
+    <div class="table-responsive">
+      <table class="table table-bordered table-sm table-striped">
+        <thead class="table-light">
+          <tr>
+            <th>No</th>
+            <th>Point ID</th>
+            <th>Survey Count</th>
+            <th>NDVI</th>
+            <th>EVI</th>
+            <th>B4</th>
+            <th>B8</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Survey Range</th>
+            <th>Sentinel Date</th>
+            <th>Total Biomass (kg)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map((row, i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${row.sampling_point_id}</td>
+              <td class="fw-semibold">${row.survey_count}</td>
+              <td>${formatNum(row.ndvi)}</td>
+              <td>${formatNum(row.evi)}</td>
+              <td>${formatNum(row.b4)}</td>
+              <td>${formatNum(row.b8)}</td>
+              <td>${formatNum(row.latitude)}</td>
+              <td>${formatNum(row.longitude)}</td>
+              <td>${formatDate(row.start_date)} - ${formatDate(row.end_date)}</td>
+              <td>${formatDate(row.sentinel_date)}</td>
+              <td class="fw-bold">${formatBiomass(row.total_biomass)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+    `;
+
+    document.getElementById("tableContainer").innerHTML = table;
+
+    document.getElementById("summary").innerText =
+        `Total Points: ${data.length}`;
+}
+
+/* ---------------------- FORMATTERS ---------------------- */
+
+function formatNum(val) {
+    if (val === null || val === undefined) return "-";
+    return Number(val).toFixed(4);
+}
+
+function formatBiomass(val) {
+    if (val === null || val === undefined) return "-";
+    return Number(val).toFixed(2);
+}
+
+function formatDate(val) {
+    if (!val) return "-";
+    return new Date(val).toLocaleDateString();
+}
+
+</script>
+
+</body>
+</html>

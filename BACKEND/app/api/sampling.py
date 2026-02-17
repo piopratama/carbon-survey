@@ -38,7 +38,6 @@ def generate_sampling(
     if not project:
         raise HTTPException(404, "Project tidak ditemukan")
 
-    # Hapus hanya titik open
     db.execute(
         text("""
             DELETE FROM sampling_points
@@ -48,24 +47,34 @@ def generate_sampling(
         {"pid": project_id},
     )
 
-    # Generate grid
     db.execute(
         text("""
-        INSERT INTO sampling_points (project_id, geom, status)
-        SELECT
-          p.id,
-          ST_Transform(ST_Centroid(g.geom), 4326),
-          'open'
-        FROM projects p
-        JOIN LATERAL
-          ST_SquareGrid(
-            :spacing,
-            ST_Transform(p.aoi, 3857)
-          ) AS g
-        ON ST_Intersects(
-          ST_Transform(p.aoi, 3857),
-          g.geom
+        INSERT INTO sampling_points (
+            project_id,
+            geom,
+            latitude,
+            longitude,
+            status
         )
+        SELECT
+            p.id,
+            wgs_geom,
+            ST_Y(wgs_geom) AS latitude,
+            ST_X(wgs_geom) AS longitude,
+            'open'
+        FROM projects p
+        JOIN LATERAL (
+            SELECT
+                ST_Transform(ST_Centroid(g.geom), 4326) AS wgs_geom
+            FROM ST_SquareGrid(
+                :spacing,
+                ST_Transform(p.aoi, 3857)
+            ) AS g
+            WHERE ST_Intersects(
+                ST_Transform(p.aoi, 3857),
+                g.geom
+            )
+        ) sub ON TRUE
         WHERE p.id = :pid;
         """),
         {
@@ -94,7 +103,6 @@ def generate_sampling(
 # ===============================
 # LIST SAMPLING POINTS (WITH LAT/LNG)
 # ===============================
-@router.get("/points/{project_id}")
 @router.get("/points/{project_id}")
 def list_sampling_points(project_id: str, db: Session = Depends(get_db)):
 
@@ -854,12 +862,11 @@ def review_sampling_point(
     if point["survey_status"] != "submitted":
         raise HTTPException(400, "Point belum disubmit")
 
-    # =========================================
-    # IF APPROVED → CALCULATE BIOMASS DENSITY
-    # =========================================
+    # ===============================
+    # APPROVE
+    # ===============================
     if action == "approved":
 
-        # 1️ Aggregate total biomass
         total_biomass = db.execute(
             text("""
                 SELECT COALESCE(SUM(biomass), 0)
@@ -870,19 +877,13 @@ def review_sampling_point(
         ).scalar()
 
         if not point["plot_radius_m"]:
-            raise HTTPException(
-                400,
-                "plot_radius_m belum diisi"
-            )
+            raise HTTPException(400, "plot_radius_m belum diisi")
 
-        # 2️ Compute plot area
         radius = float(point["plot_radius_m"])
         plot_area = 3.1415926535 * radius * radius
-
-        # 3️ Compute biomass density
         agb_density = float(total_biomass) / plot_area if plot_area > 0 else 0
 
-        # 4️ Update sampling point
+        # Update sampling_point
         db.execute(
             text("""
                 UPDATE sampling_points
@@ -898,7 +899,21 @@ def review_sampling_point(
             }
         )
 
+        # ALSO UPDATE SURVEYS
+        db.execute(
+            text("""
+                UPDATE surveys
+                SET status = 'approved'
+                WHERE sampling_point_id = :pid
+            """),
+            {"pid": point_id}
+        )
+
+    # ===============================
+    # REJECT
+    # ===============================
     else:
+
         db.execute(
             text("""
                 UPDATE sampling_points
@@ -908,7 +923,18 @@ def review_sampling_point(
             {"pid": point_id}
         )
 
+        # ALSO UPDATE SURVEYS
+        db.execute(
+            text("""
+                UPDATE surveys
+                SET status = 'rejected'
+                WHERE sampling_point_id = :pid
+            """),
+            {"pid": point_id}
+        )
+
     db.commit()
 
     return {"status": action}
+
 

@@ -4,127 +4,183 @@
 
 <!doctype html>
 <html lang="en">
+
 <head>
 
-<script>
-  fetch("partials/head.html")
-    .then(r => r.text())
-    .then(html => {
-      document.head.insertAdjacentHTML("beforeend", html);
-    });
-</script>
+  <script>
+    fetch("partials/head.html")
+      .then(r => r.text())
+      .then(html => {
+        document.head.insertAdjacentHTML("beforeend", html);
+      });
+  </script>
 
-<style>
-  #map { width:100%; height:100%; }
-  .container-fluid, .row { height:100%; }
-</style>
+  <style>
+    #map {
+      width: 100%;
+      height: 100%;
+    }
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    .container-fluid,
+    .row {
+      height: 100%;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 </head>
 
 <body class="d-flex flex-column min-vh-100">
 
-<div id="header"></div>
+  <div id="header"></div>
 
-<div class="container-fluid flex-grow-1">
-<div class="row h-100">
+  <div class="container-fluid flex-grow-1">
+    <div class="row h-100">
 
-<!-- ================= MAP ================= -->
-<div class="col-md-8 col-lg-9 p-0">
-  <div id="map"></div>
-</div>
+      <!-- ================= MAP ================= -->
+      <div class="col-md-8 col-lg-9 p-0">
+        <div id="map"></div>
+      </div>
 
-<!-- ================= PANEL ================= -->
-<div class="col-md-4 col-lg-3 bg-light border-start overflow-auto">
-<div class="p-3">
+      <!-- ================= PANEL ================= -->
+      <div class="col-md-4 col-lg-3 bg-light border-start overflow-auto">
+        <div class="p-3">
 
-<div class="card shadow-sm mb-3">
-<div class="card-body">
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
 
-<h6>Analysis</h6>
+              <h6>Analysis</h6>
 
-<select id="projectSelect"
-class="form-select form-select-sm mb-2"
-onchange="selectProject()">
-<option value="">-- Select Project --</option>
-</select>
+              <select id="projectSelect" class="form-select form-select-sm mb-2" onchange="selectProject()">
+                <option value="">-- Select Project --</option>
+              </select>
 
-<label class="small">Survey Start Date</label>
-<input type="date"
-id="startDate"
-class="form-control form-control-sm mb-2" />
+              <label class="small">Survey Start Date</label>
+              <input type="date" id="startDate" class="form-control form-control-sm mb-2" />
 
-<label class="small">Survey End Date</label>
-<input type="date"
-id="endDate"
-class="form-control form-control-sm mb-3" />
+              <label class="small">Survey End Date</label>
+              <input type="date" id="endDate" class="form-control form-control-sm mb-3" />
 
-<div class="d-grid gap-2">
-  <button class="btn btn-outline-primary btn-sm"
-  onclick="loadSurveys()">
-  Load Surveys
-  </button>
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary btn-sm" onclick="loadSurveys()">
+                  Load Surveys
+                </button>
 
-  <hr>
+                <hr>
 
-  <h6>Closest Sentinel Scenes</h6>
-  <div id="sentinelScenes"
-  class="small text-muted mb-3">
-  Load surveys first
-  </div>
+                <h6>Closest Sentinel Scenes</h6>
+                <div id="sentinelScenes" class="small text-muted mb-3">
+                  Load surveys first
+                </div>
 
-  <button class="btn btn-primary btn-sm"
-  onclick="runExtract()">
-  Extract Sentinel
-  </button>
-</div>
+                <button class="btn btn-primary btn-sm" onclick="runExtract()">
+                  Extract Sentinel
+                </button>
+                <button class="btn btn-outline-dark btn-sm" onclick="openProjectReport()">
+                  View Survey Detail Table
+                </button>
+              </div>
 
-<div id="status"
-class="text-muted small mt-2">
-Select project & date range
-</div>
+              <div id="status" class="text-muted small mt-2">
+                Select project & date range
+              </div>
 
-</div>
-</div>
+            </div>
+          </div>
 
-</div>
-</div>
-</div>
+        </div>
+      </div>
+    </div>
 
-<div id="footer"></div>
+    <div id="footer"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/project_state.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/project_state.js"></script>
+    <script>
+      async function loadPartial(id, file) {
+        const res = await fetch(file);
+        const html = await res.text();
+        document.getElementById(id).innerHTML = html;
 
-<script>
-const API_BASE = "http://127.0.0.1:8000";
+        if (id === "header") {
+          initHeaderLogic();
+        }
+      }
 
-const map = L.map("map").setView([-2,118],5);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+      function initHeaderLogic() {
+        const userData = localStorage.getItem("user");
+        if (!userData) return;
 
-let CURRENT_PROJECT_ID = null;
-let projectMap = {};
-let projectAOILayer = null;
-let SELECTED_IMAGE_ID = null;
-let sentinelLayer = null;
+        const currentUser = JSON.parse(userData);
 
-// ================= POINT LAYER =================
-let pointsLayer = L.geoJSON(null,{
-  pointToLayer:(f,latlng)=>L.circleMarker(latlng,{radius:6}),
-  onEachFeature:(feature,layer)=>{
+        // tampilkan user info
+        const userInfo = document.getElementById("userInfo");
+        if (userInfo) {
+          userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
+        }
 
-  const p = feature.properties;
+        // hide admin menu
+        if (currentUser.role !== "admin") {
+          document.querySelectorAll(".admin-only").forEach((el) => el.remove());
+        }
 
-  const surveyDate = p.submitted_at
-    ? new Date(p.submitted_at).toLocaleDateString()
-    : "-";
+        // hide surveyor menu
+        if (currentUser.role !== "surveyor") {
+          document
+            .querySelectorAll(".surveyor-only")
+            .forEach((el) => el.remove());
+        }
 
-  const biomass = Number(p.total_biomass ?? 0).toFixed(2);
+        // highlight active link
+        const current = window.location.pathname.split("/").pop();
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          if (link.getAttribute("href") === current) {
+            link.classList.add("active");
+          }
+        });
+      }
 
-  const sentinelSection = p.ndvi
-    ? `
+      window.logout = function () {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "index.html";
+      };
+
+      loadPartial("header", "partials/header.html");
+      loadPartial("footer", "partials/footer.html");
+    </script>
+    <script>
+      const API_BASE = "http://127.0.0.1:8000";
+
+      const map = L.map("map").setView([-2, 118], 5);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+      let CURRENT_PROJECT_ID = null;
+      let projectMap = {};
+      let projectAOILayer = null;
+      let SELECTED_IMAGE_ID = null;
+      let sentinelLayer = null;
+
+      // ================= POINT LAYER =================
+      let pointsLayer = L.geoJSON(null, {
+        pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6 }),
+        onEachFeature: (feature, layer) => {
+
+          const p = feature.properties;
+
+          const surveyDate = p.submitted_at
+            ? new Date(p.submitted_at).toLocaleDateString()
+            : "-";
+
+          const sentinelDate = p.sentinel_date
+            ? new Date(p.sentinel_date).toLocaleDateString()
+            : "-";
+
+          const biomass = Number(p.total_biomass ?? 0).toFixed(2);
+
+          const sentinelSection = p.ndvi
+            ? `
       <div class="mt-2 pt-2 border-top">
         <div class="fw-semibold text-success mb-1">
           Sentinel Data
@@ -139,7 +195,7 @@ let pointsLayer = L.geoJSON(null,{
 
         <div class="d-flex justify-content-between">
           <span>Acquisition</span>
-          <span>${p.sentinel_date}</span>
+          <span>${sentinelDate}</span>
         </div>
 
         <div class="d-flex justify-content-between">
@@ -148,13 +204,13 @@ let pointsLayer = L.geoJSON(null,{
         </div>
       </div>
     `
-    : `
+            : `
       <div class="mt-2 pt-2 border-top text-muted small">
         Sentinel not extracted yet
       </div>
     `;
 
-  layer.bindPopup(`
+          layer.bindPopup(`
     <div style="min-width:240px">
 
       <div class="fw-bold mb-2">
@@ -177,113 +233,133 @@ let pointsLayer = L.geoJSON(null,{
 
     </div>
   `);
-}
-}).addTo(map);
+        }
+      }).addTo(map);
 
-// ================= LOAD PROJECTS =================
-async function loadProjects(){
-  const res = await fetch(`${API_BASE}/projects`);
-  const projects = await res.json();
-  const select = document.getElementById("projectSelect");
+      // ================= LOAD PROJECTS =================
+      async function loadProjects() {
 
-  projects.forEach(p=>{
-    projectMap[p.id]=p;
-    const opt=document.createElement("option");
-    opt.value=p.id;
-    opt.textContent=p.name;
-    select.appendChild(opt);
-  });
-}
+        const res = await fetch(`${API_BASE}/projects`);
+        const projects = await res.json();
+        const select = document.getElementById("projectSelect");
 
-// ================= SELECT PROJECT =================
-function selectProject(){
-  CURRENT_PROJECT_ID =
-    document.getElementById("projectSelect").value;
+        select.innerHTML = `<option value="">-- Select Project --</option>`;
+        projectMap = {};
 
-  if(!CURRENT_PROJECT_ID) return;
+        projects.forEach(p => {
+          projectMap[p.id] = p;
 
-  const project=projectMap[CURRENT_PROJECT_ID];
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.textContent = p.name;
+          select.appendChild(opt);
+        });
 
-  if(projectAOILayer) map.removeLayer(projectAOILayer);
+        // Use project_state.js
+        const savedProject = getCurrentProject();
 
-  projectAOILayer=L.geoJSON(
-    {type:"Feature",geometry:project.aoi}
-  ).addTo(map);
+        if (savedProject && projectMap[savedProject]) {
+          select.value = savedProject;
+          selectProject();
+        } else {
+          clearCurrentProject(); // cleanup if project no longer exists
+        }
+      }
 
-  map.fitBounds(projectAOILayer.getBounds());
 
-  document.getElementById("status")
-  .innerText="Select date range then Load Surveys";
-}
+      // ================= SELECT PROJECT =================
+      function selectProject() {
 
-// ================= LOAD SURVEYS =================
-async function loadSurveys(){
+        CURRENT_PROJECT_ID =
+          document.getElementById("projectSelect").value;
 
-  if(!CURRENT_PROJECT_ID)
-    return alert("Select project");
+        if (!CURRENT_PROJECT_ID) return;
 
-  const start=document.getElementById("startDate").value;
-  const end=document.getElementById("endDate").value;
+        // persist using shared project state
+        setCurrentProject(CURRENT_PROJECT_ID);
 
-  if(!start||!end)
-    return alert("Select date range");
+        const project = projectMap[CURRENT_PROJECT_ID];
 
-  const res =
-  await fetch(`${API_BASE}/sampling/points/${CURRENT_PROJECT_ID}`);
+        if (projectAOILayer) map.removeLayer(projectAOILayer);
 
-  const geojson=await res.json();
+        projectAOILayer = L.geoJSON(
+          { type: "Feature", geometry: project.aoi }
+        ).addTo(map);
 
-  const filteredFeatures = geojson.features.filter(f=>{
-      if(f.properties.survey_status!=="approved")
-        return false;
+        map.fitBounds(projectAOILayer.getBounds());
 
-      const d=f.properties.submitted_at;
-      if(!d) return false;
+        document.getElementById("status")
+          .innerText = "Select date range then Load Surveys";
+      }
 
-      return d>=start && d<=end;
-  });
+      // ================= LOAD SURVEYS =================
+      async function loadSurveys() {
 
-  const filtered={
-    type:"FeatureCollection",
-    features:filteredFeatures
-  };
+        if (!CURRENT_PROJECT_ID)
+          return alert("Select project");
 
-  pointsLayer.clearLayers();
-  pointsLayer.addData(filtered);
+        const start = document.getElementById("startDate").value;
+        const end = document.getElementById("endDate").value;
 
-  document.getElementById("status")
-  .innerText=`Loaded ${filtered.features.length} surveys`;
+        if (!start || !end)
+          return alert("Select date range");
 
-  await loadSentinelScenes(start,end);
-}
+        const res =
+          await fetch(`${API_BASE}/sampling/points/${CURRENT_PROJECT_ID}`);
 
-// ================= LOAD SENTINEL SCENES =================
-async function loadSentinelScenes(start,end){
+        const geojson = await res.json();
 
-  const res = await fetch(
-    `${API_BASE}/sentinel/list-closest-scenes/${CURRENT_PROJECT_ID}`,
-    {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        start_date:start,
-        end_date:end,
-        cloud:50
-      })
-    }
-  );
+        const filteredFeatures = geojson.features.filter(f => {
+          if (f.properties.survey_status !== "approved")
+            return false;
 
-  const scenes = await res.json();
+          const d = f.properties.submitted_at;
+          if (!d) return false;
 
-  const container =
-    document.getElementById("sentinelScenes");
+          return d >= start && d <= end;
+        });
 
-  if(!scenes.length){
-    container.innerHTML="<div>No scenes found</div>";
-    return;
-  }
+        const filtered = {
+          type: "FeatureCollection",
+          features: filteredFeatures
+        };
 
-  container.innerHTML=`
+        pointsLayer.clearLayers();
+        pointsLayer.addData(filtered);
+
+        document.getElementById("status")
+          .innerText = `Loaded ${filtered.features.length} surveys`;
+
+        await loadSentinelScenes(start, end);
+      }
+
+      // ================= LOAD SENTINEL SCENES =================
+      async function loadSentinelScenes(start, end) {
+
+        const res = await fetch(
+          `${API_BASE}/sentinel/list-closest-scenes/${CURRENT_PROJECT_ID}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              start_date: start,
+              end_date: end,
+              cloud: 50
+            })
+          }
+        );
+
+        const scenes = await res.json();
+
+        const container =
+          document.getElementById("sentinelScenes");
+
+        if (!scenes.length) {
+          container.innerHTML = "<div>No scenes found</div>";
+          return;
+        }
+
+        container.innerHTML = `
     <table class="table table-sm">
       <thead>
         <tr>
@@ -294,7 +370,7 @@ async function loadSentinelScenes(start,end){
         </tr>
       </thead>
       <tbody>
-        ${scenes.map(s=>`
+        ${scenes.map(s => `
           <tr>
             <td>
               <input type="radio"
@@ -310,80 +386,93 @@ async function loadSentinelScenes(start,end){
       </tbody>
     </table>
   `;
-}
+      }
 
-// ================= RUN EXTRACT =================
-async function runExtract(){
+      // ================= RUN EXTRACT =================
+      async function runExtract() {
 
-  if(!CURRENT_PROJECT_ID)
-    return alert("Select project");
+        if (!CURRENT_PROJECT_ID)
+          return alert("Select project");
 
-  if(!SELECTED_IMAGE_ID)
-    return alert("Select Sentinel scene first");
+        if (!SELECTED_IMAGE_ID)
+          return alert("Select Sentinel scene first");
 
-  const start=document.getElementById("startDate").value;
-  const end=document.getElementById("endDate").value;
+        const start = document.getElementById("startDate").value;
+        const end = document.getElementById("endDate").value;
 
-  document.getElementById("status")
-  .innerText="Extracting Sentinel...";
+        document.getElementById("status")
+          .innerText = "Extracting Sentinel...";
 
-  const res=await fetch(
-    `${API_BASE}/sentinel/extract/${CURRENT_PROJECT_ID}`,
-    {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        image_id:SELECTED_IMAGE_ID,
-        start_date:start,
-        end_date:end,
-        cloud:50
-      })
-    }
-  );
+        const res = await fetch(
+          `${API_BASE}/sentinel/extract/${CURRENT_PROJECT_ID}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              image_id: SELECTED_IMAGE_ID,
+              start_date: start,
+              end_date: end,
+              cloud: 50
+            })
+          }
+        );
 
-  const data=await res.json();
+        const data = await res.json();
 
-  if(!res.ok){
-    alert(data.detail);
-    return;
-  }
+        if (!res.ok) {
+          alert(data.detail);
+          return;
+        }
 
-  alert(`Processed: ${data.processed_points}`);
+        alert(`Processed: ${data.processed_points}`);
 
-  await showSentinelImage(SELECTED_IMAGE_ID);
+        await showSentinelImage(SELECTED_IMAGE_ID);
 
-  loadSurveys();
-}
+        loadSurveys();
+      }
 
-// ================= SHOW SENTINEL RGB =================
-async function showSentinelImage(imageId){
+      // ================= SHOW SENTINEL RGB =================
+      async function showSentinelImage(imageId) {
 
-  if(sentinelLayer){
-    map.removeLayer(sentinelLayer);
-  }
+        if (sentinelLayer) {
+          map.removeLayer(sentinelLayer);
+        }
 
-  const res = await fetch(
-    `${API_BASE}/sentinel/preview-image`,
-    {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ image_id:imageId })
-    }
-  );
+        const res = await fetch(
+          `${API_BASE}/sentinel/preview-image`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image_id: imageId })
+          }
+        );
 
-  const data = await res.json();
+        const data = await res.json();
 
-  sentinelLayer = L.tileLayer(
-    data.tile_url,
-    { opacity:0.7 }
-  ).addTo(map);
+        sentinelLayer = L.tileLayer(
+          data.tile_url,
+          { opacity: 0.7 }
+        ).addTo(map);
 
-  document.getElementById("status")
-  .innerText="Sentinel imagery loaded";
-}
+        document.getElementById("status")
+          .innerText = "Sentinel imagery loaded";
+      }
 
-loadProjects();
-</script>
+      function openProjectReport() {
+
+        if (!CURRENT_PROJECT_ID) {
+          alert("Select project first");
+          return;
+        }
+
+        window.location.href =
+          `feature_report.html?project_id=${CURRENT_PROJECT_ID}`;
+      }
+
+
+      loadProjects();
+    </script>
 
 </body>
+
 </html>
