@@ -4,283 +4,277 @@
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <script>
-      fetch("partials/head.html")
-        .then((r) => r.text())
-        .then((html) => document.head.insertAdjacentHTML("beforeend", html));
-    </script>
-  </head>
+<head>
+  <script>
+    fetch("partials/head.html")
+      .then((r) => r.text())
+      .then((html) => document.head.insertAdjacentHTML("beforeend", html));
+  </script>
 
-  <body class="d-flex flex-column min-vh-100">
-    <div id="header"></div>
+  <!-- DataTables CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"
+  />
 
-    <div class="container py-4 flex-grow-1">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Users</h4>
-        <button class="btn btn-primary btn-sm" onclick="openForm()">
-          Add User
-        </button>
-      </div>
+  <style>
+    .table-hover tbody tr:hover {
+      background-color: rgba(14,165,233,0.08);
+    }
 
-      <!-- FORM -->
-      <div id="formCard" class="card mb-4 d-none">
-        <div class="card-body">
-          <h6 id="formTitle" class="mb-3">New User</h6>
+    .dataTables_wrapper .dataTables_filter input {
+      border-radius: 8px;
+      padding: 5px 10px;
+    }
 
-          <input type="hidden" id="userIdInput" />
+    .dataTables_wrapper .dataTables_length select {
+      border-radius: 8px;
+    }
+  </style>
+</head>
 
-          <div class="mb-2">
+<body class="d-flex flex-column min-vh-100">
+
+  <div id="header"></div>
+
+  <div class="container py-4 flex-grow-1">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="mb-0 fw-semibold">User Management</h4>
+      <button class="btn btn-primary btn-sm" onclick="openForm()">
+        Add User
+      </button>
+    </div>
+
+    <!-- FORM -->
+    <div id="formCard" class="card shadow-sm mb-4 d-none border-0">
+      <div class="card-body">
+        <h6 id="formTitle" class="mb-3 fw-semibold">New User</h6>
+
+        <input type="hidden" id="userIdInput" />
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
             <label class="form-label small">Name</label>
             <input id="nameInput" class="form-control form-control-sm" />
           </div>
 
-          <div class="mb-2">
+          <div class="col-md-6 mb-3">
             <label class="form-label small">Email</label>
-            <input
-              id="emailInput"
-              type="email"
-              class="form-control form-control-sm"
-            />
+            <input id="emailInput" type="email" class="form-control form-control-sm" />
           </div>
 
-          <div class="mb-2">
+          <div class="col-md-6 mb-3">
             <label class="form-label small">Password</label>
-            <input
-              id="passwordInput"
-              type="password"
-              class="form-control form-control-sm"
-            />
-            <small class="text-muted">Kosongkan jika tidak diubah</small>
+            <input id="passwordInput" type="password" class="form-control form-control-sm" />
+            <small class="text-muted">Leave blank if unchanged</small>
           </div>
 
-          <div class="mb-3">
+          <div class="col-md-6 mb-3">
             <label class="form-label small">Role</label>
             <select id="roleInput" class="form-select form-select-sm">
               <option value="admin">Admin</option>
               <option value="surveyor">Surveyor</option>
             </select>
           </div>
-
-          <div class="d-flex gap-2">
-            <button class="btn btn-success btn-sm" onclick="saveUser()">
-              Save
-            </button>
-            <button class="btn btn-secondary btn-sm" onclick="closeForm()">
-              Cancel
-            </button>
-          </div>
         </div>
-      </div>
 
-      <!-- TABLE -->
-      <div class="card shadow-sm">
-        <div class="card-body p-0">
-          <table class="table table-sm mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th width="120">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="usersTable"></tbody>
-          </table>
+        <div class="d-flex gap-2">
+          <button class="btn btn-success btn-sm px-3" onclick="saveUser()">
+            Save
+          </button>
+          <button class="btn btn-secondary btn-sm px-3" onclick="closeForm()">
+            Cancel
+          </button>
         </div>
       </div>
     </div>
 
-    <div id="footer"></div>
+    <!-- TABLE -->
+    <div class="card shadow-lg border-0">
+      <div class="card-body">
+        <table id="usersTable" class="table table-striped table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th width="140">Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </div>
 
-    <script>
-      async function loadPartial(id, file) {
-        const res = await fetch(file);
-        const html = await res.text();
-        document.getElementById(id).innerHTML = html;
+  <div id="footer"></div>
 
-        if (id === "header") {
-          initHeaderLogic();
-        }
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- jQuery + DataTables -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+    let usersTable;
+
+    async function loadPartial(id, file) {
+      const res = await fetch(file);
+      const html = await res.text();
+      document.getElementById(id).innerHTML = html;
+
+      if (id === "header") {
+        initHeaderLogic();
+      }
+    }
+
+    function initHeaderLogic() {
+      const userData = localStorage.getItem("user");
+      if (!userData) return;
+
+      const currentUser = JSON.parse(userData);
+
+      const userInfo = document.getElementById("userInfo");
+      if (userInfo) {
+        userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
       }
 
-      function initHeaderLogic() {
-        const userData = localStorage.getItem("user");
-        if (!userData) return;
-
-        const currentUser = JSON.parse(userData);
-
-        // tampilkan user info
-        const userInfo = document.getElementById("userInfo");
-        if (userInfo) {
-          userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
-        }
-
-        // hide admin menu
-        if (currentUser.role !== "admin") {
-          document.querySelectorAll(".admin-only").forEach((el) => el.remove());
-        }
-
-        // hide surveyor menu
-        if (currentUser.role !== "surveyor") {
-          document
-            .querySelectorAll(".surveyor-only")
-            .forEach((el) => el.remove());
-        }
-
-        // highlight active link
-        const current = window.location.pathname.split("/").pop();
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          if (link.getAttribute("href") === current) {
-            link.classList.add("active");
-          }
-        });
+      if (currentUser.role !== "admin") {
+        document.querySelectorAll(".admin-only").forEach((el) => el.remove());
       }
 
-      window.logout = function () {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "index.html";
+      if (currentUser.role !== "surveyor") {
+        document.querySelectorAll(".surveyor-only").forEach((el) => el.remove());
+      }
+
+      const current = window.location.pathname.split("/").pop();
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        if (link.getAttribute("href") === current) {
+          link.classList.add("active");
+        }
+      });
+    }
+
+    window.logout = function () {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    };
+
+    loadPartial("header", "partials/header.html");
+    loadPartial("footer", "partials/footer.html");
+
+    async function loadUsers() {
+      const res = await fetch(`${API_BASE}/users`);
+      const data = await res.json();
+
+      if (usersTable) {
+        usersTable.clear().destroy();
+      }
+
+      const tbody = document.querySelector("#usersTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach((u) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${u.name}</strong></td>
+          <td>${u.email}</td>
+          <td>
+            <span class="badge ${
+              u.role === "admin" ? "bg-danger" : "bg-success"
+            }">
+              ${u.role}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-outline-warning me-1"
+              onclick='editUser(${JSON.stringify(u)})'>
+              Edit
+            </button>
+            <button class="btn btn-sm btn-outline-danger"
+              onclick="deleteUser('${u.id}')">
+              Delete
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      usersTable = new DataTable("#usersTable", {
+        pageLength: 5,
+        lengthMenu: [5, 10, 20, 50],
+        ordering: true,
+        responsive: true,
+      });
+    }
+
+    function openForm() {
+      document.getElementById("formTitle").innerText = "New User";
+      document.getElementById("formCard").classList.remove("d-none");
+      document.getElementById("userIdInput").value = "";
+    }
+
+    function closeForm() {
+      document.getElementById("formCard").classList.add("d-none");
+      document.getElementById("nameInput").value = "";
+      document.getElementById("emailInput").value = "";
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("roleInput").value = "surveyor";
+    }
+
+    function editUser(u) {
+      openForm();
+      document.getElementById("formTitle").innerText = "Edit User";
+      document.getElementById("userIdInput").value = u.id;
+      document.getElementById("nameInput").value = u.name;
+      document.getElementById("emailInput").value = u.email;
+      document.getElementById("roleInput").value = u.role;
+    }
+
+    async function saveUser() {
+      const id = document.getElementById("userIdInput").value;
+
+      const payload = {
+        name: nameInput.value,
+        email: emailInput.value,
+        password: passwordInput.value,
+        role: roleInput.value,
       };
 
-      loadPartial("header", "partials/header.html");
-      loadPartial("footer", "partials/footer.html");
-    </script>
+      const url = id ? `${API_BASE}/users/${id}` : `${API_BASE}/users`;
+      const method = id ? "PUT" : "POST";
 
-    <script>
-      async function loadPartial(id, file) {
-        const res = await fetch(file);
-        const html = await res.text();
-        document.getElementById(id).innerHTML = html;
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-        if (id === "header") {
-          initHeaderLogic();
-        }
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.detail || "Failed");
+        return;
       }
 
-      function initHeaderLogic() {
-        const userData = localStorage.getItem("user");
-        if (!userData) return;
-
-        const currentUser = JSON.parse(userData);
-
-        // tampilkan user info
-        const userInfo = document.getElementById("userInfo");
-        if (userInfo) {
-          userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
-        }
-
-        // hide admin menu
-        if (currentUser.role !== "admin") {
-          document.querySelectorAll(".admin-only").forEach((el) => el.remove());
-        }
-
-        // hide surveyor menu
-        if (currentUser.role !== "surveyor") {
-          document
-            .querySelectorAll(".surveyor-only")
-            .forEach((el) => el.remove());
-        }
-
-        // highlight active link
-        const current = window.location.pathname.split("/").pop();
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          if (link.getAttribute("href") === current) {
-            link.classList.add("active");
-          }
-        });
-      }
-
-      loadPartial("header", "partials/header.html");
-      loadPartial("footer", "partials/footer.html");
-    </script>
-
-    <script>
-      const API_BASE = "http://127.0.0.1:8000";
-
-      async function loadUsers() {
-        const res = await fetch(`${API_BASE}/users`);
-        const data = await res.json();
-
-        const tbody = document.getElementById("usersTable");
-        tbody.innerHTML = "";
-
-        data.forEach((u) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${u.name}</td>
-            <td>${u.email}</td>
-            <td>${u.role}</td>
-            <td>
-              <button class="btn btn-sm btn-warning" onclick='editUser(${JSON.stringify(u)})'>Edit</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">Delete</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      function openForm() {
-        document.getElementById("formTitle").innerText = "New User";
-        document.getElementById("formCard").classList.remove("d-none");
-        document.getElementById("userIdInput").value = "";
-      }
-
-      function closeForm() {
-        document.getElementById("formCard").classList.add("d-none");
-        document.getElementById("nameInput").value = "";
-        document.getElementById("emailInput").value = "";
-        document.getElementById("passwordInput").value = "";
-        document.getElementById("roleInput").value = "surveyor";
-      }
-
-      function editUser(u) {
-        openForm();
-        document.getElementById("formTitle").innerText = "Edit User";
-        document.getElementById("userIdInput").value = u.id;
-        document.getElementById("nameInput").value = u.name;
-        document.getElementById("emailInput").value = u.email;
-        document.getElementById("roleInput").value = u.role;
-      }
-
-      async function saveUser() {
-        const id = document.getElementById("userIdInput").value;
-        const payload = {
-          name: nameInput.value,
-          email: emailInput.value,
-          password: passwordInput.value,
-          role: roleInput.value,
-        };
-
-        const url = id ? `${API_BASE}/users/${id}` : `${API_BASE}/users`;
-        const method = id ? "PUT" : "POST";
-
-        const res = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) {
-          const err = await res.json();
-          alert(err.detail || "Failed");
-          return;
-        }
-
-        closeForm();
-        loadUsers();
-      }
-
-      async function deleteUser(id) {
-        if (!confirm("Delete this user?")) return;
-
-        await fetch(`${API_BASE}/users/${id}`, { method: "DELETE" });
-        loadUsers();
-      }
-
+      closeForm();
       loadUsers();
-    </script>
-  </body>
+    }
+
+    async function deleteUser(id) {
+      if (!confirm("Delete this user?")) return;
+
+      await fetch(`${API_BASE}/users/${id}`, { method: "DELETE" });
+      loadUsers();
+    }
+
+    loadUsers();
+  </script>
+
+</body>
 </html>

@@ -4,388 +4,401 @@
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <script>
-      fetch("partials/head.html")
-        .then((r) => r.text())
-        .then((html) => document.head.insertAdjacentHTML("beforeend", html));
-    </script>
-  </head>
 
-  <!-- IMAGE MODAL -->
-  <div class="modal fade" id="imageModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content bg-dark">
-        <div class="modal-body text-center p-0">
-          <img id="modalImage" class="img-fluid" />
-        </div>
+<head>
+  <script>
+    fetch("partials/head.html")
+      .then((r) => r.text())
+      .then((html) => document.head.insertAdjacentHTML("beforeend", html));
+  </script>
+  <style>
+    .dataTables_wrapper .dataTables_paginate {
+      text-align: right !important;
+      float: right !important;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+      float: left !important;
+    }
+
+    .dataTables_wrapper .row:last-child {
+      align-items: center;
+    }
+  </style>
+
+</head>
+
+<!-- IMAGE MODAL -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark">
+      <div class="modal-body text-center p-0">
+        <img id="modalImage" class="img-fluid" />
       </div>
     </div>
   </div>
+</div>
 
-  <body class="d-flex flex-column min-vh-100">
-    <div id="header"></div>
+<body class="d-flex flex-column min-vh-100">
+  <div id="header"></div>
 
-    <div class="container py-4 flex-grow-1">
-      <div class="d-flex justify-content-between mb-3">
-        <h4>Tree Species</h4>
-        <button class="btn btn-primary btn-sm" onclick="openForm()">
-          Add Species
+  <div class="container py-4 flex-grow-1">
+    <div class="d-flex justify-content-between mb-3">
+      <h4>Tree Species</h4>
+      <button class="btn btn-primary btn-sm" onclick="openForm()">
+        Add Species
+      </button>
+    </div>
+
+    <!-- FORM -->
+    <div id="formCard" class="card mb-4 d-none">
+      <div class="card-body">
+        <input type="hidden" id="speciesId" />
+
+        <div class="mb-2">
+          <label>Name</label>
+          <input id="localName" class="form-control form-control-sm" />
+        </div>
+
+        <div class="mb-2">
+          <label>Scientific Name</label>
+          <input id="scientificName" class="form-control form-control-sm" />
+        </div>
+
+        <div class="mb-2">
+          <label>Wood Density</label>
+          <input id="woodDensity" type="number" step="0.01" class="form-control form-control-sm" />
+        </div>
+
+        <div class="mb-2">
+          <label>Biomass Formula</label>
+          <textarea id="biomassFormula" class="form-control form-control-sm"
+            placeholder="Example: exp(-1.803 + 0.976 * ln(wood_density * (dbh ^ 2)))">
+            </textarea>
+          <div id="formulaError" class="text-danger small mt-1"></div>
+        </div>
+
+        <div class="mb-3">
+          <label>Description</label>
+          <textarea id="description" class="form-control form-control-sm" style="min-height:150px;"></textarea>
+        </div>
+
+        <!-- PHOTOS -->
+        <div class="mb-2">
+          <label>Leaf Photo</label>
+          <input type="file" id="leafFile" accept="image/*" capture="environment" />
+          <div id="leafPreview" class="mt-2"></div>
+        </div>
+
+        <div class="mb-2">
+          <label>Trunk Photo</label>
+          <input type="file" id="trunkFile" accept="image/*" capture="environment" />
+          <div id="trunkPreview" class="mt-2"></div>
+        </div>
+
+        <div class="mb-3">
+          <label>Full Tree Photo</label>
+          <input type="file" id="treeFile" accept="image/*" capture="environment" />
+          <div id="treePreview" class="mt-2"></div>
+        </div>
+
+        <button class="btn btn-success btn-sm" onclick="saveSpecies()">
+          Save
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="closeForm()">
+          Cancel
         </button>
       </div>
+    </div>
 
-      <!-- FORM -->
-      <div id="formCard" class="card mb-4 d-none">
-        <div class="card-body">
-          <input type="hidden" id="speciesId" />
+    <!-- TABLE -->
+    <div class="card shadow border-0 rounded-4">
+      <div class="card-body p-3">
 
-          <div class="mb-2">
-            <label>Name</label>
-            <input id="localName" class="form-control form-control-sm" />
-          </div>
-
-          <div class="mb-2">
-            <label>Scientific Name</label>
-            <input id="scientificName" class="form-control form-control-sm" />
-          </div>
-
-          <div class="mb-2">
-            <label>Wood Density</label>
-            <input
-              id="woodDensity"
-              type="number"
-              step="0.01"
-              class="form-control form-control-sm"
-            />
-          </div>
-
-          <div class="mb-2">
-            <label>Biomass Formula</label>
-            <textarea
-              id="biomassFormula"
-              class="form-control form-control-sm"
-              placeholder="Example: exp(-1.803 + 0.976 * ln(wood_density * (dbh ^ 2)))"
-            >
-            </textarea>
-            <div id="formulaError" class="text-danger small mt-1"></div>
-          </div>
-
-          <div class="mb-3">
-            <label>Description</label>
-            <textarea
-              id="description"
-              class="form-control form-control-sm"
-            ></textarea>
-          </div>
-
-          <!-- PHOTOS -->
-          <div class="mb-2">
-            <label>Leaf Photo</label>
-            <input
-              type="file"
-              id="leafFile"
-              accept="image/*"
-              capture="environment"
-            />
-            <div id="leafPreview" class="mt-2"></div>
-          </div>
-
-          <div class="mb-2">
-            <label>Trunk Photo</label>
-            <input
-              type="file"
-              id="trunkFile"
-              accept="image/*"
-              capture="environment"
-            />
-            <div id="trunkPreview" class="mt-2"></div>
-          </div>
-
-          <div class="mb-3">
-            <label>Full Tree Photo</label>
-            <input
-              type="file"
-              id="treeFile"
-              accept="image/*"
-              capture="environment"
-            />
-            <div id="treePreview" class="mt-2"></div>
-          </div>
-
-          <button class="btn btn-success btn-sm" onclick="saveSpecies()">
-            Save
-          </button>
-          <button class="btn btn-secondary btn-sm" onclick="closeForm()">
-            Cancel
-          </button>
-        </div>
-      </div>
-
-      <!-- TABLE -->
-      <div class="card shadow-sm">
-        <div class="card-body p-0">
-          <table class="table table-sm mb-0">
+        <div class="table-responsive">
+          <table id="speciesDataTable" class="table table-hover align-middle mb-0" style="width:100%">
             <thead class="table-light">
               <tr>
-                <th>Name</th>
-                <th>Scientific</th>
-                <th>Density</th>
-                <th>Photos</th>
-                <th width="150">Actions</th>
+                <th class="fw-semibold">Name</th>
+                <th class="fw-semibold">Scientific</th>
+                <th class="fw-semibold text-center">Density</th>
+                <th class="fw-semibold text-center">Photos</th>
+                <th class="fw-semibold text-center" width="150">Actions</th>
               </tr>
             </thead>
             <tbody id="speciesTable"></tbody>
           </table>
         </div>
+
       </div>
     </div>
 
-    <div id="footer"></div>
+  </div>
 
-    <script>
-      async function loadPartial(id, file) {
-        const res = await fetch(file);
-        const html = await res.text();
-        document.getElementById(id).innerHTML = html;
+  <div id="footer"></div>
 
-        if (id === "header") {
-          initHeaderLogic();
+  <script>
+    async function loadPartial(id, file) {
+      const res = await fetch(file);
+      const html = await res.text();
+      document.getElementById(id).innerHTML = html;
+
+      if (id === "header") {
+        initHeaderLogic();
+      }
+    }
+
+    function initHeaderLogic() {
+      const userData = localStorage.getItem("user");
+      if (!userData) return;
+
+      const currentUser = JSON.parse(userData);
+
+      const userInfo = document.getElementById("userInfo");
+      if (userInfo) {
+        userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
+      }
+
+      if (currentUser.role !== "admin") {
+        document.querySelectorAll(".admin-only").forEach((el) => el.remove());
+      }
+
+      if (currentUser.role !== "surveyor") {
+        document
+          .querySelectorAll(".surveyor-only")
+          .forEach((el) => el.remove());
+      }
+
+      const current = window.location.pathname.split("/").pop();
+
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        if (link.getAttribute("href") === current) {
+          link.classList.add("active");
+        }
+      });
+    }
+
+    window.logout = function () {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    };
+
+    loadPartial("header", "partials/header.html");
+    loadPartial("footer", "partials/footer.html");
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jQuery (required for DataTables) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- DataTables -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+  <script>
+    let CURRENT_EDIT_IMAGES = {
+      leaf: null,
+      trunk: null,
+      tree: null,
+    };
+
+    const API = "http://127.0.0.1:8000";
+
+    /* ========================= */
+    /* FORMULA VALIDATION       */
+    /* ========================= */
+
+    function validateFormula(formula) {
+      if (!formula || !formula.trim()) return null;
+
+      formula = formula.trim();
+
+      const forbidden = [
+        "import",
+        "exec",
+        "eval",
+        "os",
+        "sys",
+        "subprocess",
+        "__",
+        "lambda",
+        "class",
+        "open",
+        "globals",
+        "locals",
+      ];
+
+      for (let word of forbidden) {
+        if (formula.toLowerCase().includes(word)) {
+          return "Forbidden keyword detected: " + word;
         }
       }
 
-      function initHeaderLogic() {
-        const userData = localStorage.getItem("user");
-        if (!userData) return;
+      const allowedPattern = /^[0-9a-zA-Z_\s\.\+\-\*\/\^\(\)]*$/;
+      if (!allowedPattern.test(formula)) {
+        return "Invalid characters detected";
+      }
 
-        const currentUser = JSON.parse(userData);
+      const allowedFunctions = ["exp", "ln", "log", "sqrt"];
+      const functionCalls = formula.match(/[a-zA-Z_]+\s*\(/g);
 
-        const userInfo = document.getElementById("userInfo");
-        if (userInfo) {
-          userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
-        }
-
-        if (currentUser.role !== "admin") {
-          document.querySelectorAll(".admin-only").forEach((el) => el.remove());
-        }
-
-        if (currentUser.role !== "surveyor") {
-          document
-            .querySelectorAll(".surveyor-only")
-            .forEach((el) => el.remove());
-        }
-
-        const current = window.location.pathname.split("/").pop();
-
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          if (link.getAttribute("href") === current) {
-            link.classList.add("active");
+      if (functionCalls) {
+        for (let fn of functionCalls) {
+          const name = fn.replace("(", "").trim();
+          if (!allowedFunctions.includes(name)) {
+            return "Function not allowed: " + name;
           }
-        });
+        }
       }
 
-      window.logout = function () {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "index.html";
+      if (!formula.includes("dbh")) {
+        return "Formula must use dbh variable";
+      }
+
+      return null;
+    }
+
+    document
+      .getElementById("biomassFormula")
+      .addEventListener("input", function () {
+        const error = validateFormula(this.value);
+        const errorBox = document.getElementById("formulaError");
+
+        if (error) {
+          errorBox.innerText = error;
+        } else {
+          errorBox.innerText = "";
+        }
+      });
+
+    /* ========================= */
+    /* BASIC FUNCTIONS           */
+    /* ========================= */
+
+    function openForm() {
+      document.getElementById("formCard").classList.remove("d-none");
+
+      speciesId.value = "";
+      CURRENT_EDIT_IMAGES = { leaf: null, trunk: null, tree: null };
+
+      document.getElementById("leafPreview").innerHTML = "";
+      document.getElementById("trunkPreview").innerHTML = "";
+      document.getElementById("treePreview").innerHTML = "";
+    }
+
+    function closeForm() {
+      document.getElementById("formCard").classList.add("d-none");
+    }
+
+    async function uploadFile(inputId) {
+      const input = document.getElementById(inputId);
+      if (!input.files.length) return null;
+
+      const formData = new FormData();
+      formData.append("file", input.files[0]);
+
+      const res = await fetch(`${API}/upload?category=tree_species`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      return data.url;
+    }
+
+    /* ========================= */
+    /* SAVE SPECIES              */
+    /* ========================= */
+
+    async function saveSpecies() {
+      const formula = biomassFormula.value.trim();
+      let formulaError = null;
+
+      if (formula) {
+        formulaError = validateFormula(formula);
+      }
+
+      if (formulaError) {
+        alert("Formula error: " + formulaError);
+        return;
+      }
+
+      const newLeaf = await uploadFile("leafFile");
+      const newTrunk = await uploadFile("trunkFile");
+      const newTree = await uploadFile("treeFile");
+
+      const leafUrl = newLeaf || CURRENT_EDIT_IMAGES.leaf;
+      const trunkUrl = newTrunk || CURRENT_EDIT_IMAGES.trunk;
+      const treeUrl = newTree || CURRENT_EDIT_IMAGES.tree;
+
+      const payload = {
+        local_name: localName.value,
+        scientific_name: scientificName.value,
+        wood_density: parseFloat(woodDensity.value) || null,
+        biomass_formula: formula,
+        description: description.value,
+        leaf_photo_url: leafUrl,
+        trunk_photo_url: trunkUrl,
+        tree_photo_url: treeUrl,
       };
 
-      loadPartial("header", "partials/header.html");
-      loadPartial("footer", "partials/footer.html");
-    </script>
+      const id = speciesId.value;
+      const url = id ? `${API}/tree-species/${id}` : `${API}/tree-species`;
+      const method = id ? "PUT" : "POST";
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    <script>
-      let CURRENT_EDIT_IMAGES = {
-        leaf: null,
-        trunk: null,
-        tree: null,
-      };
-
-      const API = "http://127.0.0.1:8000";
-
-      /* ========================= */
-      /* FORMULA VALIDATION       */
-      /* ========================= */
-
-      function validateFormula(formula) {
-        if (!formula || !formula.trim()) return null;
-
-        formula = formula.trim();
-
-        const forbidden = [
-          "import",
-          "exec",
-          "eval",
-          "os",
-          "sys",
-          "subprocess",
-          "__",
-          "lambda",
-          "class",
-          "open",
-          "globals",
-          "locals",
-        ];
-
-        for (let word of forbidden) {
-          if (formula.toLowerCase().includes(word)) {
-            return "Forbidden keyword detected: " + word;
-          }
-        }
-
-        const allowedPattern = /^[0-9a-zA-Z_\s\.\+\-\*\/\^\(\)]*$/;
-        if (!allowedPattern.test(formula)) {
-          return "Invalid characters detected";
-        }
-
-        const allowedFunctions = ["exp", "ln", "log", "sqrt"];
-        const functionCalls = formula.match(/[a-zA-Z_]+\s*\(/g);
-
-        if (functionCalls) {
-          for (let fn of functionCalls) {
-            const name = fn.replace("(", "").trim();
-            if (!allowedFunctions.includes(name)) {
-              return "Function not allowed: " + name;
-            }
-          }
-        }
-
-        if (!formula.includes("dbh")) {
-          return "Formula must use dbh variable";
-        }
-
-        return null;
+      if (!res.ok) {
+        alert("Failed to save species");
+        return;
       }
 
-      document
-        .getElementById("biomassFormula")
-        .addEventListener("input", function () {
-          const error = validateFormula(this.value);
-          const errorBox = document.getElementById("formulaError");
+      alert("Saved successfully");
+      closeForm();
+      loadSpecies();
+    }
 
-          if (error) {
-            errorBox.innerText = error;
-          } else {
-            errorBox.innerText = "";
-          }
-        });
+    /* ========================= */
+    /* LOAD SPECIES              */
+    /* ========================= */
 
-      /* ========================= */
-      /* BASIC FUNCTIONS           */
-      /* ========================= */
+    async function loadSpecies() {
+      const res = await fetch(`${API}/tree-species`);
+      const data = await res.json();
 
-      function openForm() {
-        document.getElementById("formCard").classList.remove("d-none");
+      const tableElement = $("#speciesDataTable");
 
-        speciesId.value = "";
-        CURRENT_EDIT_IMAGES = { leaf: null, trunk: null, tree: null };
-
-        document.getElementById("leafPreview").innerHTML = "";
-        document.getElementById("trunkPreview").innerHTML = "";
-        document.getElementById("treePreview").innerHTML = "";
+      // Destroy DataTable if already initialized
+      if ($.fn.DataTable.isDataTable("#speciesDataTable")) {
+        tableElement.DataTable().destroy();
       }
 
-      function closeForm() {
-        document.getElementById("formCard").classList.add("d-none");
-      }
+      const tbody = document.getElementById("speciesTable");
+      tbody.innerHTML = "";
 
-      async function uploadFile(inputId) {
-        const input = document.getElementById(inputId);
-        if (!input.files.length) return null;
-
-        const formData = new FormData();
-        formData.append("file", input.files[0]);
-
-        const res = await fetch(`${API}/upload?category=tree_species`, {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-        return data.url;
-      }
-
-      /* ========================= */
-      /* SAVE SPECIES              */
-      /* ========================= */
-
-      async function saveSpecies() {
-        const formula = biomassFormula.value.trim();
-        let formulaError = null;
-
-        if (formula) {
-          formulaError = validateFormula(formula);
-        }
-
-        if (formulaError) {
-          alert("Formula error: " + formulaError);
-          return;
-        }
-
-        const newLeaf = await uploadFile("leafFile");
-        const newTrunk = await uploadFile("trunkFile");
-        const newTree = await uploadFile("treeFile");
-
-        const leafUrl = newLeaf || CURRENT_EDIT_IMAGES.leaf;
-        const trunkUrl = newTrunk || CURRENT_EDIT_IMAGES.trunk;
-        const treeUrl = newTree || CURRENT_EDIT_IMAGES.tree;
-
-        const payload = {
-          local_name: localName.value,
-          scientific_name: scientificName.value,
-          wood_density: parseFloat(woodDensity.value) || null,
-          biomass_formula: formula,
-          description: description.value,
-          leaf_photo_url: leafUrl,
-          trunk_photo_url: trunkUrl,
-          tree_photo_url: treeUrl,
-        };
-
-        const id = speciesId.value;
-        const url = id ? `${API}/tree-species/${id}` : `${API}/tree-species`;
-        const method = id ? "PUT" : "POST";
-
-        const res = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) {
-          alert("Failed to save species");
-          return;
-        }
-
-        alert("Saved successfully");
-        closeForm();
-        loadSpecies();
-      }
-
-      /* ========================= */
-      /* LOAD SPECIES              */
-      /* ========================= */
-
-      async function loadSpecies() {
-        const res = await fetch(`${API}/tree-species`);
-        const data = await res.json();
-
-        const tbody = document.getElementById("speciesTable");
-        tbody.innerHTML = "";
-
-        data.forEach((s) => {
-          function thumb(url) {
-            if (!url) return "-";
-            return `<img src="${url}" style="width:60px;height:60px;object-fit:cover;cursor:pointer;border-radius:6px"
+      data.forEach((s) => {
+        function thumb(url) {
+          if (!url) return "-";
+          return `<img src="${url}" 
+        style="width:60px;height:60px;object-fit:cover;cursor:pointer;border-radius:6px"
         onclick="showImage('${url}')">`;
-          }
+        }
 
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
       <td>${s.local_name}</td>
       <td><em>${s.scientific_name}</em></td>
       <td>${s.wood_density || "-"}</td>
-      <td>${thumb(s.leaf_photo_url)} ${thumb(s.trunk_photo_url)} ${thumb(s.tree_photo_url)}</td>
+      <td>
+        ${thumb(s.leaf_photo_url)}
+        ${thumb(s.trunk_photo_url)}
+        ${thumb(s.tree_photo_url)}
+      </td>
       <td>
         <button class="btn btn-sm btn-warning"
           onclick='editSpecies(${JSON.stringify(s)})'>Edit</button>
@@ -393,56 +406,66 @@
           onclick="deleteSpecies(${s.id})">Delete</button>
       </td>
     `;
-          tbody.appendChild(tr);
-        });
-      }
+        tbody.appendChild(tr);
+      });
 
-      async function deleteSpecies(id) {
-        if (!confirm("Delete this species?")) return;
-        await fetch(`${API}/tree-species/${id}`, { method: "DELETE" });
-        loadSpecies();
-      }
+      // Reinitialize DataTable
+      $("#speciesDataTable").DataTable({
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50],
+        ordering: true,
+        responsive: true
+      });
+    }
 
-      function editSpecies(s) {
-        openForm();
 
-        speciesId.value = s.id;
-        localName.value = s.local_name;
-        scientificName.value = s.scientific_name;
-        woodDensity.value = s.wood_density;
-        biomassFormula.value = s.biomass_formula;
-        description.value = s.description;
+    async function deleteSpecies(id) {
+      if (!confirm("Delete this species?")) return;
+      await fetch(`${API}/tree-species/${id}`, { method: "DELETE" });
+      loadSpecies();
+    }
 
-        // Store existing image URLs
-        CURRENT_EDIT_IMAGES.leaf = s.leaf_photo_url;
-        CURRENT_EDIT_IMAGES.trunk = s.trunk_photo_url;
-        CURRENT_EDIT_IMAGES.tree = s.tree_photo_url;
+    function editSpecies(s) {
+      openForm();
 
-        // Show previews
-        showExistingPreview("leafPreview", s.leaf_photo_url);
-        showExistingPreview("trunkPreview", s.trunk_photo_url);
-        showExistingPreview("treePreview", s.tree_photo_url);
-      }
+      speciesId.value = s.id;
+      localName.value = s.local_name;
+      scientificName.value = s.scientific_name;
+      woodDensity.value = s.wood_density;
+      biomassFormula.value = s.biomass_formula;
+      description.value = s.description;
 
-      function showExistingPreview(containerId, url) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = "";
+      // Store existing image URLs
+      CURRENT_EDIT_IMAGES.leaf = s.leaf_photo_url;
+      CURRENT_EDIT_IMAGES.trunk = s.trunk_photo_url;
+      CURRENT_EDIT_IMAGES.tree = s.tree_photo_url;
 
-        if (!url) return;
+      // Show previews
+      showExistingPreview("leafPreview", s.leaf_photo_url);
+      showExistingPreview("trunkPreview", s.trunk_photo_url);
+      showExistingPreview("treePreview", s.tree_photo_url);
+    }
 
-        container.innerHTML = `
+    function showExistingPreview(containerId, url) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      if (!url) return;
+
+      container.innerHTML = `
             <img src="${url}"
             style="width:100px;height:100px;object-fit:cover;border-radius:8px;cursor:pointer"
             onclick="showImage('${url}')">
         `;
-      }
+    }
 
-      function showImage(url) {
-        document.getElementById("modalImage").src = url;
-        new bootstrap.Modal(document.getElementById("imageModal")).show();
-      }
+    function showImage(url) {
+      document.getElementById("modalImage").src = url;
+      new bootstrap.Modal(document.getElementById("imageModal")).show();
+    }
 
-      loadSpecies();
-    </script>
-  </body>
+    loadSpecies();
+  </script>
+</body>
+
 </html>

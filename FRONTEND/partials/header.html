@@ -1,17 +1,15 @@
+<!-- ===============================
+AUTH & ROLE PROTECTION
+=============================== -->
 <script>
-  // ===============================
-  // AUTH & ROLE PROTECTION
-  // ===============================
   const token = localStorage.getItem("token");
   const userData = localStorage.getItem("user");
   const currentUser = userData ? JSON.parse(userData) : null;
 
-  // Redirect if not logged in
   if (!token || !currentUser) {
     window.location.href = "index.html";
   }
 
-  // Page-level role restriction
   if (window.REQUIRED_ROLE) {
     const allowed = Array.isArray(window.REQUIRED_ROLE)
       ? window.REQUIRED_ROLE
@@ -24,83 +22,78 @@
   }
 </script>
 
-<header class="bg-primary text-white shadow-sm">
-  <nav class="navbar navbar-expand-lg navbar-dark container-fluid">
-    
-    <a class="navbar-brand fw-semibold" href="main.html">
-      AOI Sentinel Survey
+<!-- ===============================
+HEADER
+=============================== -->
+<header class="custom-navbar shadow">
+  <nav class="navbar navbar-expand-lg navbar-dark container px-4">
+
+    <a class="navbar-brand text-white" href="main.html">
+      Carbon Monitoring System
     </a>
 
-    <div class="collapse navbar-collapse">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-        <!-- ================= ADMIN MENU ================= -->
         <li class="nav-item admin-only">
-          <a class="nav-link" href="main.html">Project</a>
+          <a class="nav-link text-white" href="main.html">Project</a>
         </li>
 
         <li class="nav-item admin-only">
-          <a class="nav-link" href="analysis.html">Carbon Analysis</a>
+          <a class="nav-link text-white" href="analysis.html">Carbon Analysis</a>
         </li>
 
         <li class="nav-item admin-only">
-          <a class="nav-link" href="surveyors.html">Surveyor</a>
+          <a class="nav-link text-white" href="surveyors.html">Surveyor</a>
         </li>
 
         <li class="nav-item admin-only">
-          <a class="nav-link" href="tree_species.html">Tree Species</a>
+          <a class="nav-link text-white" href="tree_species.html">Tree Species</a>
         </li>
 
-        <!-- ================= SURVEYOR MENU ================= -->
         <li class="nav-item surveyor-only">
-          <a class="nav-link" href="surveyor_main.html">Project</a>
+          <a class="nav-link text-white" href="surveyor_main.html">Project</a>
         </li>
-
       </ul>
 
       <div class="d-flex align-items-center gap-3">
-        <span class="small text-white-50" id="userInfo"></span>
-        <button class="btn btn-sm btn-light" onclick="logout()">
+        <span class="user-badge text-white" id="userInfo"></span>
+        <button class="btn btn-logout text-white" onclick="logout()">
           Logout
         </button>
       </div>
+
     </div>
   </nav>
 </header>
 
+
 <script>
-  // ===============================
-  // USER INFO DISPLAY
-  // ===============================
   if (currentUser) {
     document.getElementById("userInfo").innerText =
       currentUser.name + " (" + currentUser.role + ")";
 
-    // Hide admin menu if not admin
     if (currentUser.role !== "admin") {
-      document.querySelectorAll(".admin-only").forEach((el) => el.remove());
+      document.querySelectorAll(".admin-only").forEach(el => el.remove());
     }
 
-    // Hide surveyor menu if not surveyor
     if (currentUser.role !== "surveyor") {
-      document.querySelectorAll(".surveyor-only").forEach((el) => el.remove());
+      document.querySelectorAll(".surveyor-only").forEach(el => el.remove());
     }
   }
 
-  // ===============================
-  // HIGHLIGHT ACTIVE LINK
-  // ===============================
   const currentPage = window.location.pathname.split("/").pop();
 
-  document.querySelectorAll(".nav-link").forEach((link) => {
+  document.querySelectorAll(".nav-link").forEach(link => {
     if (link.getAttribute("href") === currentPage) {
       link.classList.add("active");
     }
   });
 
-  // ===============================
-  // LOGOUT
-  // ===============================
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
