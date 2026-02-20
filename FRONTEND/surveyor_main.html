@@ -1,314 +1,281 @@
-<script>
-  window.REQUIRED_ROLE = "surveyor";
-</script>
-
 <!doctype html>
 <html lang="en">
-  <head>
-    <script>
-      fetch("partials/head.html")
-        .then((r) => r.text())
-        .then((html) => {
-          document.head.insertAdjacentHTML("beforeend", html);
-        });
-    </script>
 
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+<head>
+  <script src="js/config.js"></script>
+  <script>
+    window.REQUIRED_ROLE = "surveyor";
+  </script>
+  <script>
+    fetch("partials/head.html")
+      .then((r) => r.text())
+      .then((html) => {
+        document.head.insertAdjacentHTML("beforeend", html);
+      });
+  </script>
 
-    <style>
-      #map {
-        width: 100%;
-        height: 100%;
-      }
-      .container-fluid,
-      .row {
-        height: 100%;
-      }
-    </style>
-  </head>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <body class="d-flex flex-column min-vh-100">
-    <div id="header"></div>
+  <style>
+    #map {
+      width: 100%;
+      height: 100%;
+    }
 
-    <!-- ========================= -->
-    <!-- MODAL -->
-    <!-- ========================= -->
-    <div class="modal fade" id="measurementModal" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Tree Measurement</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
+    .container-fluid,
+    .row {
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  <div id="header"></div>
+
+  <!-- ========================= -->
+  <!-- MODAL -->
+  <!-- ========================= -->
+  <div class="modal fade" id="measurementModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tree Measurement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" id="measurementPointId" />
+
+          <!-- Survey Description -->
+          <div class="alert alert-info small">
+            <strong>Survey Description:</strong>
+            <div id="surveyDescription"></div>
           </div>
 
-          <div class="modal-body">
-            <input type="hidden" id="measurementPointId" />
-
-            <!-- Survey Description -->
-            <div class="alert alert-info small">
-              <strong>Survey Description:</strong>
-              <div id="surveyDescription"></div>
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <label>Tree Species</label>
+              <select id="speciesSelect" class="form-select form-select-sm"></select>
             </div>
 
-            <div class="row">
-              <div class="col-md-6 mb-2">
-                <label>Tree Species</label>
-                <select
-                  id="speciesSelect"
-                  class="form-select form-select-sm"
-                ></select>
-              </div>
-
-              <!-- Species Detail -->
-              <div class="col-12 mb-2">
-                <div
-                  id="speciesDetailBox"
-                  class="border rounded p-2 small bg-light"
-                  style="display: none"
-                >
-                  <strong id="speciesName"></strong><br />
-                  <em id="speciesLatin" class="text-muted"></em>
-                  <div id="speciesDescription" class="mt-1"></div>
-                  <div id="speciesExtra" class="mt-1 text-muted"></div>
-                </div>
-              </div>
-
-              <div class="col-md-3 mb-2">
-                <label>DBH (cm)</label>
-                <input
-                  type="number"
-                  id="dbhInput"
-                  class="form-control form-control-sm"
-                />
-              </div>
-
-              <div class="col-md-3 mb-2">
-                <label>Height (m)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  id="heightInput"
-                  class="form-control form-control-sm"
-                />
-              </div>
-
-              <div class="col-12 mb-2">
-                <label>Notes</label>
-                <textarea
-                  id="notesInput"
-                  class="form-control form-control-sm"
-                ></textarea>
-              </div>
-
-              <div class="col-md-4 mb-2">
-                <input
-                  type="file"
-                  id="photo1"
-                  class="form-control form-control-sm"
-                />
-              </div>
-
-              <div class="col-md-4 mb-2">
-                <input
-                  type="file"
-                  id="photo2"
-                  class="form-control form-control-sm"
-                />
-              </div>
-
-              <div class="col-md-4 mb-2">
-                <input
-                  type="file"
-                  id="photo3"
-                  class="form-control form-control-sm"
-                />
+            <!-- Species Detail -->
+            <div class="col-12 mb-2">
+              <div id="speciesDetailBox" class="border rounded p-2 small bg-light" style="display: none">
+                <strong id="speciesName"></strong><br />
+                <em id="speciesLatin" class="text-muted"></em>
+                <div id="speciesDescription" class="mt-1"></div>
+                <div id="speciesExtra" class="mt-1 text-muted"></div>
               </div>
             </div>
-          </div>
 
-          <div class="modal-footer">
-            <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-              Cancel
-            </button>
+            <div class="col-md-3 mb-2">
+              <label>DBH (cm)</label>
+              <input type="number" id="dbhInput" class="form-control form-control-sm" />
+            </div>
 
-            <button
-              class="btn btn-primary btn-sm"
-              onclick="submitMeasurement()"
-            >
-              Submit
-            </button>
+            <div class="col-md-3 mb-2">
+              <label>Height (m)</label>
+              <input type="number" step="0.1" id="heightInput" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col-12 mb-2">
+              <label>Notes</label>
+              <textarea id="notesInput" class="form-control form-control-sm"></textarea>
+            </div>
+
+            <div class="col-md-4 mb-2">
+              <input type="file" id="photo1" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col-md-4 mb-2">
+              <input type="file" id="photo2" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col-md-4 mb-2">
+              <input type="file" id="photo3" class="form-control form-control-sm" />
+            </div>
           </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+            Cancel
+          </button>
+
+          <button class="btn btn-primary btn-sm" onclick="submitMeasurement()">
+            Submit
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- ========================= -->
-    <!-- MAIN -->
-    <!-- ========================= -->
+  <!-- ========================= -->
+  <!-- MAIN -->
+  <!-- ========================= -->
 
-    <div class="container-fluid flex-grow-1">
-      <div class="row h-100">
-        <div class="col-md-9 p-0">
-          <div id="map"></div>
-        </div>
+  <div class="container-fluid flex-grow-1 p-0">
 
-        <div class="col-md-3 bg-light border-start overflow-auto">
-          <div class="p-3">
-            <div class="card shadow-sm">
-              <div class="card-body">
-                <h6 class="mb-2">Project</h6>
+    <!-- MOBILE PROJECT SELECT -->
+    <div class="d-md-none p-3 bg-light border-bottom">
+      <h6 class="mb-2">Project</h6>
+      <select id="projectSelect" class="form-select form-select-sm" onchange="selectProject()">
+        <option value="">-- Select Project --</option>
+      </select>
+    </div>
 
-                <select
-                  id="projectSelect"
-                  class="form-select form-select-sm mb-3"
-                  onchange="selectProject()"
-                >
-                  <option value="">-- Select Project --</option>
-                </select>
-              </div>
+    <div class="row g-0 h-100">
+
+      <!-- MAP -->
+      <div class="col-12 col-md-9">
+        <div id="map"></div>
+      </div>
+
+      <!-- DESKTOP SIDEBAR -->
+      <div class="d-none d-md-block col-md-3 bg-light border-start">
+        <div class="p-3">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="mb-2">Project</h6>
+              <select id="projectSelectDesktop" class="form-select form-select-sm" onchange="selectProject()">
+                <option value="">-- Select Project --</option>
+              </select>
             </div>
           </div>
         </div>
       </div>
+
     </div>
+  </div>
+  <div id="footer"></div>
 
-    <div id="footer"></div>
+  <script>
+    async function loadPartial(id, file) {
+      const res = await fetch(file);
+      const html = await res.text();
+      document.getElementById(id).innerHTML = html;
 
-    <script>
-      async function loadPartial(id, file) {
-        const res = await fetch(file);
-        const html = await res.text();
-        document.getElementById(id).innerHTML = html;
+      if (id === "header") {
+        initHeaderLogic();
+      }
+    }
 
-        if (id === "header") {
-          initHeaderLogic();
-        }
+    function initHeaderLogic() {
+      const userData = localStorage.getItem("user");
+      if (!userData) return;
+
+      const currentUser = JSON.parse(userData);
+
+      const userInfo = document.getElementById("userInfo");
+      if (userInfo) {
+        userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
       }
 
-      function initHeaderLogic() {
-        const userData = localStorage.getItem("user");
-        if (!userData) return;
+      if (currentUser.role !== "admin") {
+        document.querySelectorAll(".admin-only").forEach((el) => el.remove());
+      }
 
-        const currentUser = JSON.parse(userData);
+      if (currentUser.role !== "surveyor") {
+        document
+          .querySelectorAll(".surveyor-only")
+          .forEach((el) => el.remove());
+      }
 
-        const userInfo = document.getElementById("userInfo");
-        if (userInfo) {
-          userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
+      const current = window.location.pathname.split("/").pop();
+
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        if (link.getAttribute("href") === current) {
+          link.classList.add("active");
         }
+      });
+    }
 
-        if (currentUser.role !== "admin") {
-          document.querySelectorAll(".admin-only").forEach((el) => el.remove());
-        }
+    window.logout = function () {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    };
 
-        if (currentUser.role !== "surveyor") {
-          document
-            .querySelectorAll(".surveyor-only")
-            .forEach((el) => el.remove());
-        }
+    loadPartial("header", "partials/header.html");
+    loadPartial("footer", "partials/footer.html");
+  </script>
 
-        const current = window.location.pathname.split("/").pop();
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          if (link.getAttribute("href") === current) {
-            link.classList.add("active");
-          }
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+
+    let CURRENT_PROJECT_ID = null;
+    let CURRENT_SURVEY_LAT = null;
+    let CURRENT_SURVEY_LNG = null;
+    let CURRENT_POINT_DATA = null;
+    let SPECIES_DATA = [];
+
+    /* ============================= */
+    /* MAP */
+    /* ============================= */
+
+    const map = L.map("map").setView([-2, 118], 5);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+      map,
+    );
+
+    let samplingLayer = L.geoJSON(null, {
+      pointToLayer: (feature, latlng) => {
+        return L.marker(latlng, {
+          icon: samplingIcon(feature.properties),
         });
-      }
+      },
+      onEachFeature: (feature, layer) => {
+        layer.bindPopup(buildPopup(feature.properties));
+      },
+    }).addTo(map);
 
-      window.logout = function () {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "index.html";
-      };
+    function samplingIcon(p) {
+      let color = "#6c757d";
 
-      loadPartial("header", "partials/header.html");
-      loadPartial("footer", "partials/footer.html");
-    </script>
+      if (p.survey_status === "draft") color = "#0d6efd";
+      else if (p.survey_status === "ready") {
+        if (p.assigned_count === 0) color = "#8B5A2B";
+        else if (p.assigned_count < p.max_surveyors) color = "#fd7e14";
+        else color = "#6f42c1";
+      } else if (p.survey_status === "submitted") color = "#dc3545";
+      else if (p.survey_status === "approved") color = "#198754";
+      else if (p.survey_status === "rejected") color = "#ffc107";
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-      const API_BASE = "http://127.0.0.1:8000";
-      const currentUser = JSON.parse(localStorage.getItem("user"));
-
-      let CURRENT_PROJECT_ID = null;
-      let CURRENT_SURVEY_LAT = null;
-      let CURRENT_SURVEY_LNG = null;
-      let CURRENT_POINT_DATA = null;
-      let SPECIES_DATA = [];
-
-      /* ============================= */
-      /* MAP */
-      /* ============================= */
-
-      const map = L.map("map").setView([-2, 118], 5);
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
-        map,
-      );
-
-      let samplingLayer = L.geoJSON(null, {
-        pointToLayer: (feature, latlng) => {
-          return L.marker(latlng, {
-            icon: samplingIcon(feature.properties),
-          });
-        },
-        onEachFeature: (feature, layer) => {
-          layer.bindPopup(buildPopup(feature.properties));
-        },
-      }).addTo(map);
-
-      function samplingIcon(p) {
-        let color = "#6c757d";
-
-        if (p.survey_status === "draft") color = "#0d6efd";
-        else if (p.survey_status === "ready") {
-          if (p.assigned_count === 0) color = "#8B5A2B";
-          else if (p.assigned_count < p.max_surveyors) color = "#fd7e14";
-          else color = "#6f42c1";
-        } else if (p.survey_status === "submitted") color = "#dc3545";
-        else if (p.survey_status === "approved") color = "#198754";
-        else if (p.survey_status === "rejected") color = "#ffc107";
-
-        return L.divIcon({
-          className: "sampling-marker",
-          html: `<div style="
+      return L.divIcon({
+        className: "sampling-marker",
+        html: `<div style="
       background:${color};
       width:14px;
       height:14px;
       border-radius:50%;
       border:2px solid white;"></div>`,
-        });
-      }
+      });
+    }
 
-      /* ============================= */
-      /* POPUP */
-      /* ============================= */
+    /* ============================= */
+    /* POPUP */
+    /* ============================= */
 
-      function buildPopup(p) {
-        const joined = p.assigned_ids?.includes(currentUser.id);
-        const full = p.assigned_count >= p.max_surveyors;
+    function buildPopup(p) {
+      const joined = p.assigned_ids?.includes(currentUser.id);
+      const full = p.assigned_count >= p.max_surveyors;
 
-        let buttons = "";
+      let buttons = "";
 
-        if (!joined && !full) {
-          buttons += `
+      if (!joined && !full) {
+        buttons += `
       <button class="btn btn-sm btn-primary w-100 mt-2"
         onclick="joinSurvey(${p.id})">
         Join
       </button>`;
-        }
+      }
 
-        if (joined) {
-          buttons += `
+      if (joined) {
+        buttons += `
       <button class="btn btn-sm btn-danger w-100 mt-2"
         onclick="leaveSurvey(${p.id})">
         Leave
@@ -318,22 +285,22 @@
         onclick="openSurveyTreePage(${p.id})">
         Input Measurement
       </button>`;
-        }
+      }
 
-        // =========================
-        // Assigned Surveyors List
-        // =========================
-        let assignedList = "<span class='text-muted'>Belum ada</span>";
+      // =========================
+      // Assigned Surveyors List
+      // =========================
+      let assignedList = "<span class='text-muted'>Belum ada</span>";
 
-        if (p.assigned_names && p.assigned_names.length > 0) {
-          assignedList = `
+      if (p.assigned_names && p.assigned_names.length > 0) {
+        assignedList = `
       <ol class="mb-1 ps-3">
         ${p.assigned_names.map((name) => `<li>${name}</li>`).join("")}
       </ol>
     `;
-        }
+      }
 
-        return `
+      return `
   <div style="min-width:260px">
     <table class="table table-sm table-borderless mb-1">
       <tr><td><strong>ID</strong></td><td>${p.id}</td></tr>
@@ -357,191 +324,192 @@
     </table>
     ${buttons}
   </div>`;
+    }
+
+    function openSurveyTreePage(pointId) {
+      window.location.href = `survey_tree.html?point_id=${pointId}`;
+    }
+
+    /* ============================= */
+    /* MODAL */
+    /* ============================= */
+
+    function openSurveyModal(id, lat, lng, data) {
+      CURRENT_SURVEY_LAT = lat;
+      CURRENT_SURVEY_LNG = lng;
+      CURRENT_POINT_DATA = data;
+
+      document.getElementById("measurementPointId").value = id;
+      document.getElementById("surveyDescription").innerText =
+        data.description || "No description";
+
+      loadSpecies();
+
+      new bootstrap.Modal(document.getElementById("measurementModal")).show();
+    }
+
+    async function loadSpecies() {
+      const res = await fetch(`${API_BASE}/tree-species`);
+      const data = await res.json();
+
+      SPECIES_DATA = data;
+
+      const select = document.getElementById("speciesSelect");
+      select.innerHTML = `<option value="">-- Select Species --</option>`;
+
+      data.forEach((s) => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.name;
+        select.appendChild(opt);
+      });
+
+      select.onchange = showSpeciesDetail;
+    }
+
+    function showSpeciesDetail() {
+      const id = document.getElementById("speciesSelect").value;
+      const species = SPECIES_DATA.find((s) => s.id == id);
+      const box = document.getElementById("speciesDetailBox");
+
+      if (!species) {
+        box.style.display = "none";
+        return;
       }
 
-      function openSurveyTreePage(pointId) {
-        window.location.href = `survey_tree.html?point_id=${pointId}`;
+      document.getElementById("speciesName").innerText = species.name;
+      document.getElementById("speciesLatin").innerText =
+        species.latin_name || "";
+      document.getElementById("speciesDescription").innerText =
+        species.description || "No description";
+      document.getElementById("speciesExtra").innerText = species.family
+        ? `Family: ${species.family}`
+        : "";
+
+      box.style.display = "block";
+    }
+
+    /* ============================= */
+    /* SUBMIT */
+    /* ============================= */
+
+    async function submitMeasurement() {
+      const pointId = document.getElementById("measurementPointId").value;
+
+      const payload = {
+        surveyor_id: currentUser.id,
+        latitude: CURRENT_SURVEY_LAT,
+        longitude: CURRENT_SURVEY_LNG,
+        species_id: document.getElementById("speciesSelect").value,
+        dbh: document.getElementById("dbhInput").value,
+        height: document.getElementById("heightInput").value,
+        notes: document.getElementById("notesInput").value,
+      };
+
+      const res = await fetch(`${API_BASE}/survey/submit-tree/${pointId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        alert("Failed");
+        return;
       }
 
-      /* ============================= */
-      /* MODAL */
-      /* ============================= */
+      alert("Saved");
+      bootstrap.Modal.getInstance(
+        document.getElementById("measurementModal"),
+      ).hide();
+    }
 
-      function openSurveyModal(id, lat, lng, data) {
-        CURRENT_SURVEY_LAT = lat;
-        CURRENT_SURVEY_LNG = lng;
-        CURRENT_POINT_DATA = data;
+    /* ============================= */
+    /* PROJECT */
+    /* ============================= */
 
-        document.getElementById("measurementPointId").value = id;
-        document.getElementById("surveyDescription").innerText =
-          data.description || "No description";
+    async function loadProjects() {
+      const res = await fetch(`${API_BASE}/projects`);
+      const projects = await res.json();
 
-        loadSpecies();
+      const select = document.getElementById("projectSelect");
 
-        new bootstrap.Modal(document.getElementById("measurementModal")).show();
-      }
+      projects.forEach((p) => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = `${p.name} (${p.year})`;
+        select.appendChild(opt);
+      });
+    }
 
-      async function loadSpecies() {
-        const res = await fetch(`${API_BASE}/tree-species`);
-        const data = await res.json();
+    async function selectProject() {
+      const id = document.getElementById("projectSelect").value;
+      if (!id) return;
 
-        SPECIES_DATA = data;
+      CURRENT_PROJECT_ID = id;
 
-        const select = document.getElementById("speciesSelect");
-        select.innerHTML = `<option value="">-- Select Species --</option>`;
+      const res = await fetch(`${API_BASE}/sampling/points/${id}`);
+      const geojson = await res.json();
 
-        data.forEach((s) => {
-          const opt = document.createElement("option");
-          opt.value = s.id;
-          opt.textContent = s.name;
-          select.appendChild(opt);
-        });
+      samplingLayer.clearLayers();
+      samplingLayer.addData(geojson);
 
-        select.onchange = showSpeciesDetail;
-      }
+      map.fitBounds(samplingLayer.getBounds());
+    }
 
-      function showSpeciesDetail() {
-        const id = document.getElementById("speciesSelect").value;
-        const species = SPECIES_DATA.find((s) => s.id == id);
-        const box = document.getElementById("speciesDetailBox");
+    loadProjects();
 
-        if (!species) {
-          box.style.display = "none";
-          return;
-        }
+    /* ============================= */
+    /* JOIN / LEAVE */
+    /* ============================= */
 
-        document.getElementById("speciesName").innerText = species.name;
-        document.getElementById("speciesLatin").innerText =
-          species.latin_name || "";
-        document.getElementById("speciesDescription").innerText =
-          species.description || "No description";
-        document.getElementById("speciesExtra").innerText = species.family
-          ? `Family: ${species.family}`
-          : "";
-
-        box.style.display = "block";
-      }
-
-      /* ============================= */
-      /* SUBMIT */
-      /* ============================= */
-
-      async function submitMeasurement() {
-        const pointId = document.getElementById("measurementPointId").value;
-
-        const payload = {
+    window.joinSurvey = async function (pointId) {
+      const res = await fetch(`${API_BASE}/sampling/assign/${pointId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           surveyor_id: currentUser.id,
-          latitude: CURRENT_SURVEY_LAT,
-          longitude: CURRENT_SURVEY_LNG,
-          species_id: document.getElementById("speciesSelect").value,
-          dbh: document.getElementById("dbhInput").value,
-          height: document.getElementById("heightInput").value,
-          notes: document.getElementById("notesInput").value,
-        };
+        }),
+      });
 
-        const res = await fetch(`${API_BASE}/survey/submit-tree/${pointId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+      const data = await res.json();
 
-        if (!res.ok) {
-          alert("Failed");
-          return;
-        }
-
-        alert("Saved");
-        bootstrap.Modal.getInstance(
-          document.getElementById("measurementModal"),
-        ).hide();
+      if (!res.ok) {
+        alert(data.detail || "Failed to join");
+        return;
       }
 
-      /* ============================= */
-      /* PROJECT */
-      /* ============================= */
+      alert("Joined successfully");
 
-      async function loadProjects() {
-        const res = await fetch(`${API_BASE}/projects`);
-        const projects = await res.json();
+      // reload current project layer
+      if (CURRENT_PROJECT_ID) {
+        selectProject();
+      }
+    };
 
-        const select = document.getElementById("projectSelect");
+    window.leaveSurvey = async function (pointId) {
+      const res = await fetch(
+        `${API_BASE}/sampling/assign/${pointId}/${currentUser.id}`,
+        {
+          method: "DELETE",
+        },
+      );
 
-        projects.forEach((p) => {
-          const opt = document.createElement("option");
-          opt.value = p.id;
-          opt.textContent = `${p.name} (${p.year})`;
-          select.appendChild(opt);
-        });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.detail || "Failed to leave");
+        return;
       }
 
-      async function selectProject() {
-        const id = document.getElementById("projectSelect").value;
-        if (!id) return;
+      alert("Left successfully");
 
-        CURRENT_PROJECT_ID = id;
-
-        const res = await fetch(`${API_BASE}/sampling/points/${id}`);
-        const geojson = await res.json();
-
-        samplingLayer.clearLayers();
-        samplingLayer.addData(geojson);
-
-        map.fitBounds(samplingLayer.getBounds());
+      if (CURRENT_PROJECT_ID) {
+        selectProject();
       }
+    };
+  </script>
+</body>
 
-      loadProjects();
-
-      /* ============================= */
-      /* JOIN / LEAVE */
-      /* ============================= */
-
-      window.joinSurvey = async function (pointId) {
-        const res = await fetch(`${API_BASE}/sampling/assign/${pointId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            surveyor_id: currentUser.id,
-          }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          alert(data.detail || "Failed to join");
-          return;
-        }
-
-        alert("Joined successfully");
-
-        // reload current project layer
-        if (CURRENT_PROJECT_ID) {
-          selectProject();
-        }
-      };
-
-      window.leaveSurvey = async function (pointId) {
-        const res = await fetch(
-          `${API_BASE}/sampling/assign/${pointId}/${currentUser.id}`,
-          {
-            method: "DELETE",
-          },
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          alert(data.detail || "Failed to leave");
-          return;
-        }
-
-        alert("Left successfully");
-
-        if (CURRENT_PROJECT_ID) {
-          selectProject();
-        }
-      };
-    </script>
-  </body>
 </html>

@@ -1,8 +1,10 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>ML Feature Dataset</title>
+    <script src="js/config.js"></script>
 
     <script>
         fetch("partials/head.html")
@@ -15,111 +17,109 @@
 
 <body class="d-flex flex-column min-vh-100">
 
-<div id="header"></div>
+    <div id="header"></div>
 
-<div class="container-fluid flex-grow-1">
-<div class="row">
-<div class="col-12 p-4">
+    <div class="container-fluid flex-grow-1">
+        <div class="row">
+            <div class="col-12 p-4">
 
-<div class="card shadow-sm">
-<div class="card-body">
+                <div class="card shadow-sm">
+                    <div class="card-body">
 
-<h5 class="mb-3">ML Feature Dataset</h5>
+                        <h5 class="mb-3">ML Feature Dataset</h5>
 
-<div id="summary" class="mb-3 small text-muted">
-  Loading...
-</div>
+                        <div id="summary" class="mb-3 small text-muted">
+                            Loading...
+                        </div>
 
-<div id="tableContainer">
-  Loading...
-</div>
+                        <div id="tableContainer">
+                            Loading...
+                        </div>
 
-</div>
-</div>
+                    </div>
+                </div>
 
-</div>
-</div>
-</div>
+            </div>
+        </div>
+    </div>
 
-<div id="footer"></div>
+    <div id="footer"></div>
 
-<!-- MUST load project_state FIRST -->
-<script src="js/project_state.js"></script>
+    <!-- MUST load project_state FIRST -->
+    <script src="js/project_state.js"></script>
 
-<script>
-const API_BASE = "http://127.0.0.1:8000";
+    <script>
+        /* ---------------------- LOAD PARTIALS ---------------------- */
 
-/* ---------------------- LOAD PARTIALS ---------------------- */
-
-async function loadPartial(id, file) {
-    try {
-        const res = await fetch(file);
-        const html = await res.text();
-        document.getElementById(id).innerHTML = html;
-    } catch (err) {
-        console.error("Failed to load partial:", file);
-    }
-}
-
-loadPartial("header", "partials/header.html");
-loadPartial("footer", "partials/footer.html");
-
-/* ---------------------- PROJECT ID ---------------------- */
-
-const params = new URLSearchParams(window.location.search);
-let projectId = params.get("project_id");
-
-if (!projectId && typeof getCurrentProject === "function") {
-    projectId = getCurrentProject();
-}
-
-/* ---------------------- MAIN ---------------------- */
-
-if (!projectId) {
-    document.getElementById("summary").innerText = "";
-    document.getElementById("tableContainer").innerHTML =
-        "<div class='text-danger'>No project selected</div>";
-} else {
-    loadReport();
-}
-
-/* ---------------------- FETCH DATA ---------------------- */
-
-async function loadReport() {
-
-    try {
-        const res = await fetch(
-            `${API_BASE}/projects/${projectId}/feature-report`
-        );
-
-        if (!res.ok) {
-            throw new Error("API error");
+        async function loadPartial(id, file) {
+            try {
+                const res = await fetch(file);
+                const html = await res.text();
+                document.getElementById(id).innerHTML = html;
+            } catch (err) {
+                console.error("Failed to load partial:", file);
+            }
         }
 
-        const data = await res.json();
+        loadPartial("header", "partials/header.html");
+        loadPartial("footer", "partials/footer.html");
 
-        renderTable(data);
+        /* ---------------------- PROJECT ID ---------------------- */
 
-    } catch (err) {
-        console.error(err);
-        document.getElementById("summary").innerText = "";
-        document.getElementById("tableContainer").innerHTML =
-            "<div class='text-danger'>Failed to load data</div>";
-    }
-}
+        const params = new URLSearchParams(window.location.search);
+        let projectId = params.get("project_id");
 
-/* ---------------------- RENDER TABLE ---------------------- */
+        if (!projectId && typeof getCurrentProject === "function") {
+            projectId = getCurrentProject();
+        }
 
-function renderTable(data) {
+        /* ---------------------- MAIN ---------------------- */
 
-    if (!data || !data.length) {
-        document.getElementById("summary").innerText = "";
-        document.getElementById("tableContainer").innerHTML =
-            "<div class='text-muted'>No approved sampling data</div>";
-        return;
-    }
+        if (!projectId) {
+            document.getElementById("summary").innerText = "";
+            document.getElementById("tableContainer").innerHTML =
+                "<div class='text-danger'>No project selected</div>";
+        } else {
+            loadReport();
+        }
 
-    const table = `
+        /* ---------------------- FETCH DATA ---------------------- */
+
+        async function loadReport() {
+
+            try {
+                const res = await fetch(
+                    `${API_BASE}/projects/${projectId}/feature-report`
+                );
+
+                if (!res.ok) {
+                    throw new Error("API error");
+                }
+
+                const data = await res.json();
+
+                renderTable(data);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById("summary").innerText = "";
+                document.getElementById("tableContainer").innerHTML =
+                    "<div class='text-danger'>Failed to load data</div>";
+            }
+        }
+
+        /* ---------------------- RENDER TABLE ---------------------- */
+
+        function renderTable(data) {
+
+            if (!data || !data.length) {
+                document.getElementById("summary").innerText = "";
+                document.getElementById("tableContainer").innerHTML =
+                    "<div class='text-muted'>No approved sampling data</div>";
+                return;
+            }
+
+            const table = `
     <div class="table-responsive">
       <table class="table table-bordered table-sm table-striped">
         <thead class="table-light">
@@ -160,30 +160,31 @@ function renderTable(data) {
     </div>
     `;
 
-    document.getElementById("tableContainer").innerHTML = table;
+            document.getElementById("tableContainer").innerHTML = table;
 
-    document.getElementById("summary").innerText =
-        `Total Points: ${data.length}`;
-}
+            document.getElementById("summary").innerText =
+                `Total Points: ${data.length}`;
+        }
 
-/* ---------------------- FORMATTERS ---------------------- */
+        /* ---------------------- FORMATTERS ---------------------- */
 
-function formatNum(val) {
-    if (val === null || val === undefined) return "-";
-    return Number(val).toFixed(4);
-}
+        function formatNum(val) {
+            if (val === null || val === undefined) return "-";
+            return Number(val).toFixed(4);
+        }
 
-function formatBiomass(val) {
-    if (val === null || val === undefined) return "-";
-    return Number(val).toFixed(2);
-}
+        function formatBiomass(val) {
+            if (val === null || val === undefined) return "-";
+            return Number(val).toFixed(2);
+        }
 
-function formatDate(val) {
-    if (!val) return "-";
-    return new Date(val).toLocaleDateString();
-}
+        function formatDate(val) {
+            if (!val) return "-";
+            return new Date(val).toLocaleDateString();
+        }
 
-</script>
+    </script>
 
 </body>
+
 </html>

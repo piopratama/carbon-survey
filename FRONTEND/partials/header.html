@@ -22,47 +22,92 @@ AUTH & ROLE PROTECTION
   }
 </script>
 
+<style>
+  .custom-navbar {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+  }
+
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+
+  .nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 0.9rem;
+  }
+
+  .nav-link.active {
+    font-weight: 600;
+    color: #ffffff !important;
+  }
+
+  .user-section {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .user-name {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 991px) {
+    .user-section {
+      margin-top: 10px;
+    }
+  }
+</style>
+
 <!-- ===============================
 HEADER
 =============================== -->
-<header class="custom-navbar shadow">
-  <nav class="navbar navbar-expand-lg navbar-dark container px-4">
+<header class="custom-navbar shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark container px-3">
 
-    <a class="navbar-brand text-white" href="main.html">
-      Carbon Monitoring System
+    <!-- BRAND -->
+    <a class="navbar-brand fw-semibold" href="main.html">
+      Carbon Monitoring
     </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+    <!-- TOGGLER -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarContent">
 
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <!-- MENU -->
+      <ul class="navbar-nav me-auto mb-2 mt-2 mb-lg-0">
+
         <li class="nav-item admin-only">
-          <a class="nav-link text-white" href="main.html">Project</a>
+          <a class="nav-link" href="main.html">Project</a>
         </li>
 
         <li class="nav-item admin-only">
-          <a class="nav-link text-white" href="analysis.html">Carbon Analysis</a>
+          <a class="nav-link" href="analysis.html">Analysis</a>
         </li>
 
         <li class="nav-item admin-only">
-          <a class="nav-link text-white" href="surveyors.html">Surveyor</a>
+          <a class="nav-link" href="surveyors.html">Surveyor</a>
         </li>
 
         <li class="nav-item admin-only">
-          <a class="nav-link text-white" href="tree_species.html">Tree Species</a>
+          <a class="nav-link" href="tree_species.html">Species</a>
         </li>
 
         <li class="nav-item surveyor-only">
-          <a class="nav-link text-white" href="surveyor_main.html">Project</a>
+          <a class="nav-link" href="surveyor_main.html">Project</a>
         </li>
+
       </ul>
 
-      <div class="d-flex align-items-center gap-3">
-        <span class="user-badge text-white" id="userInfo"></span>
-        <button class="btn btn-logout text-white" onclick="logout()">
+      <!-- USER SECTION -->
+      <div class="user-section">
+        <span id="userInfo" class="user-name"></span>
+        <button class="btn btn-sm btn-light ms-2" onclick="logout()">
           Logout
         </button>
       </div>

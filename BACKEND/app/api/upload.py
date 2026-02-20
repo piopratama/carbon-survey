@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Query, HTTPException
+from fastapi import APIRouter, UploadFile, File, Query, HTTPException, Request
 from pathlib import Path
 import shutil
 import uuid
@@ -16,10 +16,10 @@ ALLOWED_MIME_TYPES = {
 
 @router.post("")
 def upload_image(
+    request: Request,
     file: UploadFile = File(...),
-    category: str = Query("general")  # tree_species | surveys
+    category: str = Query("general")
 ):
-    # Validasi hanya gambar
     if file.content_type not in ALLOWED_MIME_TYPES:
         raise HTTPException(
             status_code=400,
@@ -29,7 +29,6 @@ def upload_image(
     folder = BASE_DIR / category
     folder.mkdir(parents=True, exist_ok=True)
 
-    # Gunakan ekstensi berdasarkan MIME (lebih aman)
     ext = ALLOWED_MIME_TYPES[file.content_type]
     filename = f"{uuid.uuid4()}.{ext}"
     filepath = folder / filename
@@ -37,6 +36,9 @@ def upload_image(
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
+    # Ambil base URL otomatis (works local & production)
+    base_url = str(request.base_url).rstrip("/")
+
     return {
-        "url": f"http://127.0.0.1:8000/uploads/{category}/{filename}"
+        "url": f"{base_url}/uploads/{category}/{filename}"
     }

@@ -1,10 +1,11 @@
-<script>
-  window.REQUIRED_ROLE = "admin";
-</script>
-
 <!doctype html>
 <html lang="en">
+
 <head>
+  <script src="js/config.js"></script>
+  <script>
+    window.REQUIRED_ROLE = "admin";
+  </script>
   <script>
     fetch("partials/head.html")
       .then((r) => r.text())
@@ -12,14 +13,12 @@
   </script>
 
   <!-- DataTables CSS -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"
-  />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" />
 
   <style>
     .table-hover tbody tr:hover {
-      background-color: rgba(14,165,233,0.08);
+      background-color: rgba(14, 165, 233, 0.08);
     }
 
     .dataTables_wrapper .dataTables_filter input {
@@ -118,9 +117,10 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
   <script>
-    const API_BASE = "http://127.0.0.1:8000";
     let usersTable;
 
     async function loadPartial(id, file) {
@@ -186,9 +186,8 @@
           <td><strong>${u.name}</strong></td>
           <td>${u.email}</td>
           <td>
-            <span class="badge ${
-              u.role === "admin" ? "bg-danger" : "bg-success"
-            }">
+            <span class="badge ${u.role === "admin" ? "bg-danger" : "bg-success"
+          }">
               ${u.role}
             </span>
           </td>
@@ -277,4 +276,5 @@
   </script>
 
 </body>
+
 </html>

@@ -1,11 +1,26 @@
-import ee
+# import ee
 
-# Initialize Earth Engine (pakai credential hasil earthengine authenticate)
-try:
-    ee.Initialize()
-except Exception as e:
-    ee.Authenticate()
-    ee.Initialize()
+# # Initialize Earth Engine (pakai credential hasil earthengine authenticate)
+# try:
+#     ee.Initialize()
+# except Exception as e:
+#     ee.Authenticate()
+#     ee.Initialize()
+import ee
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+KEY_FILE = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+PROJECT_ID = os.getenv("GEE_PROJECT_ID")
+
+credentials = ee.ServiceAccountCredentials(
+    None,
+    KEY_FILE
+)
+
+ee.Initialize(credentials, project=PROJECT_ID)
 
 def get_sentinel_composite(
     geometry: dict,

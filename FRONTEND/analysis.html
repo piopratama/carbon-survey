@@ -1,12 +1,11 @@
-<script>
-  window.REQUIRED_ROLE = "admin";
-</script>
-
 <!doctype html>
 <html lang="en">
 
 <head>
-
+  <script src="js/config.js"></script>
+  <script>
+    window.REQUIRED_ROLE = "admin";
+  </script>
   <script>
     fetch("partials/head.html")
       .then(r => r.text())
@@ -35,18 +34,28 @@
 
   <div id="header"></div>
 
-  <div class="container-fluid flex-grow-1">
-    <div class="row h-100">
+  <div class="container-fluid flex-grow-1 p-0">
+
+    <!-- ===== MOBILE CONTROL TOGGLE ===== -->
+    <div class="d-md-none bg-light border-bottom p-2">
+      <button class="btn btn-primary btn-sm w-100" type="button" data-bs-toggle="collapse"
+        data-bs-target="#analysisPanel" aria-expanded="false" aria-controls="analysisPanel">
+        Analysis Controls
+      </button>
+    </div>
+
+    <div class="row g-0 h-100">
 
       <!-- ================= MAP ================= -->
-      <div class="col-md-8 col-lg-9 p-0">
+      <div class="col-12 col-md-8 col-lg-9 order-2 order-md-1">
         <div id="map"></div>
       </div>
 
       <!-- ================= PANEL ================= -->
-      <div class="col-md-4 col-lg-3 bg-light border-start overflow-auto">
-        <div class="p-3">
+      <div id="analysisPanel"
+        class="collapse d-md-block col-12 col-md-4 col-lg-3 bg-light border-start order-1 order-md-2 overflow-auto">
 
+        <div class="p-3">
           <div class="card shadow-sm mb-3">
             <div class="card-body">
 
@@ -63,6 +72,7 @@
               <input type="date" id="endDate" class="form-control form-control-sm mb-3" />
 
               <div class="d-grid gap-2">
+
                 <button class="btn btn-outline-primary btn-sm" onclick="loadSurveys()">
                   Load Surveys
                 </button>
@@ -70,6 +80,7 @@
                 <hr>
 
                 <h6>Closest Sentinel Scenes</h6>
+
                 <div id="sentinelScenes" class="small text-muted mb-3">
                   Load surveys first
                 </div>
@@ -77,9 +88,11 @@
                 <button class="btn btn-primary btn-sm" onclick="runExtract()">
                   Extract Sentinel
                 </button>
+
                 <button class="btn btn-outline-dark btn-sm" onclick="openProjectReport()">
                   View Survey Detail Table
                 </button>
+
               </div>
 
               <div id="status" class="text-muted small mt-2">
@@ -88,99 +101,100 @@
 
             </div>
           </div>
-
         </div>
+
       </div>
+
     </div>
+  </div>
 
-    <div id="footer"></div>
+  <div id="footer"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="js/project_state.js"></script>
-    <script>
-      async function loadPartial(id, file) {
-        const res = await fetch(file);
-        const html = await res.text();
-        document.getElementById(id).innerHTML = html;
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/project_state.js"></script>
+  <script>
+    async function loadPartial(id, file) {
+      const res = await fetch(file);
+      const html = await res.text();
+      document.getElementById(id).innerHTML = html;
 
-        if (id === "header") {
-          initHeaderLogic();
-        }
+      if (id === "header") {
+        initHeaderLogic();
+      }
+    }
+
+    function initHeaderLogic() {
+      const userData = localStorage.getItem("user");
+      if (!userData) return;
+
+      const currentUser = JSON.parse(userData);
+
+      // tampilkan user info
+      const userInfo = document.getElementById("userInfo");
+      if (userInfo) {
+        userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
       }
 
-      function initHeaderLogic() {
-        const userData = localStorage.getItem("user");
-        if (!userData) return;
-
-        const currentUser = JSON.parse(userData);
-
-        // tampilkan user info
-        const userInfo = document.getElementById("userInfo");
-        if (userInfo) {
-          userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
-        }
-
-        // hide admin menu
-        if (currentUser.role !== "admin") {
-          document.querySelectorAll(".admin-only").forEach((el) => el.remove());
-        }
-
-        // hide surveyor menu
-        if (currentUser.role !== "surveyor") {
-          document
-            .querySelectorAll(".surveyor-only")
-            .forEach((el) => el.remove());
-        }
-
-        // highlight active link
-        const current = window.location.pathname.split("/").pop();
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          if (link.getAttribute("href") === current) {
-            link.classList.add("active");
-          }
-        });
+      // hide admin menu
+      if (currentUser.role !== "admin") {
+        document.querySelectorAll(".admin-only").forEach((el) => el.remove());
       }
 
-      window.logout = function () {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "index.html";
-      };
+      // hide surveyor menu
+      if (currentUser.role !== "surveyor") {
+        document
+          .querySelectorAll(".surveyor-only")
+          .forEach((el) => el.remove());
+      }
 
-      loadPartial("header", "partials/header.html");
-      loadPartial("footer", "partials/footer.html");
-    </script>
-    <script>
-      const API_BASE = "http://127.0.0.1:8000";
+      // highlight active link
+      const current = window.location.pathname.split("/").pop();
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        if (link.getAttribute("href") === current) {
+          link.classList.add("active");
+        }
+      });
+    }
 
-      const map = L.map("map").setView([-2, 118], 5);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+    window.logout = function () {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    };
 
-      let CURRENT_PROJECT_ID = null;
-      let projectMap = {};
-      let projectAOILayer = null;
-      let SELECTED_IMAGE_ID = null;
-      let sentinelLayer = null;
+    loadPartial("header", "partials/header.html");
+    loadPartial("footer", "partials/footer.html");
+  </script>
+  <script>
+    const map = L.map("map").setView([-2, 118], 5);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-      // ================= POINT LAYER =================
-      let pointsLayer = L.geoJSON(null, {
-        pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6 }),
-        onEachFeature: (feature, layer) => {
+    let CURRENT_PROJECT_ID = null;
+    let projectMap = {};
+    let projectAOILayer = null;
+    let SELECTED_IMAGE_ID = null;
+    let sentinelLayer = null;
 
-          const p = feature.properties;
+    // ================= POINT LAYER =================
+    let pointsLayer = L.geoJSON(null, {
+      pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6 }),
+      onEachFeature: (feature, layer) => {
 
-          const surveyDate = p.submitted_at
-            ? new Date(p.submitted_at).toLocaleDateString()
-            : "-";
+        const p = feature.properties;
 
-          const sentinelDate = p.sentinel_date
-            ? new Date(p.sentinel_date).toLocaleDateString()
-            : "-";
+        const surveyDate = p.submitted_at
+          ? new Date(p.submitted_at).toLocaleDateString()
+          : "-";
 
-          const biomass = Number(p.total_biomass ?? 0).toFixed(2);
+        const sentinelDate = p.sentinel_date
+          ? new Date(p.sentinel_date).toLocaleDateString()
+          : "-";
 
-          const sentinelSection = p.ndvi
-            ? `
+        const biomass = Number(p.total_biomass ?? 0).toFixed(2);
+
+        const sentinelSection = p.ndvi
+          ? `
       <div class="mt-2 pt-2 border-top">
         <div class="fw-semibold text-success mb-1">
           Sentinel Data
@@ -204,13 +218,13 @@
         </div>
       </div>
     `
-            : `
+          : `
       <div class="mt-2 pt-2 border-top text-muted small">
         Sentinel not extracted yet
       </div>
     `;
 
-          layer.bindPopup(`
+        layer.bindPopup(`
     <div style="min-width:240px">
 
       <div class="fw-bold mb-2">
@@ -233,133 +247,133 @@
 
     </div>
   `);
+      }
+    }).addTo(map);
+
+    // ================= LOAD PROJECTS =================
+    async function loadProjects() {
+
+      const res = await fetch(`${API_BASE}/projects`);
+      const projects = await res.json();
+      const select = document.getElementById("projectSelect");
+
+      select.innerHTML = `<option value="">-- Select Project --</option>`;
+      projectMap = {};
+
+      projects.forEach(p => {
+        projectMap[p.id] = p;
+
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.name;
+        select.appendChild(opt);
+      });
+
+      // Use project_state.js
+      const savedProject = getCurrentProject();
+
+      if (savedProject && projectMap[savedProject]) {
+        select.value = savedProject;
+        selectProject();
+      } else {
+        clearCurrentProject(); // cleanup if project no longer exists
+      }
+    }
+
+
+    // ================= SELECT PROJECT =================
+    function selectProject() {
+
+      CURRENT_PROJECT_ID =
+        document.getElementById("projectSelect").value;
+
+      if (!CURRENT_PROJECT_ID) return;
+
+      // persist using shared project state
+      setCurrentProject(CURRENT_PROJECT_ID);
+
+      const project = projectMap[CURRENT_PROJECT_ID];
+
+      if (projectAOILayer) map.removeLayer(projectAOILayer);
+
+      projectAOILayer = L.geoJSON(
+        { type: "Feature", geometry: project.aoi }
+      ).addTo(map);
+
+      map.fitBounds(projectAOILayer.getBounds());
+
+      document.getElementById("status")
+        .innerText = "Select date range then Load Surveys";
+    }
+
+    // ================= LOAD SURVEYS =================
+    async function loadSurveys() {
+
+      if (!CURRENT_PROJECT_ID)
+        return alert("Select project");
+
+      const start = document.getElementById("startDate").value;
+      const end = document.getElementById("endDate").value;
+
+      if (!start || !end)
+        return alert("Select date range");
+
+      const res =
+        await fetch(`${API_BASE}/sampling/points/${CURRENT_PROJECT_ID}`);
+
+      const geojson = await res.json();
+
+      const filteredFeatures = geojson.features.filter(f => {
+        if (f.properties.survey_status !== "approved")
+          return false;
+
+        const d = f.properties.submitted_at;
+        if (!d) return false;
+
+        return d >= start && d <= end;
+      });
+
+      const filtered = {
+        type: "FeatureCollection",
+        features: filteredFeatures
+      };
+
+      pointsLayer.clearLayers();
+      pointsLayer.addData(filtered);
+
+      document.getElementById("status")
+        .innerText = `Loaded ${filtered.features.length} surveys`;
+
+      await loadSentinelScenes(start, end);
+    }
+
+    // ================= LOAD SENTINEL SCENES =================
+    async function loadSentinelScenes(start, end) {
+
+      const res = await fetch(
+        `${API_BASE}/sentinel/list-closest-scenes/${CURRENT_PROJECT_ID}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            start_date: start,
+            end_date: end,
+            cloud: 50
+          })
         }
-      }).addTo(map);
+      );
 
-      // ================= LOAD PROJECTS =================
-      async function loadProjects() {
+      const scenes = await res.json();
 
-        const res = await fetch(`${API_BASE}/projects`);
-        const projects = await res.json();
-        const select = document.getElementById("projectSelect");
+      const container =
+        document.getElementById("sentinelScenes");
 
-        select.innerHTML = `<option value="">-- Select Project --</option>`;
-        projectMap = {};
-
-        projects.forEach(p => {
-          projectMap[p.id] = p;
-
-          const opt = document.createElement("option");
-          opt.value = p.id;
-          opt.textContent = p.name;
-          select.appendChild(opt);
-        });
-
-        // Use project_state.js
-        const savedProject = getCurrentProject();
-
-        if (savedProject && projectMap[savedProject]) {
-          select.value = savedProject;
-          selectProject();
-        } else {
-          clearCurrentProject(); // cleanup if project no longer exists
-        }
+      if (!scenes.length) {
+        container.innerHTML = "<div>No scenes found</div>";
+        return;
       }
 
-
-      // ================= SELECT PROJECT =================
-      function selectProject() {
-
-        CURRENT_PROJECT_ID =
-          document.getElementById("projectSelect").value;
-
-        if (!CURRENT_PROJECT_ID) return;
-
-        // persist using shared project state
-        setCurrentProject(CURRENT_PROJECT_ID);
-
-        const project = projectMap[CURRENT_PROJECT_ID];
-
-        if (projectAOILayer) map.removeLayer(projectAOILayer);
-
-        projectAOILayer = L.geoJSON(
-          { type: "Feature", geometry: project.aoi }
-        ).addTo(map);
-
-        map.fitBounds(projectAOILayer.getBounds());
-
-        document.getElementById("status")
-          .innerText = "Select date range then Load Surveys";
-      }
-
-      // ================= LOAD SURVEYS =================
-      async function loadSurveys() {
-
-        if (!CURRENT_PROJECT_ID)
-          return alert("Select project");
-
-        const start = document.getElementById("startDate").value;
-        const end = document.getElementById("endDate").value;
-
-        if (!start || !end)
-          return alert("Select date range");
-
-        const res =
-          await fetch(`${API_BASE}/sampling/points/${CURRENT_PROJECT_ID}`);
-
-        const geojson = await res.json();
-
-        const filteredFeatures = geojson.features.filter(f => {
-          if (f.properties.survey_status !== "approved")
-            return false;
-
-          const d = f.properties.submitted_at;
-          if (!d) return false;
-
-          return d >= start && d <= end;
-        });
-
-        const filtered = {
-          type: "FeatureCollection",
-          features: filteredFeatures
-        };
-
-        pointsLayer.clearLayers();
-        pointsLayer.addData(filtered);
-
-        document.getElementById("status")
-          .innerText = `Loaded ${filtered.features.length} surveys`;
-
-        await loadSentinelScenes(start, end);
-      }
-
-      // ================= LOAD SENTINEL SCENES =================
-      async function loadSentinelScenes(start, end) {
-
-        const res = await fetch(
-          `${API_BASE}/sentinel/list-closest-scenes/${CURRENT_PROJECT_ID}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              start_date: start,
-              end_date: end,
-              cloud: 50
-            })
-          }
-        );
-
-        const scenes = await res.json();
-
-        const container =
-          document.getElementById("sentinelScenes");
-
-        if (!scenes.length) {
-          container.innerHTML = "<div>No scenes found</div>";
-          return;
-        }
-
-        container.innerHTML = `
+      container.innerHTML = `
     <table class="table table-sm">
       <thead>
         <tr>
@@ -386,92 +400,92 @@
       </tbody>
     </table>
   `;
-      }
+    }
 
-      // ================= RUN EXTRACT =================
-      async function runExtract() {
+    // ================= RUN EXTRACT =================
+    async function runExtract() {
 
-        if (!CURRENT_PROJECT_ID)
-          return alert("Select project");
+      if (!CURRENT_PROJECT_ID)
+        return alert("Select project");
 
-        if (!SELECTED_IMAGE_ID)
-          return alert("Select Sentinel scene first");
+      if (!SELECTED_IMAGE_ID)
+        return alert("Select Sentinel scene first");
 
-        const start = document.getElementById("startDate").value;
-        const end = document.getElementById("endDate").value;
+      const start = document.getElementById("startDate").value;
+      const end = document.getElementById("endDate").value;
 
-        document.getElementById("status")
-          .innerText = "Extracting Sentinel...";
+      document.getElementById("status")
+        .innerText = "Extracting Sentinel...";
 
-        const res = await fetch(
-          `${API_BASE}/sentinel/extract/${CURRENT_PROJECT_ID}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              image_id: SELECTED_IMAGE_ID,
-              start_date: start,
-              end_date: end,
-              cloud: 50
-            })
-          }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          alert(data.detail);
-          return;
+      const res = await fetch(
+        `${API_BASE}/sentinel/extract/${CURRENT_PROJECT_ID}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image_id: SELECTED_IMAGE_ID,
+            start_date: start,
+            end_date: end,
+            cloud: 50
+          })
         }
+      );
 
-        alert(`Processed: ${data.processed_points}`);
+      const data = await res.json();
 
-        await showSentinelImage(SELECTED_IMAGE_ID);
-
-        loadSurveys();
+      if (!res.ok) {
+        alert(data.detail);
+        return;
       }
 
-      // ================= SHOW SENTINEL RGB =================
-      async function showSentinelImage(imageId) {
+      alert(`Processed: ${data.processed_points}`);
 
-        if (sentinelLayer) {
-          map.removeLayer(sentinelLayer);
+      await showSentinelImage(SELECTED_IMAGE_ID);
+
+      loadSurveys();
+    }
+
+    // ================= SHOW SENTINEL RGB =================
+    async function showSentinelImage(imageId) {
+
+      if (sentinelLayer) {
+        map.removeLayer(sentinelLayer);
+      }
+
+      const res = await fetch(
+        `${API_BASE}/sentinel/preview-image`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image_id: imageId })
         }
+      );
 
-        const res = await fetch(
-          `${API_BASE}/sentinel/preview-image`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image_id: imageId })
-          }
-        );
+      const data = await res.json();
 
-        const data = await res.json();
+      sentinelLayer = L.tileLayer(
+        data.tile_url,
+        { opacity: 0.7 }
+      ).addTo(map);
 
-        sentinelLayer = L.tileLayer(
-          data.tile_url,
-          { opacity: 0.7 }
-        ).addTo(map);
+      document.getElementById("status")
+        .innerText = "Sentinel imagery loaded";
+    }
 
-        document.getElementById("status")
-          .innerText = "Sentinel imagery loaded";
+    function openProjectReport() {
+
+      if (!CURRENT_PROJECT_ID) {
+        alert("Select project first");
+        return;
       }
 
-      function openProjectReport() {
-
-        if (!CURRENT_PROJECT_ID) {
-          alert("Select project first");
-          return;
-        }
-
-        window.location.href =
-          `feature_report.html?project_id=${CURRENT_PROJECT_ID}`;
-      }
+      window.location.href =
+        `feature_report.html?project_id=${CURRENT_PROJECT_ID}`;
+    }
 
 
-      loadProjects();
-    </script>
+    loadProjects();
+  </script>
 
 </body>
 

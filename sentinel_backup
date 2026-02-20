@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict L0AOhbmZ15wW2GhGfwoMQAMjfhf3yKGWcq7atAMKFi6lI2htLZY7DIxnWFJCDVn
+\restrict VZUnpc7cT8hwTb418Dx15hCyJvnPHybGxhA9akYr3RBFi7zbCnXLHojRFwuzEvk
 
 -- Dumped from database version 18.2
 -- Dumped by pg_dump version 18.2
 
--- Started on 2026-02-17 21:56:21
+-- Started on 2026-02-20 11:11:41
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -965,7 +965,7 @@ COPY public.survey_photos (id, survey_id, photo_url, created_at) FROM stdin;
 --
 
 COPY public.surveys (id, sampling_point_id, surveyor_id, tree_species_id, survey_date, dbh_cm, circumference_cm, height_m, biomass, created_at, description, reviewed_by, reviewed_at, status, geom, latitude, longitude) FROM stdin;
-4	68091	bb85907a-0585-47aa-bf1f-b2ead3b88214	1	2026-02-15	30	\N	4	77.76598143290376	2026-02-15 11:02:25.409471+08	\N	\N	\N	draft	0101000020E6100000963AAD2AC3F85D4081F666B048F520C0	-8.47907019860145	119.88691203038101
+4	68091	bb85907a-0585-47aa-bf1f-b2ead3b88214	1	2026-02-15	30	\N	4	77.76598143290376	2026-02-15 11:02:25.409471+08	\N	\N	\N	draft	0101000020E6100000963AAD2AC3F85D4081F666B048F520C0	-8.47907019860145	119.88691303038101
 \.
 
 
@@ -987,9 +987,23 @@ COPY public.tree_species (id, local_name, scientific_name, biomass_formula, wood
 --
 
 COPY public.users (id, name, email, password_hash, role, created_at) FROM stdin;
-670a0a24-7bb0-46c1-8dcb-72a3b5e30c72	Surveyor 2	surveyor2@gmail.com	$2b$12$lIvH/kJoy6E65D9GXkMuAek3Y5zQhvnZhs8vZJ52X65Ujff1sxWzK	surveyor	2026-02-11 17:27:48.366075+08
-0989837f-bbb9-48ff-b5e2-133061cac6a7	Admin Utama	admin@gmail.com	$2b$12$DFWB6vKxrb06RXQb/36pSumrdDsKE3p8mwOhVJSzCQ8deFn8vfX6C	admin	2026-02-10 20:57:48.865591+08
-bb85907a-0585-47aa-bf1f-b2ead3b88214	Surveyor Pertama	surveyor@gmail.com	$2b$12$DFWB6vKxrb06RXQb/36pSumrdDsKE3p8mwOhVJSzCQ8deFn8vfX6C	surveyor	2026-02-10 20:58:00.457714+08
+670a0a24-7bb0-46c1-8dcb-72a3b5e30c72	KRISTOFORUS RENGGO	renggokristo@gmail.com	$2b$12$VfTHAfNWpN0wgvlUr1h2iOQj.mg5xoeeY9xqYoFtdO.1gD9z306GC	surveyor	2026-02-11 17:27:48.366075+08
+0989837f-bbb9-48ff-b5e2-133061cac6a7	I WAYAN PIO PRATAMA	piopratama2@gmail.com	$2b$12$8zZto75HbqJ1LQ3oKlTHB.1E5bf.cT5U9W0iBLyANUBFobACu.7sG	admin	2026-02-10 20:57:48.865591+08
+bb85907a-0585-47aa-bf1f-b2ead3b88214	OKTAVIANUS JEDAUT	oktavianusjedaut@gmail.com	$2b$12$TamAC5MglcmZj7msBou8LedSx9DEyc3itsrg2NIgpr3PnEZ6fC2oe	surveyor	2026-02-10 20:58:00.457714+08
+38e5588b-90d8-4560-b57b-3e986bd8715b	MARIUS YOSEF SERAN	rioseran19@gmail.com	$2b$12$G12M7qXxM3umgjW2F.3hcOlGfCEsvwqRRhuKn0ydxVoQ.kp08FTnK	admin	2026-02-20 09:30:52.578896+08
+7dd57ed2-14e3-42bf-b1a7-d83287e00606	I PUTU EKA SUDARSANA	ekasudarsana180195@gmail.com	$2b$12$lkmM8Xd/pb8S/08jSfUO6ujstZRj8OqTTuNPWF6CbD5x5ZazEoYKy	admin	2026-02-20 09:33:41.541823+08
+019064c1-c6e2-4c87-9728-fef846b7b63a	WILHELMUS SABATANI JANGKU	willy.jangku@gmail.com	$2b$12$OwsKowUH3o2aOmBA6jnSyOgQYW3Kz6Pk8lK8Ijm.qmK/Bwh0mxMUe	admin	2026-02-20 09:35:52.924513+08
+20e563a1-22ac-4b46-9e7e-d550fabbeed8	SISILIA FHELLY DJUN	sisiliafhellydjun@gmail.com	$2b$12$0tFAWwMjXwLqA5drNt/00et.chl6F7NvFREPmFKZFmGs3MU5FgZEy	admin	2026-02-20 09:38:45.444284+08
+1d4d477a-27bc-4f13-bf30-f9df6e88f0bd	DWIJA OKA NEGARA	dwija.elbajo@gmail.com	$2b$12$AVV4gifwiB20dRZM4R9AWOovW70beyhNixxrUhZL9hkweieeiRvy6	admin	2026-02-20 09:40:15.433611+08
+1b5a235d-c222-462b-b407-7e8f10a21437	FILOMENA SELSAGUS MHUTRI	selsaagus10@gmail.com	$2b$12$1HOl.v8G1hA3Pk1Y0uE5Au1PPbc2fF4tMrhnbX1DxzYlekJJmGfKG	surveyor	2026-02-20 09:43:26.683936+08
+3d9ef0be-63ec-4564-b01f-f8d5eaaf22e0	FRANSISKUS NONO	fransiskusnono515@gmail.com	$2b$12$MbGEVHY8G.m5BsdhAFa/Te0rt1m4t0DVE8rjZRePYX8EHKqfK5sbG	surveyor	2026-02-20 09:44:07.23843+08
+a7892cc2-3e4a-4cc1-9e73-d0f4f2d07288	YOHANA FEBRONIA DIMA	yohanadima809@gmail.com	$2b$12$wgmjTmunQ6L.FzNgP0jhR.4so7oR.xGDwB7rxqYXp0dsQLxuvS58O	surveyor	2026-02-20 09:44:39.309415+08
+68a92953-c694-44c9-ac94-365ce4aba025	ADE FATIMA NADIA	adefatimanadia@gmail.com	$2b$12$rKevjq02lfSfTDxEqBmK8OojFflFWZbWwJUN59WQL3spHnETphXIe	surveyor	2026-02-20 09:45:13.881788+08
+3fe888e4-8933-4287-b713-d5b1c84921a0	ROBERTO FLORIO TITO TARANG	tarangtito@gmail.com	$2b$12$cNUo6NlTISIINYIy/a9k/ekSHVXyDMObi2Slwc5gfJAcMZtubTnPK	surveyor	2026-02-20 10:07:53.310267+08
+b7cbdf8d-7a16-42c9-8a1e-9ce52f987a9d	YOHANES ALDINAN MOA	aldimoa947@gmail.com	$2b$12$ssfHFr6qwFvxtbyU5TuP8e5c8pAt3fzUcMQ7kbgFQoHy8xk6xljT.	surveyor	2026-02-20 10:14:33.119191+08
+86646200-d276-4b31-86c3-1e17aece2f7d	BERGITA ASTIANA JELITA	astianabergita@gmail.com	$2b$12$IPd4O3qjh7/Gje5YSL4Wf.ohC3UhMx9se0uzxRBX9xuY5fmD/N/sm	surveyor	2026-02-20 10:17:25.229625+08
+3cf1c114-323d-4e5e-9768-f8952ca75020	MARIA EKAWATI JIMI	ekajhimy@gmail.com	$2b$12$qerSMHnLOJnpG0fvjif3Q.3H5t4LNvGAp1iiwCv1JJ9S0tJ45892a	surveyor	2026-02-20 10:25:58.897638+08
+6cb81c7c-63cd-421b-8334-97860d4f4d7f	TIMOTIUS DANDI JELAHA	dandijelaha877@gmail.com	$2b$12$c.Kjr0uAbMevtiXgSJ0fm.ymYxTuTbbw1SvlqobhPnkmj.MjMk.by	surveyor	2026-02-20 10:26:36.817937+08
 \.
 
 
@@ -1113,7 +1127,7 @@ SELECT pg_catalog.setval('public.surveys_id_seq', 4, true);
 -- Name: tree_species_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tree_species_id_seq', 1, true);
+SELECT pg_catalog.setval('public.tree_species_id_seq', 2, true);
 
 
 --
@@ -1356,11 +1370,11 @@ ALTER TABLE ONLY public.surveys
     ADD CONSTRAINT surveys_tree_species_id_fkey FOREIGN KEY (tree_species_id) REFERENCES public.tree_species(id);
 
 
--- Completed on 2026-02-17 21:56:22
+-- Completed on 2026-02-20 11:11:41
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict L0AOhbmZ15wW2GhGfwoMQAMjfhf3yKGWcq7atAMKFi6lI2htLZY7DIxnWFJCDVn
+\unrestrict VZUnpc7cT8hwTb418Dx15hCyJvnPHybGxhA9akYr3RBFi7zbCnXLHojRFwuzEvk
 

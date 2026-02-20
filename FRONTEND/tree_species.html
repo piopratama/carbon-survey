@@ -1,11 +1,11 @@
-<script>
-  window.REQUIRED_ROLE = "admin";
-</script>
-
 <!doctype html>
 <html lang="en">
 
 <head>
+  <script src="js/config.js"></script>
+  <script>
+    window.REQUIRED_ROLE = "admin";
+  </script>
   <script>
     fetch("partials/head.html")
       .then((r) => r.text())
@@ -25,22 +25,23 @@
       align-items: center;
     }
   </style>
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" />
 
 </head>
 
-<!-- IMAGE MODAL -->
-<div class="modal fade" id="imageModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content bg-dark">
-      <div class="modal-body text-center p-0">
-        <img id="modalImage" class="img-fluid" />
+<body class="d-flex flex-column min-vh-100">
+  <div id="header"></div>
+
+  <!-- IMAGE MODAL -->
+  <div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-dark">
+        <div class="modal-body text-center p-0">
+          <img id="modalImage" class="img-fluid" />
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<body class="d-flex flex-column min-vh-100">
-  <div id="header"></div>
 
   <div class="container py-4 flex-grow-1">
     <div class="d-flex justify-content-between mb-3">
@@ -195,6 +196,8 @@
   <!-- DataTables -->
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
   <script>
     let CURRENT_EDIT_IMAGES = {
@@ -202,8 +205,6 @@
       trunk: null,
       tree: null,
     };
-
-    const API = "http://127.0.0.1:8000";
 
     /* ========================= */
     /* FORMULA VALIDATION       */
@@ -298,7 +299,7 @@
       const formData = new FormData();
       formData.append("file", input.files[0]);
 
-      const res = await fetch(`${API}/upload?category=tree_species`, {
+      const res = await fetch(`${API_BASE}/upload?category=tree_species`, {
         method: "POST",
         body: formData,
       });
@@ -344,7 +345,7 @@
       };
 
       const id = speciesId.value;
-      const url = id ? `${API}/tree-species/${id}` : `${API}/tree-species`;
+      const url = id ? `${API_BASE}/tree-species/${id}` : `${API_BASE}/tree-species`;
       const method = id ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -368,7 +369,7 @@
     /* ========================= */
 
     async function loadSpecies() {
-      const res = await fetch(`${API}/tree-species`);
+      const res = await fetch(`${API_BASE}/tree-species`);
       const data = await res.json();
 
       const tableElement = $("#speciesDataTable");
@@ -421,7 +422,7 @@
 
     async function deleteSpecies(id) {
       if (!confirm("Delete this species?")) return;
-      await fetch(`${API}/tree-species/${id}`, { method: "DELETE" });
+      await fetch(`${API_BASE}/tree-species/${id}`, { method: "DELETE" });
       loadSpecies();
     }
 
