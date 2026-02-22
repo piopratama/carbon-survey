@@ -234,7 +234,7 @@ you MUST cite it as follows:
 
 ### APA 7th Citation Format
 
-Pratama, I. W. P. (2026). *Carbon Survey System* [Software]. GitHub.  
-https://github.com/piopratama/carbon-survey
+Pratama, I. W. P. (2026). Carbon Survey System (Version 1.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.18732075
+
 
 Failure to provide proper citation constitutes academic misconduct.
