@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1155294575.svg)](https://doi.org/10.5281/zenodo.18732075)
+
 ## Database Import (Required Before Running the Project)
 
 Before running the frontend or backend services, the **PostgreSQL database must be restored first**.
