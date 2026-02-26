@@ -1,1635 +1,456 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-  <script src="js/config.js"></script>
-  <script>
-    window.REQUIRED_ROLE = "admin";
-  </script>
-  <script>
-    fetch("partials/head.html")
-      .then((r) => r.text())
-      .then((html) => {
-        document.head.insertAdjacentHTML("beforeend", html);
-      });
-  </script>
-  <!-- Leaflet (ONLY FOR MAP PAGE) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
-</head>
-
-<style>
-  html, body {
-  margin: 0;
-  padding: 0;
-}
-
-#map {
-  width: 100%;
-  height: calc(100vh - 120px);
-}
-</style>
-
-<body class="d-flex flex-column min-vh-100">
-  <!-- ================= HEADER ================= -->
-  <div id="header"></div>
-
-  <div class="modal fade" id="assignSurveyModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Assign Surveyor</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
-          <input type="hidden" id="assignPointId" />
-
-          <!-- Dropdown surveyor -->
-          <div class="mb-2">
-            <label>Pilih Surveyor</label>
-            <select id="availableSurveyors" class="form-select form-select-sm"></select>
-          </div>
-
-          <button class="btn btn-primary btn-sm mb-3" onclick="assignSurveyor()">
-            Tambah
-          </button>
-
-          <hr />
-
-          <h6>Surveyor Terdaftar</h6>
-
-          <!-- INI WAJIB ADA -->
-          <div id="assignedSurveyors"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SURVEY SETUP MODAL ================= -->
-  <div class="modal fade" id="surveySetupModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Setup Survey</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
-          <input type="hidden" id="setupPointId" />
-
-          <div class="mb-2">
-            <label>Start Date</label>
-            <input type="date" id="setupStartDate" class="form-control form-control-sm" />
-          </div>
-
-          <div class="mb-2">
-            <label>End Date</label>
-            <input type="date" id="setupEndDate" class="form-control form-control-sm" />
-          </div>
-
-          <div class="mb-2">
-            <label>Description</label>
-            <textarea id="setupDescription" class="form-control form-control-sm"></textarea>
-          </div>
-
-          <div class="mb-2">
-            <label>Max Surveyor</label>
-            <input type="number" id="setupMaxSurveyor" class="form-control form-control-sm" value="5" min="1"
-              max="10" />
-          </div>
-
-          <div class="mb-2">
-            <label>Plot Radius (meter)</label>
-            <input type="number" id="setupPlotRadius" class="form-control form-control-sm" value="10" min="1"
-              max="50" />
-            <small class="text-muted">
-              Radius of circular plot (example: 10m)
-            </small>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-            Cancel
-          </button>
-          <button class="btn btn-primary btn-sm" onclick="saveSurveySetup()">
-            Save Setup
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= MAIN ================= -->
-  <div class="container-fluid flex-grow-1 p-0">
-
-    <!-- MOBILE TOGGLE BUTTON -->
-    <div class="d-md-none bg-light border-bottom p-2">
-      <button class="btn btn-primary btn-sm w-100" data-bs-toggle="collapse" data-bs-target="#mobileControlPanel">
-        Show Controls
-      </button>
-    </div>
-
-    <div class="row g-0 h-100">
-
-      <!-- ================= MAP ================= -->
-      <div class="col-12 col-md-8 col-lg-9 order-2 order-md-1">
-        <div id="map"></div>
-      </div>
-
-      <!-- ================= CONTROL PANEL ================= -->
-      <div id="mobileControlPanel"
-        class="collapse d-md-block col-12 col-md-4 col-lg-3 bg-light border-start order-1 order-md-2 overflow-auto">
-
-        <div class="p-3">
-          <div class="card shadow-sm">
-            <div class="card-body">
-
-              <!-- ================= LOKASI ================= -->
-              <h6 class="mb-2">Location</h6>
-
-              <div class="input-group mb-3">
-                <input id="searchInput" class="form-control" placeholder="Example: Ubud" />
-                <button class="btn btn-primary" onclick="searchLocation()">
-                  Search
-                </button>
-              </div>
-
-              <hr />
-
-              <!-- ================= PROJECT ================= -->
-              <h6 class="mb-2">Project</h6>
-
-              <select id="projectSelect" class="form-select form-select-sm mb-2" onchange="selectProject()">
-                <option value="">-- Select Project --</option>
-              </select>
-
-              <div class="d-grid gap-2 mb-3">
-                <button id="newProjectBtn" class="btn btn-outline-success btn-sm" onclick="startNewProject()">
-                  New Project
-                </button>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label small">Project Name (new)</label>
-                <input id="projectNameInput" class="form-control form-control-sm"
-                  placeholder="Contoh: Labuan Bajo Carbon Study" />
-              </div>
-
-              <hr />
-
-              <!-- ================= AREA FOKUS ================= -->
-              <h6 class="mb-2">Focus Area</h6>
-
-              <div id="aoiControlSection" class="d-grid gap-2 mb-3" style="display:none">
-
-                <button id="editBtn" class="btn btn-outline-primary btn-sm" onclick="enableEditAOI()" disabled>
-                  Edit Focus Area
-                </button>
-
-                <button id="resetBtn" class="btn btn-outline-secondary btn-sm" onclick="resetAOI()" disabled>
-                  Reset Focus Area
-                </button>
-
-              </div>
-
-              <div class="d-grid gap-2 mb-2">
-                <button id="saveProjectBtn" class="btn btn-success btn-sm" onclick="saveProject()" disabled>
-                  Save Project
-                </button>
-
-                <button class="btn btn-danger btn-sm" onclick="deleteProject()">
-                  Delete Project
-                </button>
-              </div>
-
-              <div id="status" class="text-muted small mb-3"></div>
-
-              <hr />
-
-              <!-- ================= SAMPLING ================= -->
-              <h6 class="mb-2">Sampling</h6>
-
-              <div id="samplingSection" style="display:none">
-
-                <label class="form-label small">Mode Sampling</label>
-
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="samplingMode" value="grid" checked
-                    onchange="onSamplingModeChange()" />
-                  <label class="form-check-label small">
-                    Grid
-                  </label>
-                </div>
-
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="radio" name="samplingMode" value="manual"
-                    onchange="onSamplingModeChange()" />
-                  <label class="form-check-label small">
-                    Manual (click map)
-                  </label>
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label small">
-                    Point Distance (meter)
-                  </label>
-                  <input id="spacingInput" type="number" class="form-control form-control-sm" value="50" min="10"
-                    step="10" />
-                </div>
-
-                <div class="d-grid gap-2 mb-2">
-                  <button class="btn btn-outline-primary btn-sm" onclick="previewSampling()">
-                    Preview Number of Points
-                  </button>
-
-                  <button class="btn btn-success btn-sm" onclick="generateSampling()">
-                    Generate Sampling
-                  </button>
-                </div>
-
-                <div id="samplingPreview" class="text-muted small mb-2">
-                  No Calculation
-                </div>
-
-                <div class="d-grid gap-2 mb-2">
-                  <button class="btn btn-outline-danger btn-sm" onclick="removeAllSampling()">
-                    Remove All Sampling Points
-                  </button>
-                </div>
-
-              </div>
-
-              <hr />
-
-              <!-- ================= SENTINEL ================= -->
-              <div id="sentinelSection" style="display:none">
-
-                <h6 class="mb-2">Sentinel Preview</h6>
-
-                <div class="mb-2">
-                  <label class="form-label small">Year</label>
-                  <input id="yearInput" type="number" class="form-control form-control-sm" value="2024" />
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label small">
-                    Month (comma separated)
-                  </label>
-                  <input id="monthsInput" class="form-control form-control-sm" value="6,7,8" />
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label small">Cloud (%)</label>
-                  <input id="cloudInput" type="number" class="form-control form-control-sm" value="20" />
-                </div>
-
-                <button class="btn btn-primary btn-sm w-100" onclick="loadSentinelPreview()">
-                  Show Sentinel
-                </button>
-
-              </div>
-
-              <hr />
-
-              <!-- ================= RESET ================= -->
-              <button class="btn btn-outline-danger btn-sm w-100" onclick="resetAll()">
-                Reset All
-              </button>
-
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= FOOTER ================= -->
-  <div id="footer"></div>
-
-  <!-- ================= SCRIPTS ================= -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    async function loadPartial(id, file) {
-      const res = await fetch(file);
-      const html = await res.text();
-      document.getElementById(id).innerHTML = html;
-
-      if (id === "header") {
-        initHeaderLogic();
-      }
-    }
-
-    function initHeaderLogic() {
-      const userData = localStorage.getItem("user");
-      if (!userData) return;
-
-      const currentUser = JSON.parse(userData);
-
-      // tampilkan user info
-      const userInfo = document.getElementById("userInfo");
-      if (userInfo) {
-        userInfo.innerText = currentUser.name + " (" + currentUser.role + ")";
-      }
-
-      // hide admin menu
-      if (currentUser.role !== "admin") {
-        document.querySelectorAll(".admin-only").forEach((el) => el.remove());
-      }
-
-      // hide surveyor menu
-      if (currentUser.role !== "surveyor") {
-        document
-          .querySelectorAll(".surveyor-only")
-          .forEach((el) => el.remove());
-      }
-
-      // highlight active link
-      const current = window.location.pathname.split("/").pop();
-      document.querySelectorAll(".nav-link").forEach((link) => {
-        if (link.getAttribute("href") === current) {
-          link.classList.add("active");
-        }
-      });
-    }
-
-    window.logout = function () {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "index.html";
-    };
-
-    loadPartial("header", "partials/header.html");
-    loadPartial("footer", "partials/footer.html");
-  </script>
-  <script src="js/project_state.js"></script>
-  <script>
-    const map = L.map("map").setView([-2, 118], 5);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap",
-    }).addTo(map);
-
-    let marker = null;
-    let aoiLayer = null;
-    let originalAOI = null;
-    let editHandler = null;
-    let projectAOILayer = null; // AOI dari project terpilih
-
-    let finalAOIGeometry = null;
-
-    let sentinelTrueColor = null;
-    let sentinelNDVI = null;
-    let sentinelControl = null;
-
-    let CURRENT_PROJECT_ID = null;
-    let projectMap = {}; // <-- WAJIB
-
-    let MANUAL_MODE_ACTIVE = false;
-
-    const statusEl = document.getElementById("status");
-    const saveBtn = document.getElementById("saveProjectBtn");
-
-    function isEditModeActive() {
-      return !!editHandler;
-    }
-
-    async function searchLocation() {
-      const q = document.getElementById("searchInput").value.trim();
-      if (!q) return;
-
-      statusEl.textContent = "Mencari lokasi...";
-
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,
-      );
-      const data = await res.json();
-
-      if (!data.length) {
-        statusEl.textContent = "Lokasi tidak ditemukan.";
-        return;
-      }
-
-      const p = data[0];
-
-      if (marker) map.removeLayer(marker);
-
-      marker = L.marker([p.lat, p.lon])
-        .addTo(map)
-        .bindPopup(p.display_name)
-        .openPopup();
-
-      map.setView([p.lat, p.lon], 13);
-
-      statusEl.textContent =
-        "Lokasi ditemukan. Klik Project Baru untuk mulai.";
-    }
-
-    let manualTempLayer = L.geoJSON(null, {
-      pointToLayer: (f, latlng) =>
-        L.marker(latlng, {
-          icon: samplingIcon({
-            survey_status: "draft",
-            assigned_count: 0,
-            max_surveyors: 0,
-            approval_status: null,
-          }),
-        }),
-    }).addTo(map);
-
-    function initPage() {
-      // reset variabel global
-      marker = null;
-      aoiLayer = null;
-      originalAOI = null;
-      editHandler = null;
-      projectAOILayer = null;
-      finalAOIGeometry = null;
-
-      sentinelTrueColor = null;
-      sentinelNDVI = null;
-      sentinelControl = null;
-
-      CURRENT_PROJECT_ID = null;
-      projectMap = {};
-      MANUAL_MODE_ACTIVE = false;
-
-      // reset UI
-      document.getElementById("searchInput").value = "";
-      document.getElementById("projectNameInput").value = "";
-      document.getElementById("projectSelect").value = "";
-
-      document.getElementById("samplingSection").style.display = "none";
-      document.getElementById("sentinelSection").style.display = "none";
-      document.getElementById("aoiControlSection").style.display = "none";
-
-      document.getElementById("samplingPreview").innerText = "Belum dihitung";
-
-      editBtn.disabled = true;
-      resetBtn.disabled = true;
-      saveBtn.disabled = true;
-
-      statusEl.textContent = "Silakan cari lokasi.";
-
-      // reset map view
-      map.setView([-2, 118], 5);
-    }
-
-    function enableEditAOI() {
-      if (!aoiLayer) return;
-
-      if (!editHandler) {
-        // MASUK MODE EDIT
-        editHandler = new L.EditToolbar.Edit(map, { featureGroup: aoiLayer });
-        editHandler.enable();
-
-        editBtn.textContent = "Selesai Edit";
-        statusEl.textContent = "Edit area aktif.";
-
-        // disable save saat edit
-        saveBtn.disabled = true;
-      } else {
-        // KELUAR MODE EDIT
-        editHandler.disable();
-        editHandler = null;
-
-        editBtn.textContent = "Edit Area";
-        statusEl.textContent = "Edit selesai.";
-
-        // save aktif hanya kalau nama ada
-        saveBtn.disabled = projectNameInput.value.trim() === "";
-      }
-    }
-
-    projectNameInput.addEventListener("input", () => {
-      if (!aoiLayer) {
-        saveBtn.disabled = true;
-        return;
-      }
-
-      if (isEditModeActive()) {
-        saveBtn.disabled = true;
-        return;
-      }
-
-      saveBtn.disabled = projectNameInput.value.trim() === "";
-    });
-
-    function resetAOI() {
-      if (!originalAOI) return;
-      if (editHandler) enableEditAOI();
-
-      map.removeLayer(aoiLayer);
-      aoiLayer = L.geoJSON(originalAOI).addTo(map);
-      statusEl.textContent = "Area direset.";
-    }
-
-    function confirmAOI() {
-      const geo = aoiLayer.toGeoJSON();
-      const feature = geo.features ? geo.features[0] : geo;
-      finalAOIGeometry = feature.geometry;
-
-      document.getElementById("sentinelSection").style.display = "block";
-      document.getElementById("saveProjectBtn").disabled = false;
-
-      statusEl.textContent = "Area dikunci. Silakan simpan project.";
-    }
-
-    async function loadSentinelPreview() {
-      if (!finalAOIGeometry) return;
-
-      const payload = {
-        geometry: finalAOIGeometry,
-        year: Number(yearInput.value),
-        months: monthsInput.value.split(",").map((m) => Number(m.trim())),
-        cloud: Number(cloudInput.value),
-      };
-
-      statusEl.textContent = "Memuat Sentinel...";
-
-      const res = await fetch(`${API_BASE}/sentinel/preview`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (sentinelTrueColor) map.removeLayer(sentinelTrueColor);
-      if (sentinelNDVI) map.removeLayer(sentinelNDVI);
-      if (sentinelControl) map.removeControl(sentinelControl);
-
-      sentinelTrueColor = L.tileLayer(data.true_color_url);
-      sentinelNDVI = L.tileLayer(data.ndvi_url, { opacity: 0.8 });
-
-      sentinelTrueColor.addTo(map);
-
-      sentinelControl = L.control
-        .layers(null, {
-          "Sentinel True Color": sentinelTrueColor,
-          NDVI: sentinelNDVI,
-        })
-        .addTo(map);
-
-      statusEl.textContent = "Sentinel berhasil dimuat.";
-    }
-
-    function resetAll() {
-      // Disable edit mode
-      if (editHandler) {
-        editHandler.disable();
-        editHandler = null;
-        editBtn.textContent = "Edit Area";
-      }
-
-      // Reset project state
-      CURRENT_PROJECT_ID = null;
-
-      // Remove marker
-      if (marker) {
-        map.removeLayer(marker);
-        marker = null;
-      }
-
-      // Remove AOI
-      if (aoiLayer) {
-        map.removeLayer(aoiLayer);
-        aoiLayer = null;
-      }
-
-      originalAOI = null;
-      finalAOIGeometry = null;
-
-      // Remove Sentinel layers
-      if (sentinelTrueColor) {
-        map.removeLayer(sentinelTrueColor);
-        sentinelTrueColor = null;
-      }
-
-      if (sentinelNDVI) {
-        map.removeLayer(sentinelNDVI);
-        sentinelNDVI = null;
-      }
-
-      if (sentinelControl) {
-        map.removeControl(sentinelControl);
-        sentinelControl = null;
-      }
-
-      // Clear sampling points
-      samplingLayer.clearLayers();
-
-      // Hide Sentinel section
-      document.getElementById("sentinelSection").style.display = "none";
-
-      // Reset inputs
-      document.getElementById("searchInput").value = "";
-      document.getElementById("yearInput").value = 2024;
-      document.getElementById("monthsInput").value = "6,7,8";
-      document.getElementById("cloudInput").value = 20;
-      document.getElementById("projectNameInput").value = "";
-
-      // Reset project select
-      document.getElementById("projectSelect").value = "";
-
-      // Disable buttons
-      editBtn.disabled = true;
-      resetBtn.disabled = true;
-      document.getElementById("saveProjectBtn").disabled = true;
-
-      // Reset status
-      statusEl.textContent = "Silakan cari lokasi.";
-
-      document.getElementById("samplingSection").style.display = "none";
-      document.getElementById("samplingPreview").innerText = "Belum dihitung";
-      document.getElementById("sentinelSection").style.display = "none";
-      document.getElementById("aoiControlSection").style.display = "none";
-
-      // hapus AOI project jika masih ada
-      if (projectAOILayer) {
-        map.removeLayer(projectAOILayer);
-        projectAOILayer = null;
-      }
-
-      // Reset map view
-      map.setView([-2, 118], 5);
-    }
-
-    function onSamplingModeChange() {
-      const mode = document.querySelector(
-        'input[name="samplingMode"]:checked',
-      )?.value;
-
-      const spacingInput = document.getElementById("spacingInput");
-      const previewText = document.getElementById("samplingPreview");
-
-      MANUAL_MODE_ACTIVE = false;
-      map.off("click", onManualMapClick);
-      manualTempLayer.clearLayers();
-
-      if (mode === "grid") {
-        spacingInput.disabled = false;
-        previewText.innerText = "Belum dihitung";
-      }
-
-      if (mode === "manual") {
-        if (!CURRENT_PROJECT_ID) {
-          alert("Pilih project terlebih dahulu");
-          document.querySelector(
-            'input[name="samplingMode"][value="grid"]',
-          ).checked = true;
-          return;
-        }
-
-        spacingInput.disabled = true;
-        previewText.innerText = "Klik peta untuk menambah titik";
-
-        MANUAL_MODE_ACTIVE = true;
-        map.on("click", onManualMapClick);
-      }
-
-      if (mode === "count") {
-        spacingInput.disabled = true;
-        previewText.innerText = "Mode ini belum tersedia";
-      }
-    }
-
-    async function onManualMapClick(e) {
-      if (!MANUAL_MODE_ACTIVE || !CURRENT_PROJECT_ID) return;
-
-      const { lat, lng } = e.latlng;
-
-      // tampilkan sementara
-      manualTempLayer.addData({
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [lng, lat],
-        },
-      });
-
-      if (!confirm("Tambahkan titik sampling di lokasi ini?")) {
-        manualTempLayer.clearLayers();
-        return;
-      }
-
-      statusEl.textContent = "Menyimpan titik manual...";
-
-      const res = await fetch(
-        `${API_BASE}/sampling/manual/${CURRENT_PROJECT_ID}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lat, lng }),
-        },
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        alert(err.detail || "Gagal menyimpan titik");
-        manualTempLayer.clearLayers();
-        return;
-      }
-
-      manualTempLayer.clearLayers();
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-
-      statusEl.textContent = "Titik manual ditambahkan";
-    }
-
-    async function saveProject() {
-      if (!aoiLayer) {
-        alert("Area fokus belum ada");
-        return;
-      }
-
-      if (isEditModeActive()) {
-        alert("Selesaikan edit area terlebih dahulu");
-        return;
-      }
-
-      const name = document.getElementById("projectNameInput").value.trim();
-      if (!name) {
-        alert("Nama project wajib diisi");
-        return;
-      }
-
-      const geo = aoiLayer.toGeoJSON();
-      const feature = geo.features ? geo.features[0] : geo;
-
-      const payload = {
-        name,
-        geometry: feature.geometry,
-        year: Number(document.getElementById("yearInput").value),
-        months: document
-          .getElementById("monthsInput")
-          .value.split(",")
-          .map((m) => Number(m.trim()))
-          .filter((x) => !Number.isNaN(x)),
-        cloud: Number(document.getElementById("cloudInput").value),
-      };
-
-      const isUpdate = !!CURRENT_PROJECT_ID;
-      const url = isUpdate
-        ? `${API_BASE}/projects/${CURRENT_PROJECT_ID}`
-        : `${API_BASE}/projects`;
-
-      const method = isUpdate ? "PUT" : "POST";
-
-      statusEl.textContent = isUpdate
-        ? "Memperbarui project..."
-        : "Menyimpan project...";
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.detail || "Gagal menyimpan project");
-        statusEl.textContent = "Gagal menyimpan project.";
-        return;
-      }
-
-      // reload list
-      await loadProjects();
-
-      // set & select project
-      CURRENT_PROJECT_ID = data.id;
-      const select = document.getElementById("projectSelect");
-      select.value = data.id;
-
-      selectProject();
-
-      statusEl.textContent = isUpdate
-        ? "Project berhasil diperbarui"
-        : "Project berhasil disimpan";
-    }
-
-    let samplingLayer = L.geoJSON(null, {
-      pointToLayer: (feature, latlng) => {
-        const surveyStatus = feature.properties.survey_status;
-
-        return L.marker(latlng, {
-          draggable: surveyStatus === "draft", // hanya draft bisa digeser
-          icon: samplingIcon(feature.properties),
+  <head>
+    <script src="js/config.js"></script>
+    <script>
+      window.REQUIRED_ROLE = "admin";
+    </script>
+    <script>
+      fetch("partials/head.html")
+        .then((r) => r.text())
+        .then((html) => {
+          document.head.insertAdjacentHTML("beforeend", html);
         });
-      },
+    </script>
+    <!-- Leaflet (ONLY FOR MAP PAGE) -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
+    />
+  </head>
 
-      onEachFeature: (feature, layer) => {
-        layer.bindPopup(samplingPopupHTML(feature.properties));
-
-        if (feature.properties.survey_status === "draft") {
-          layer.on("dragend", (e) => {
-            const { lat, lng } = e.target.getLatLng();
-            movePoint(feature.properties.id, lat, lng);
-          });
-        }
-      },
-    }).addTo(map);
-
-    async function movePoint(pointId, lat, lng) {
-      const res = await fetch(`${API_BASE}/sampling/${pointId}/move`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat, lng }),
-      });
-
-      if (!res.ok) {
-        alert("Gagal memindahkan titik");
-        await loadSamplingPoints(CURRENT_PROJECT_ID);
-        return;
-      }
-
-      statusEl.textContent = "Titik dipindahkan";
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
     }
 
-    function samplingIcon(p) {
-      let color = "#6c757d";
-
-      if (p.survey_status === "draft") {
-        color = "#0d6efd"; // biru
-      } else if (p.survey_status === "ready") {
-        if (p.assigned_count === 0) {
-          color = "#8B5A2B"; // coklat → sudah setup tapi belum ada orang
-        } else if (p.assigned_count < p.max_surveyors) {
-          color = "#fd7e14"; // orange → sudah ada orang tapi belum penuh
-        } else {
-          color = "#6f42c1"; // ungu → penuh
-        }
-      } else if (p.survey_status === "submitted") {
-        color = "#dc3545"; // merah → menunggu review
-      } else if (p.survey_status === "approved") {
-        color = "#198754"; // hijau
-      } else if (p.survey_status === "rejected") {
-        color = "#ffc107"; // kuning
-      }
-
-      return L.divIcon({
-        className: "sampling-marker",
-        html: `<div style="
-            background:${color};
-            width:14px;
-            height:14px;
-            border-radius:50%;
-            border:2px solid white;
-          "></div>`,
-      });
+    #map {
+      width: 100%;
+      height: calc(100vh - 120px);
     }
+  </style>
 
-    function samplingPopupHTML(p) {
-      let actions = "";
+  <body class="d-flex flex-column min-vh-100">
+    <!-- ================= HEADER ================= -->
+    <div id="header"></div>
 
-      const progress = p.survey_status;
-      const approval = p.approval_status;
-
-      const assigned = p.assigned_count ?? 0;
-      const maxSurveyor = p.max_surveyors ?? 0;
-
-      const start = p.start_date
-        ? new Date(p.start_date).toLocaleDateString()
-        : "-";
-      const end = p.end_date
-        ? new Date(p.end_date).toLocaleDateString()
-        : "-";
-
-      const surveyDate = p.survey_date
-        ? new Date(p.survey_date).toLocaleDateString()
-        : "-";
-
-      const totalBiomass = Number(p.total_biomass || 0).toFixed(2);
-
-      // STATUS BADGE
-      let approvalBadge = "-";
-      if (approval && approval !== "none") {
-        let color = "secondary";
-        if (approval === "submitted") color = "danger";
-        if (approval === "approved") color = "success";
-        if (approval === "rejected") color = "warning";
-
-        approvalBadge = `<span class="badge bg-${color}">${approval}</span>`;
-      }
-
-      const progressBadge = `
-          <span class="badge bg-info">${progress}</span>
-        `;
-
-      // LOCK RULE
-      const isLocked = approval === "approved" || progress === "expired";
-
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const isAdmin = currentUser.role === "admin";
-
-      if (!isLocked) {
-        actions += `
-            <button class="btn btn-sm btn-dark w-100 mb-1"
-              onclick="openSurveyTreePage(${p.id})">
-              View Trees
-            </button>
-          `;
-
-        // ADMIN REVIEW SECTION
-        if (isAdmin && progress === "submitted") {
-          actions += `
-              <button class="btn btn-sm btn-success w-100 mb-1"
-                onclick="approvePoint(${p.id})">
-                Approve Survey
-              </button>
-
-              <button class="btn btn-sm btn-warning w-100 mb-1"
-                onclick="rejectPoint(${p.id})">
-                Reject Survey
-              </button>
-            `;
-        } else if (progress === "draft") {
-          actions += `
-              <button class="btn btn-sm btn-secondary w-100 mb-1"
-                onclick="openSurveySetup(${p.id})">
-                Setup Survey
-              </button>
-
-              <button class="btn btn-sm btn-danger w-100"
-                onclick="deletePoint(${p.id})">
-                Delete Sampling Point
-              </button>
-            `;
-        }
-
-        if (progress !== "draft") {
-          actions += `
-              <button class="btn btn-sm btn-secondary w-100 mb-1"
-                onclick="openSurveySetup(${p.id}, true)">
-                Edit Survey
-              </button>
-
-              <button class="btn btn-sm btn-primary w-100"
-                onclick="openAssignModal(${p.id})">
-                Manage Surveyor
-              </button>
-            `;
-        }
-      } else {
-        actions = `
-            <span class="text-muted small">
-              Survey terkunci (final)
-            </span>
-          `;
-      }
-
-      return `
-          <div style="min-width:280px">
-
-            <h6 class="mb-2">Sampling Point #${p.id}</h6>
-
-            <table class="table table-sm table-bordered small mb-2">
-              <tbody>
-                <tr>
-                  <th width="110">Progress</th>
-                  <td>${progressBadge}</td>
-                </tr>
-                <tr>
-                  <th>Approval</th>
-                  <td>${approvalBadge}</td>
-                </tr>
-                <tr>
-                  <th>Latitude</th>
-                  <td>${p.latitude?.toFixed(6)}</td>
-                </tr>
-                <tr>
-                  <th>Longitude</th>
-                  <td>${p.longitude?.toFixed(6)}</td>
-                </tr>
-                <tr>
-                  <th>Surveyor</th>
-                  <td>${assigned} / ${maxSurveyor}</td>
-                </tr>
-                <tr>
-                  <th>Period</th>
-                  <td>${start} - ${end}</td>
-                </tr>
-                <tr>
-                  <th>Survey Date</th>
-                  <td>${surveyDate}</td>
-                </tr>
-                <tr>
-                  <th>Total Biomass</th>
-                  <td><strong>${totalBiomass} kg</strong></td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div class="d-grid gap-1">
-              ${actions}
-            </div>
-
+    <div class="modal fade" id="assignSurveyModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Assign Surveyor</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
-        `;
-    }
 
-    async function unlockPoint(pointId) {
-      if (!confirm("Unlock titik ini?")) return;
-
-      const res = await fetch(`${API_BASE}/sampling/unlock/${pointId}`, {
-        method: "POST",
-      });
-
-      if (!res.ok) {
-        alert("Gagal unlock titik");
-        return;
-      }
-
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-    }
-
-    async function deletePoint(pointId) {
-      if (!confirm("Hapus titik ini?")) return;
-
-      const res = await fetch(`${API_BASE}/sampling/${pointId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        alert("Tidak bisa menghapus titik (mungkin terkunci)");
-        return;
-      }
-
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-    }
-
-    function startSurvey(pointId) {
-      alert(`Mulai survey untuk titik ${pointId}`);
-      // nanti diarahkan ke halaman form survey
-    }
-
-    async function loadSamplingPoints(projectId) {
-      const res = await fetch(`${API_BASE}/sampling/points/${projectId}`);
-      const geojson = await res.json();
-
-      samplingLayer.clearLayers();
-      samplingLayer.addData(geojson);
-    }
-
-    L.control
-      .layers(null, {
-        "Sampling Points": samplingLayer,
-      })
-      .addTo(map);
-
-    async function lockPoint(pointId) {
-      if (!CURRENT_PROJECT_ID) {
-        alert("Project belum aktif");
-        return;
-      }
-
-      if (!confirm("Kunci titik ini?")) return;
-
-      const res = await fetch(`${API_BASE}/sampling/lock/${pointId}`, {
-        method: "POST",
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.detail || "Gagal mengunci titik");
-        return;
-      }
-
-      // reload points (refresh status di peta)
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-    }
-
-    async function loadProjects() {
-      const res = await fetch(`${API_BASE}/projects`);
-      const projects = await res.json(); // <-- projects DIDEFINISIKAN DI SINI
-
-      const select = document.getElementById("projectSelect");
-      select.innerHTML = `<option value="">-- Select Project --</option>`;
-
-      projectMap = {}; // reset
-
-      projects.forEach((p) => {
-        projectMap[p.id] = p;
-
-        const opt = document.createElement("option");
-        opt.value = p.id;
-        opt.textContent = `${p.name} (${p.year})`;
-        select.appendChild(opt);
-      });
-
-      const savedProject = getCurrentProject();
-
-      if (savedProject && projectMap[savedProject]) {
-        select.value = savedProject;
-        selectProject();
-      }
-    }
-
-    function selectProject() {
-      const select = document.getElementById("projectSelect");
-      const projectId = select.value;
-      if (!projectId) return;
-
-      const project = projectMap[projectId];
-      if (!project || !project.center || !project.aoi) {
-        alert("Data area project tidak tersedia");
-        return;
-      }
-
-      CURRENT_PROJECT_ID = projectId;
-      setCurrentProject(projectId);
-
-      // Hapus AOI lama
-      if (projectAOILayer) {
-        map.removeLayer(projectAOILayer);
-        projectAOILayer = null;
-      }
-
-      document.getElementById("aoiControlSection").style.display = "grid";
-      editBtn.disabled = false;
-      resetBtn.disabled = false;
-      //enableEditAOI();
-      document.getElementById("aoiControlSection").style.display = "grid";
-      editBtn.disabled = false;
-      resetBtn.disabled = false;
-
-
-      // Tambahkan AOI baru
-      projectAOILayer = L.geoJSON(
-        {
-          type: "Feature",
-          geometry: project.aoi,
-        },
-        {
-          style: {
-            color: "#dc3545", // merah (area fokus)
-            weight: 2,
-            fillOpacity: 0.05,
-            dashArray: "4,4",
-          },
-        },
-      ).addTo(map);
-
-      finalAOIGeometry = project.aoi;
-
-      map.fitBounds(projectAOILayer.getBounds());
-
-      loadSamplingPoints(projectId);
-
-      statusEl.textContent = `Project aktif: ${project.name}`;
-      document.getElementById("samplingSection").style.display = "block";
-      document.getElementById("sentinelSection").style.display = "block";
-
-      document.querySelector(
-        'input[name="samplingMode"][value="grid"]',
-      ).checked = true;
-
-      onSamplingModeChange();
-    }
-
-    async function deleteProject() {
-      if (!CURRENT_PROJECT_ID) return;
-
-      if (!confirm("Hapus project DAN semua sampling point?")) return;
-
-      // delete backend
-      await fetch(`${API_BASE}/projects/${CURRENT_PROJECT_ID}`, {
-        method: "DELETE",
-      });
-
-      // bersihkan AOI project di map (PENTING)
-      if (projectAOILayer) {
-        map.removeLayer(projectAOILayer);
-        projectAOILayer = null;
-      }
-
-      // reset semua state frontend
-      CURRENT_PROJECT_ID = null;
-      projectMap = {};
-
-      resetAll();
-
-      // reload project list (tunggu sampai selesai)
-      await loadProjects();
-
-      statusEl.textContent = "Project dihapus.";
-    }
-
-    async function generateSampling() {
-      if (!CURRENT_PROJECT_ID) {
-        alert("Pilih project terlebih dahulu");
-        return;
-      }
-
-      const mode = document.querySelector(
-        'input[name="samplingMode"]:checked',
-      ).value;
-
-      if (mode !== "grid") {
-        alert("Mode ini belum tersedia");
-        return;
-      }
-
-      const spacing = Number(document.getElementById("spacingInput").value);
-
-      if (spacing < 10) {
-        alert("Jarak terlalu kecil");
-        return;
-      }
-
-      if (
-        !confirm(
-          "Generate sampling grid?\n" +
-          "Titik open akan diganti, titik locked tetap.",
-        )
-      ) {
-        return;
-      }
-
-      statusEl.textContent = "Menghasilkan sampling...";
-
-      // BACKEND KITA HUBUNGKAN NANTI
-      await fetch(
-        `${API_BASE}/sampling/generate/${CURRENT_PROJECT_ID}?spacing_m=${spacing}`,
-        { method: "POST" },
-      );
-
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-
-      statusEl.textContent = "Sampling berhasil dibuat";
-    }
-
-    async function previewSampling() {
-      if (!CURRENT_PROJECT_ID) {
-        alert("Pilih project dulu");
-        return;
-      }
-
-      const spacing = Number(document.getElementById("spacingInput").value);
-      if (spacing < 10) {
-        alert("Spacing terlalu kecil");
-        return;
-      }
-
-      const el = document.getElementById("samplingPreview");
-      el.innerText = "Menghitung...";
-
-      const res = await fetch(
-        `${API_BASE}/sampling/preview/${CURRENT_PROJECT_ID}?spacing=${spacing}`,
-      );
-
-      if (!res.ok) {
-        el.innerText = "Gagal menghitung";
-        return;
-      }
-
-      const data = await res.json();
-
-      el.innerText = `Perkiraan titik: ${data.count} titik`;
-    }
-
-    function startNewProject() {
-      // reset project selection
-      document.getElementById("projectSelect").value = "";
-      CURRENT_PROJECT_ID = null;
-
-      // hapus AOI project lama
-      if (projectAOILayer) {
-        map.removeLayer(projectAOILayer);
-        projectAOILayer = null;
-      }
-
-      if (aoiLayer) {
-        map.removeLayer(aoiLayer);
-        aoiLayer = null;
-      }
-
-      if (!marker) {
-        alert("Cari lokasi terlebih dahulu");
-        return;
-      }
-
-      // buat AOI default di sekitar marker
-      const { lat, lng } = marker.getLatLng();
-      const size = 0.01;
-
-      originalAOI = {
-        type: "Feature",
-        geometry: {
-          type: "Polygon",
-          coordinates: [
-            [
-              [lng - size, lat - size],
-              [lng + size, lat - size],
-              [lng + size, lat + size],
-              [lng - size, lat + size],
-              [lng - size, lat - size],
-            ],
-          ],
-        },
-      };
-
-      aoiLayer = L.geoJSON(originalAOI, {
-        style: { color: "#0d6efd", weight: 2, fillOpacity: 0.1 },
-      }).addTo(map);
-
-      map.fitBounds(aoiLayer.getBounds());
-
-      // tampilkan kontrol AOI
-      document.getElementById("aoiControlSection").style.display = "grid";
-
-      // aktifkan edit mode langsung
-      editBtn.disabled = false;
-      resetBtn.disabled = false;
-      enableEditAOI();
-
-      // reset state
-      finalAOIGeometry = null;
-      document.getElementById("projectNameInput").value = "";
-      document.getElementById("saveProjectBtn").disabled = false;
-
-      // sembunyikan downstream
-      document.getElementById("samplingSection").style.display = "none";
-      document.getElementById("sentinelSection").style.display = "none";
-
-      statusEl.textContent =
-        "Mode project baru: edit area fokus lalu simpan project.";
-    }
-
-    function openSurveySetup(pointId, isEdit = false) {
-      document.getElementById("setupPointId").value = pointId;
-
-      // cari feature dari samplingLayer
-      const geo = samplingLayer.toGeoJSON();
-      const feature = geo.features.find((f) => f.properties.id == pointId);
-
-      if (!feature) return;
-
-      const p = feature.properties;
-
-      if (isEdit) {
-        // isi dengan data lama
-        document.getElementById("setupStartDate").value = p.start_date || "";
-        document.getElementById("setupEndDate").value = p.end_date || "";
-        document.getElementById("setupDescription").value =
-          p.description || "";
-        document.getElementById("setupMaxSurveyor").value =
-          p.max_surveyors || 5;
-      } else {
-        // kosongkan kalau setup baru
-        document.getElementById("setupStartDate").value = "";
-        document.getElementById("setupEndDate").value = "";
-        document.getElementById("setupDescription").value = "";
-        document.getElementById("setupMaxSurveyor").value = 5;
-      }
-
-      const modal = new bootstrap.Modal(
-        document.getElementById("surveySetupModal"),
-      );
-
-      modal.show();
-    }
-
-    async function saveSurveySetup() {
-      const pointId = document.getElementById("setupPointId").value;
-
-      const payload = {
-        start_date: document.getElementById("setupStartDate").value,
-        end_date: document.getElementById("setupEndDate").value,
-        description: document.getElementById("setupDescription").value,
-        max_surveyors: Number(
-          document.getElementById("setupMaxSurveyor").value,
-        ),
-        plot_radius_m: Number(
-          document.getElementById("setupPlotRadius").value,
-        ),
-      };
-
-      const res = await fetch(`${API_BASE}/sampling/setup/${pointId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        alert("Gagal menyimpan setup");
-        return;
-      }
-
-      alert("Survey setup berhasil");
-
-      bootstrap.Modal.getInstance(
-        document.getElementById("surveySetupModal"),
-      ).hide();
-
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-    }
-
-    function openAssignModal(pointId) {
-      document.getElementById("assignPointId").value = pointId;
-
-      loadAvailableSurveyors();
-      loadAssignedSurveyors(pointId);
-
-      const modalEl = document.getElementById("assignSurveyModal");
-
-      if (!modalEl) {
-        alert("Modal tidak ditemukan di HTML");
-        return;
-      }
-
-      const modal = new bootstrap.Modal(modalEl);
-      modal.show();
-    }
-
-    async function loadAvailableSurveyors() {
-      const res = await fetch(`${API_BASE}/users?role=surveyor`);
-      const users = await res.json();
-
-      const select = document.getElementById("availableSurveyors");
-      select.innerHTML = "";
-
-      users.forEach((u) => {
-        const opt = document.createElement("option");
-        opt.value = u.id;
-        opt.textContent = u.name;
-        select.appendChild(opt);
-      });
-    }
-
-    async function loadAssignedSurveyors(pointId) {
-      const listEl = document.getElementById("assignedSurveyors");
-
-      if (!listEl) {
-        console.error("assignedSurveyors element tidak ditemukan");
-        return;
-      }
-
-      listEl.innerHTML = "Loading...";
-
-      const res = await fetch(`${API_BASE}/sampling/assigned/${pointId}`);
-      const data = await res.json();
-
-      listEl.innerHTML = "";
-
-      if (!data.length) {
-        listEl.innerHTML =
-          "<small class='text-muted'>Belum ada surveyor</small>";
-        return;
-      }
-
-      data.forEach((s) => {
-        listEl.innerHTML += `
-            <div class="d-flex justify-content-between mb-1">
-              <span>${s.name}</span>
-              <button class="btn btn-sm btn-danger"
-                onclick="removeSurveyor(${pointId}, '${s.id}')">
-                Hapus
-              </button>
+          <div class="modal-body">
+            <input type="hidden" id="assignPointId" />
+
+            <!-- Dropdown surveyor -->
+            <div class="mb-2">
+              <label>Pilih Surveyor</label>
+              <select
+                id="availableSurveyors"
+                class="form-select form-select-sm"
+              ></select>
             </div>
-          `;
-      });
-    }
 
-    async function assignSurveyorToPoint() {
-      const pointId = document.getElementById("assignPointId").value;
-      const surveyorId = document.getElementById("surveyorSelect").value;
+            <button
+              class="btn btn-primary btn-sm mb-3"
+              onclick="AdminApp.assignSurveyor()"
+            >
+              Tambah
+            </button>
 
-      const res = await fetch(`${API_BASE}/sampling/assign/${pointId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ surveyor_id: surveyorId }),
-      });
+            <hr />
 
-      if (!res.ok) {
-        alert("Gagal assign");
-        return;
-      }
+            <h6>Surveyor Terdaftar</h6>
 
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-      loadAssignedSurveyors(pointId);
-    }
+            <!-- INI WAJIB ADA -->
+            <div id="assignedSurveyors"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    async function assignSurveyor() {
-      const pointId = document.getElementById("assignPointId").value;
-      const surveyorId = document.getElementById("availableSurveyors").value;
+    <!-- ================= SURVEY SETUP MODAL ================= -->
+    <div class="modal fade" id="surveySetupModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Setup Survey</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
 
-      if (!surveyorId) {
-        alert("Pilih surveyor terlebih dahulu");
-        return;
-      }
+          <div class="modal-body">
+            <input type="hidden" id="setupPointId" />
 
-      const res = await fetch(`${API_BASE}/sampling/assign/${pointId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ surveyor_id: surveyorId }),
-      });
+            <div class="mb-2">
+              <label>Start Date</label>
+              <input
+                type="date"
+                id="setupStartDate"
+                class="form-control form-control-sm"
+              />
+            </div>
 
-      const data = await res.json();
+            <div class="mb-2">
+              <label>End Date</label>
+              <input
+                type="date"
+                id="setupEndDate"
+                class="form-control form-control-sm"
+              />
+            </div>
 
-      if (!res.ok) {
-        alert(data.detail || "Gagal assign surveyor");
-        return;
-      }
+            <div class="mb-2">
+              <label>Description</label>
+              <textarea
+                id="setupDescription"
+                class="form-control form-control-sm"
+              ></textarea>
+            </div>
 
-      await loadAssignedSurveyors(pointId);
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-    }
+            <div class="mb-2">
+              <label>Max Surveyor</label>
+              <input
+                type="number"
+                id="setupMaxSurveyor"
+                class="form-control form-control-sm"
+                value="5"
+                min="1"
+                max="10"
+              />
+            </div>
 
-    async function removeSurveyor(pointId, surveyorId) {
-      await fetch(`${API_BASE}/sampling/assign/${pointId}/${surveyorId}`, {
-        method: "DELETE",
-      });
+            <div class="mb-2">
+              <label>Plot Radius (meter)</label>
+              <input
+                type="number"
+                id="setupPlotRadius"
+                class="form-control form-control-sm"
+                value="10"
+                min="1"
+                max="50"
+              />
+              <small class="text-muted">
+                Radius of circular plot (example: 10m)
+              </small>
+            </div>
+          </div>
 
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-      loadAssignedSurveyors(pointId);
-    }
+          <div class="modal-footer">
+            <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button
+              class="btn btn-primary btn-sm"
+              onclick="AdminApp.saveSurveySetup()"
+            >
+              Save Setup
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    function openSurveyTreePage(pointId) {
-      window.location.href = `survey_tree.html?point_id=${pointId}`;
-    }
+    <!-- ================= MAIN ================= -->
+    <div class="container-fluid flex-grow-1 p-0">
+      <!-- MOBILE TOGGLE BUTTON -->
+      <div class="d-md-none bg-light border-bottom p-2">
+        <button
+          class="btn btn-primary btn-sm w-100"
+          data-bs-toggle="collapse"
+          data-bs-target="#mobileControlPanel"
+        >
+          Show Controls
+        </button>
+      </div>
 
-    async function removeAllSampling() {
-      if (!CURRENT_PROJECT_ID) {
-        alert("Pilih project terlebih dahulu");
-        return;
-      }
+      <div class="row g-0 h-100">
+        <!-- ================= MAP ================= -->
+        <div class="col-12 col-md-8 col-lg-9 order-2 order-md-1">
+          <div id="map"></div>
+        </div>
 
-      if (
-        !confirm(
-          "Hapus SEMUA sampling point dalam project ini?\n\n" +
-          "Titik yang sudah locked / approved mungkin tidak akan terhapus.",
-        )
-      ) {
-        return;
-      }
+        <!-- ================= CONTROL PANEL ================= -->
+        <div
+          id="mobileControlPanel"
+          class="collapse d-md-block col-12 col-md-4 col-lg-3 bg-light border-start order-1 order-md-2 overflow-auto"
+        >
+          <div class="p-3">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <!-- ================= LOKASI ================= -->
+                <h6 class="mb-2">Location</h6>
 
-      statusEl.textContent = "Menghapus semua sampling point...";
+                <div class="input-group mb-3">
+                  <input
+                    id="searchInput"
+                    class="form-control"
+                    placeholder="Example: Ubud"
+                  />
+                  <button
+                    class="btn btn-primary"
+                    onclick="AdminApp.searchLocation()"
+                  >
+                    Search
+                  </button>
+                </div>
 
-      const res = await fetch(
-        `${API_BASE}/sampling/project/${CURRENT_PROJECT_ID}`,
-        {
-          method: "DELETE",
-        },
-      );
+                <hr />
 
-      const data = await res.json();
+                <!-- ================= PROJECT ================= -->
+                <h6 class="mb-2">Project</h6>
 
-      if (!res.ok) {
-        alert(data.detail || "Gagal menghapus sampling");
-        statusEl.textContent = "Gagal menghapus sampling.";
-        return;
-      }
+                <select
+                  id="projectSelect"
+                  class="form-select form-select-sm mb-2"
+                  onchange="AdminApp.selectProject()"
+                >
+                  <option value="">-- Select Project --</option>
+                </select>
 
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
+                <div class="d-grid gap-2 mb-3">
+                  <button
+                    id="newProjectBtn"
+                    class="btn btn-outline-success btn-sm"
+                    onclick="startNewProject()"
+                  >
+                    New Project
+                  </button>
+                </div>
 
-      statusEl.textContent = "Semua sampling berhasil dihapus.";
-    }
+                <div class="mb-3">
+                  <label class="form-label small">Project Name (new)</label>
+                  <input
+                    id="projectNameInput"
+                    class="form-control form-control-sm"
+                    placeholder="Contoh: Labuan Bajo Carbon Study"
+                  />
+                </div>
 
-    async function approvePoint(pointId) {
-      if (!confirm("Approve this survey?")) return;
+                <hr />
 
-      const res = await fetch(`${API_BASE}/sampling/review/${pointId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "approved" }),
-      });
+                <!-- ================= AREA FOKUS ================= -->
+                <h6 class="mb-2">Focus Area</h6>
 
-      if (!res.ok) {
-        alert("Failed to approve");
-        return;
-      }
+                <div
+                  id="aoiControlSection"
+                  class="d-grid gap-2 mb-3"
+                  style="display: none"
+                >
+                  <button
+                    id="editBtn"
+                    class="btn btn-outline-primary btn-sm"
+                    onclick="enableEditAOI()"
+                    disabled
+                  >
+                    Edit Focus Area
+                  </button>
 
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-    }
+                  <button
+                    id="resetBtn"
+                    class="btn btn-outline-secondary btn-sm"
+                    onclick="resetAOI()"
+                    disabled
+                  >
+                    Reset Focus Area
+                  </button>
+                </div>
 
-    async function rejectPoint(pointId) {
-      if (!confirm("Reject this survey?")) return;
+                <div class="d-grid gap-2 mb-2">
+                  <button
+                    id="saveProjectBtn"
+                    class="btn btn-success btn-sm"
+                    onclick="saveProject()"
+                    disabled
+                  >
+                    Save Project
+                  </button>
 
-      const res = await fetch(`${API_BASE}/sampling/review/${pointId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "rejected" }),
-      });
+                  <button
+                    class="btn btn-danger btn-sm"
+                    onclick="deleteProject()"
+                  >
+                    Delete Project
+                  </button>
+                </div>
 
-      if (!res.ok) {
-        alert("Failed to reject");
-        return;
-      }
+                <div id="status" class="text-muted small mb-3"></div>
 
-      await loadSamplingPoints(CURRENT_PROJECT_ID);
-    }
+                <hr />
 
-    initPage();
-    loadProjects();
-  </script>
-</body>
+                <!-- ================= SAMPLING ================= -->
+                <h6 class="mb-2">Sampling</h6>
 
+                <div id="samplingSection" style="display: none">
+                  <label class="form-label small">Mode Sampling</label>
+
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="samplingMode"
+                      value="grid"
+                      checked
+                      onchange="AdminApp.onSamplingModeChange()"
+                    />
+                    <label class="form-check-label small"> Grid </label>
+                  </div>
+
+                  <div class="form-check mb-2">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="samplingMode"
+                      value="manual"
+                      onchange="AdminApp.onSamplingModeChange()"
+                    />
+                    <label class="form-check-label small">
+                      Manual (click map)
+                    </label>
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label small">
+                      Point Distance (meter)
+                    </label>
+                    <input
+                      id="spacingInput"
+                      type="number"
+                      class="form-control form-control-sm"
+                      value="50"
+                      min="10"
+                      step="10"
+                    />
+                  </div>
+
+                  <div class="d-grid gap-2 mb-2">
+                    <button
+                      class="btn btn-outline-primary btn-sm"
+                      onclick="AdminApp.previewSampling()"
+                    >
+                      Preview Number of Points
+                    </button>
+
+                    <button
+                      class="btn btn-success btn-sm"
+                      onclick="AdminApp.generateSampling()"
+                    >
+                      Generate Sampling
+                    </button>
+                  </div>
+
+                  <div id="samplingPreview" class="text-muted small mb-2">
+                    No Calculation
+                  </div>
+
+                  <div class="d-grid gap-2 mb-2">
+                    <button
+                      class="btn btn-outline-danger btn-sm"
+                      onclick="AdminApp.removeAllSampling()"
+                    >
+                      Remove All Sampling Points
+                    </button>
+                  </div>
+                </div>
+
+                <hr />
+
+                <!-- ================= SENTINEL ================= -->
+                <div id="sentinelSection" style="display: none">
+                  <h6 class="mb-2">Sentinel Preview</h6>
+
+                  <div class="mb-2">
+                    <label class="form-label small">Year</label>
+                    <input
+                      id="yearInput"
+                      type="number"
+                      class="form-control form-control-sm"
+                      value="2024"
+                    />
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label small">
+                      Month (comma separated)
+                    </label>
+                    <input
+                      id="monthsInput"
+                      class="form-control form-control-sm"
+                      value="6,7,8"
+                    />
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label small">Cloud (%)</label>
+                    <input
+                      id="cloudInput"
+                      type="number"
+                      class="form-control form-control-sm"
+                      value="20"
+                    />
+                  </div>
+
+                  <button
+                    class="btn btn-primary btn-sm w-100"
+                    onclick="loadSentinelPreview()"
+                  >
+                    Show Sentinel
+                  </button>
+                </div>
+
+                <hr />
+
+                <!-- ================= RESET ================= -->
+                <button
+                  class="btn btn-outline-danger btn-sm w-100"
+                  onclick="resetAll()"
+                >
+                  Reset All
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <div id="footer"></div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="js/project_state.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/project.js"></script>
+    <script src="js/core/sampling-core.js"></script>
+    <script src="js/core/project-core.js"></script>
+    <script src="js/admin/admin-sampling.js"></script>
+    <script src="js/admin/admin-sampling-ui.js"></script>
+    <script src="js/sentinel.js"></script>
+    <script src="js/survey-setup.js"></script>
+    <script src="js/assign.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>

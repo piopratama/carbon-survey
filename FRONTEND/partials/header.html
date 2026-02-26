@@ -66,22 +66,22 @@ HEADER
 =============================== -->
 <header class="custom-navbar shadow-sm">
   <nav class="navbar navbar-expand-lg navbar-dark container px-3">
-
     <!-- BRAND -->
-    <a class="navbar-brand fw-semibold" href="main.html">
-      Carbon Monitoring
-    </a>
+    <a class="navbar-brand fw-semibold" href="main.html"> Carbon Monitoring </a>
 
     <!-- TOGGLER -->
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+    <button
+      class="navbar-toggler border-0"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarContent"
+    >
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarContent">
-
       <!-- MENU -->
       <ul class="navbar-nav me-auto mb-2 mt-2 mb-lg-0">
-
         <li class="nav-item admin-only">
           <a class="nav-link" href="main.html">Project</a>
         </li>
@@ -101,7 +101,6 @@ HEADER
         <li class="nav-item surveyor-only">
           <a class="nav-link" href="surveyor_main.html">Project</a>
         </li>
-
       </ul>
 
       <!-- USER SECTION -->
@@ -111,11 +110,9 @@ HEADER
           Logout
         </button>
       </div>
-
     </div>
   </nav>
 </header>
-
 
 <script>
   if (currentUser) {
@@ -123,17 +120,17 @@ HEADER
       currentUser.name + " (" + currentUser.role + ")";
 
     if (currentUser.role !== "admin") {
-      document.querySelectorAll(".admin-only").forEach(el => el.remove());
+      document.querySelectorAll(".admin-only").forEach((el) => el.remove());
     }
 
     if (currentUser.role !== "surveyor") {
-      document.querySelectorAll(".surveyor-only").forEach(el => el.remove());
+      document.querySelectorAll(".surveyor-only").forEach((el) => el.remove());
     }
   }
 
   const currentPage = window.location.pathname.split("/").pop();
 
-  document.querySelectorAll(".nav-link").forEach(link => {
+  document.querySelectorAll(".nav-link").forEach((link) => {
     if (link.getAttribute("href") === currentPage) {
       link.classList.add("active");
     }
