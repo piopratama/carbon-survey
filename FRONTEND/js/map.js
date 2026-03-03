@@ -24,38 +24,6 @@ function isEditModeActive() {
     return !!editHandler;
 }
 
-
-async function searchLocation() {
-    const q = document.getElementById("searchInput").value.trim();
-    if (!q) return;
-
-    statusEl.textContent = "Mencari lokasi...";
-
-    const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,
-    );
-    const data = await res.json();
-
-    if (!data.length) {
-        statusEl.textContent = "Lokasi tidak ditemukan.";
-        return;
-    }
-
-    const p = data[0];
-
-    if (marker) map.removeLayer(marker);
-
-    marker = L.marker([p.lat, p.lon])
-        .addTo(map)
-        .bindPopup(p.display_name)
-        .openPopup();
-
-    map.setView([p.lat, p.lon], 13);
-
-    statusEl.textContent =
-        "Lokasi ditemukan. Klik Project Baru untuk mulai.";
-}
-
 function enableEditAOI() {
     if (!aoiLayer) return;
 

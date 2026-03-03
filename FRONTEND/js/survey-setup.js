@@ -2,7 +2,7 @@ function openSurveySetup(pointId, isEdit = false) {
     document.getElementById("setupPointId").value = pointId;
 
     // cari feature dari samplingLayer
-    const geo = samplingLayer.toGeoJSON();
+    const geo = AdminApp.samplingLayer.toGeoJSON();
     const feature = geo.features.find((f) => f.properties.id == pointId);
 
     if (!feature) return;
@@ -30,39 +30,4 @@ function openSurveySetup(pointId, isEdit = false) {
     );
 
     modal.show();
-}
-
-async function saveSurveySetup() {
-    const pointId = document.getElementById("setupPointId").value;
-
-    const payload = {
-        start_date: document.getElementById("setupStartDate").value,
-        end_date: document.getElementById("setupEndDate").value,
-        description: document.getElementById("setupDescription").value,
-        max_surveyors: Number(
-            document.getElementById("setupMaxSurveyor").value,
-        ),
-        plot_radius_m: Number(
-            document.getElementById("setupPlotRadius").value,
-        ),
-    };
-
-    const res = await fetch(`${API_BASE}/sampling/setup/${pointId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-        alert("Gagal menyimpan setup");
-        return;
-    }
-
-    alert("Survey setup berhasil");
-
-    bootstrap.Modal.getInstance(
-        document.getElementById("surveySetupModal"),
-    ).hide();
-
-    await loadSamplingPoints(CURRENT_PROJECT_ID);
 }

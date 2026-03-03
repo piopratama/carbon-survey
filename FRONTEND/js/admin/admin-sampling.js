@@ -12,7 +12,7 @@ window.AdminApp = (function () {
 
         onEachFeature: (feature, layer) => {
 
-            // 🔥 PENTING: pakai AdminApp namespace
+            // PENTING: pakai AdminApp namespace
             layer.bindPopup(
                 AdminApp.samplingPopupHTML(feature.properties)
             );
@@ -347,8 +347,75 @@ window.AdminApp = (function () {
         statusEl.textContent = "Titik manual ditambahkan";
     }
 
+    async function saveSurveySetup() {
+        const pointId = document.getElementById("setupPointId").value;
+
+        const payload = {
+            start_date: document.getElementById("setupStartDate").value,
+            end_date: document.getElementById("setupEndDate").value,
+            description: document.getElementById("setupDescription").value,
+            max_surveyors: Number(
+                document.getElementById("setupMaxSurveyor").value,
+            ),
+            plot_radius_m: Number(
+                document.getElementById("setupPlotRadius").value,
+            ),
+        };
+
+        const res = await fetch(`${API_BASE}/sampling/setup/${pointId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+            alert("Gagal menyimpan setup");
+            return;
+        }
+
+        alert("Survey setup berhasil");
+
+        bootstrap.Modal.getInstance(
+            document.getElementById("surveySetupModal"),
+        ).hide();
+
+        await loadSamplingPoints(CURRENT_PROJECT_ID);
+    }
+
+    async function searchLocation() {
+        const q = document.getElementById("searchInput").value.trim();
+        if (!q) return;
+
+        statusEl.textContent = "Mencari lokasi...";
+
+        const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,
+        );
+        const data = await res.json();
+
+        if (!data.length) {
+            statusEl.textContent = "Lokasi tidak ditemukan.";
+            return;
+        }
+
+        const p = data[0];
+
+        if (marker) map.removeLayer(marker);
+
+        marker = L.marker([p.lat, p.lon])
+            .addTo(map)
+            .bindPopup(p.display_name)
+            .openPopup();
+
+        map.setView([p.lat, p.lon], 13);
+
+        statusEl.textContent =
+            "Lokasi ditemukan. Klik Project Baru untuk mulai.";
+    }
+
 
     return {
+        samplingLayer,
         loadSamplingPoints,
         generateSampling,
         previewSampling,
@@ -360,7 +427,9 @@ window.AdminApp = (function () {
         lockPoint,
         unlockPoint,
         onSamplingModeChange,
-        openSurveyTreePage
+        openSurveyTreePage,
+        saveSurveySetup,
+        searchLocation
     };
 
 })();
