@@ -182,7 +182,7 @@ function selectProject() {
 
     statusEl.textContent = `Project aktif: ${project.name}`;
     document.getElementById("samplingSection").style.display = "block";
-    document.getElementById("sentinelSection").style.display = "block";
+    //document.getElementById("sentinelSection").style.display = "block";
 
     document.querySelector(
         'input[name="samplingMode"][value="grid"]',
@@ -336,7 +336,7 @@ function resetAll() {
     }
 
     // Clear sampling points
-    samplingLayer.clearLayers();
+    AdminApp.samplingLayer.clearLayers();
 
     // Hide Sentinel section
     document.getElementById("sentinelSection").style.display = "none";

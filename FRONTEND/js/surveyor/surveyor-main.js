@@ -138,7 +138,22 @@ window.SurveyorApp = (function () {
         await loadSamplingToLayer(id, samplingLayer, map);
     }
 
-    loadProjectsToSelects(["projectSelect", "projectSelectDesktop"]);
+    //loadProjectsToSelects(["projectSelect", "projectSelectDesktop"]);
+    loadProjectsToSelects(["projectSelect", "projectSelectDesktop"]).then(() => {
+
+        const projectId = localStorage.getItem("current_project_id");
+
+        if (!projectId) return;
+
+        const mobile = document.getElementById("projectSelect");
+        const desktop = document.getElementById("projectSelectDesktop");
+
+        if (mobile) mobile.value = projectId;
+        if (desktop) desktop.value = projectId;
+
+        SurveyorApp.selectProject();
+
+    });
 
     /* ============================= */
     /* JOIN / LEAVE */

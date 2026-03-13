@@ -5,6 +5,7 @@ from app.db.session import SessionLocal
 from datetime import date
 import ast
 import math
+from app.services.auth import get_current_user
 
 router = APIRouter(prefix="/survey", tags=["Survey"])
 
@@ -86,9 +87,12 @@ def safe_eval_formula(expr: str, variables: dict) -> float:
 def create_tree_survey(
     sampling_point_id: int,
     payload: dict,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
-    surveyor_id = payload.get("surveyor_id")
+
+    surveyor_id = current_user["sub"]
+
     tree_species_id = payload.get("tree_species_id")
     dbh_cm = payload.get("dbh_cm")
 
@@ -98,17 +102,19 @@ def create_tree_survey(
 
     lat_in = payload.get("latitude")
     lng_in = payload.get("longitude")
+    lat_manual = payload.get("latitude_manual")
+    lng_manual = payload.get("longitude_manual")
 
-    if not surveyor_id:
-        raise HTTPException(400, "surveyor_id wajib diisi")
     if not tree_species_id:
         raise HTTPException(400, "tree_species_id wajib diisi")
+
     if dbh_cm is None:
         raise HTTPException(400, "dbh_cm wajib diisi")
 
     # ===============================
-    # 1) CHECK SAMPLING POINT
+    # CHECK SAMPLING POINT
     # ===============================
+
     point = db.execute(
         text("""
             SELECT
@@ -131,14 +137,15 @@ def create_tree_survey(
         raise HTTPException(400, "Sampling point sudah approved")
 
     # ===============================
-    # 2) CHECK SURVEYOR JOINED
+    # CHECK SURVEYOR JOINED
     # ===============================
+
     joined = db.execute(
         text("""
             SELECT 1
             FROM sampling_assignments
             WHERE sampling_point_id = :pid
-              AND surveyor_id = :sid
+            AND surveyor_id = :sid
             LIMIT 1
         """),
         {"pid": sampling_point_id, "sid": surveyor_id}
@@ -148,8 +155,9 @@ def create_tree_survey(
         raise HTTPException(403, "Anda belum join sampling point ini")
 
     # ===============================
-    # 3) GET TREE SPECIES
+    # GET TREE SPECIES
     # ===============================
+
     species = db.execute(
         text("""
             SELECT
@@ -157,11 +165,7 @@ def create_tree_survey(
                 local_name,
                 scientific_name,
                 wood_density,
-                biomass_formula,
-                description,
-                leaf_photo_url,
-                trunk_photo_url,
-                tree_photo_url
+                biomass_formula
             FROM tree_species
             WHERE id = :id
         """),
@@ -172,29 +176,30 @@ def create_tree_survey(
         raise HTTPException(404, "Tree species tidak ditemukan")
 
     # ===============================
-    # 4) LAT/LNG RESOLUTION
+    # LAT LNG RESOLUTION
     # ===============================
+
     lat = lat_in
     lng = lng_in
 
     if lat is None or lng is None:
-        lat = point["latitude"] if point["latitude"] is not None else point["geom_lat"]
-        lng = point["longitude"] if point["longitude"] is not None else point["geom_lng"]
+        lat = point["latitude"] if point["latitude"] else point["geom_lat"]
+        lng = point["longitude"] if point["longitude"] else point["geom_lng"]
 
     if lat is None or lng is None:
-        raise HTTPException(400, "Latitude/Longitude tidak tersedia")
+        raise HTTPException(400, "Latitude / Longitude tidak tersedia")
 
     # ===============================
-    # 5) BIOMASS CALCULATION
+    # BIOMASS CALCULATION
     # ===============================
+
     dbh = float(dbh_cm)
     height = float(height_m) if height_m else None
     wd = float(species["wood_density"]) if species["wood_density"] else None
     formula = species["biomass_formula"]
 
-    if not formula or not formula.strip():
+    if not formula:
 
-        # DEFAULT SIMPLE FORMULA
         if height and wd:
             biomass = 0.11 * wd * (dbh ** 2) * height
         elif wd:
@@ -203,21 +208,19 @@ def create_tree_survey(
             biomass = 0.11 * (dbh ** 2)
 
     else:
+
         variables = {
             "dbh_cm": dbh,
             "height_m": height if height else 0.0,
-            "circumference_cm": float(circumference_cm) if circumference_cm else 0.0,
-            "wood_density": wd if wd else 0.0,
+            "wood_density": wd if wd else 0.0
         }
 
-        try:
-            biomass = safe_eval_formula(formula, variables)
-        except ValueError as e:
-            raise HTTPException(400, f"biomass_formula error: {str(e)}")
+        biomass = safe_eval_formula(formula, variables)
 
     # ===============================
-    # 6) INSERT SURVEY
+    # INSERT
     # ===============================
+
     row = db.execute(
         text("""
             INSERT INTO surveys (
@@ -232,6 +235,8 @@ def create_tree_survey(
                 description,
                 latitude,
                 longitude,
+                latitude_manual,
+                longitude_manual,
                 geom,
                 status
             )
@@ -247,6 +252,8 @@ def create_tree_survey(
                 :description,
                 :latitude,
                 :longitude,
+                :latitude_manual,
+                :longitude_manual,
                 ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326),
                 'draft'
             )
@@ -263,6 +270,8 @@ def create_tree_survey(
             "description": description,
             "latitude": lat,
             "longitude": lng,
+            "latitude_manual": lat_manual,
+            "longitude_manual": lng_manual
         }
     ).mappings().first()
 
@@ -270,20 +279,7 @@ def create_tree_survey(
 
     return {
         "survey_id": row["id"],
-        "sampling_point_id": sampling_point_id,
-        "survey_date": str(row["survey_date"]) if row["survey_date"] else str(date.today()),
-        "latitude": float(lat),
-        "longitude": float(lng),
-        "biomass": float(biomass),
-        "tree_species": {
-            "id": species["id"],
-            "local_name": species["local_name"],
-            "scientific_name": species["scientific_name"],
-            "description": species["description"],
-            "leaf_photo_url": species["leaf_photo_url"],
-            "trunk_photo_url": species["trunk_photo_url"],
-            "tree_photo_url": species["tree_photo_url"],
-        }
+        "biomass": float(biomass)
     }
 
 # ===============================
@@ -395,6 +391,69 @@ def submit_survey(
         "status": "submitted"
     }
 
+# @router.get("/by-point/{point_id}")
+# def list_surveys_by_point(point_id: int, db: Session = Depends(get_db)):
+
+#     rows = db.execute(
+#         text("""
+#             SELECT
+#                 s.id AS survey_id,
+#                 s.tree_species_id,
+#                 s.dbh_cm,
+#                 s.height_m,
+#                 s.biomass,
+#                 s.latitude,
+#                 s.longitude,
+#                 s.latitude_manual,
+#                 s.longitude_manual,
+#                 s.created_at,
+#                 u.name AS input_by_name,
+#                 ts.local_name
+#             FROM surveys s
+#             JOIN tree_species ts ON ts.id = s.tree_species_id
+#             JOIN users u ON u.id = s.surveyor_id
+#             WHERE s.sampling_point_id = :pid
+#             ORDER BY s.created_at ASC
+#         """),
+#         {"pid": point_id}
+#     ).mappings().all()
+
+#     result = []
+
+#     for r in rows:
+
+#         photos = db.execute(
+#             text("""
+#                 SELECT photo_url
+#                 FROM survey_photos
+#                 WHERE survey_id = :sid
+#                 ORDER BY id ASC
+#             """),
+#             {"sid": r["survey_id"]}
+#         ).scalars().all()
+
+#         result.append({
+#             "survey_id": r["survey_id"],
+#             "tree_species_id": r["tree_species_id"],
+#             "dbh_cm": r["dbh_cm"],
+#             "height_m": r["height_m"],
+#             "biomass": r["biomass"],
+#             "latitude": float(r["latitude"]) if r["latitude"] else None,
+#             "longitude": float(r["longitude"]) if r["longitude"] else None,
+#             "latitude_manual": float(r["latitude_manual"]) if r["latitude_manual"] else None,
+#             "longitude_manual": float(r["longitude_manual"]) if r["longitude_manual"] else None,
+#             "input_by_name": r["input_by_name"],
+#             "created_at": r["created_at"].isoformat() if r["created_at"] else None,
+#             "tree_species": {
+#                 "local_name": r["local_name"]
+#             },
+#             "photo1": photos[0] if len(photos) > 0 else None,
+#             "photo2": photos[1] if len(photos) > 1 else None,
+#             "photo3": photos[2] if len(photos) > 2 else None,
+#         })
+
+#     return result
+
 @router.get("/by-point/{point_id}")
 def list_surveys_by_point(point_id: int, db: Session = Depends(get_db)):
 
@@ -402,12 +461,15 @@ def list_surveys_by_point(point_id: int, db: Session = Depends(get_db)):
         text("""
             SELECT
                 s.id AS survey_id,
+                s.surveyor_id,
                 s.tree_species_id,
                 s.dbh_cm,
                 s.height_m,
                 s.biomass,
                 s.latitude,
                 s.longitude,
+                s.latitude_manual,
+                s.longitude_manual,
                 s.created_at,
                 u.name AS input_by_name,
                 ts.local_name
@@ -436,12 +498,15 @@ def list_surveys_by_point(point_id: int, db: Session = Depends(get_db)):
 
         result.append({
             "survey_id": r["survey_id"],
+            "surveyor_id": r["surveyor_id"],
             "tree_species_id": r["tree_species_id"],
             "dbh_cm": r["dbh_cm"],
             "height_m": r["height_m"],
             "biomass": r["biomass"],
             "latitude": float(r["latitude"]) if r["latitude"] else None,
             "longitude": float(r["longitude"]) if r["longitude"] else None,
+            "latitude_manual": float(r["latitude_manual"]) if r["latitude_manual"] else None,
+            "longitude_manual": float(r["longitude_manual"]) if r["longitude_manual"] else None,
             "input_by_name": r["input_by_name"],
             "created_at": r["created_at"].isoformat() if r["created_at"] else None,
             "tree_species": {
@@ -454,15 +519,32 @@ def list_surveys_by_point(point_id: int, db: Session = Depends(get_db)):
 
     return result
 
-
-
 @router.put("/{survey_id}")
 def update_survey(
     survey_id: int,
     payload: dict,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
-    result = db.execute(
+
+    survey = db.execute(
+        text("""
+            SELECT surveyor_id
+            FROM surveys
+            WHERE id = :id
+        """),
+        {"id": survey_id}
+    ).mappings().first()
+
+    if not survey:
+        raise HTTPException(404, "Survey not found")
+
+    user_id = current_user["sub"]
+    role = current_user["role"]
+    if role != "admin" and str(survey["surveyor_id"]) != str(user_id):
+        raise HTTPException(403, "Not allowed to edit this survey")
+
+    db.execute(
         text("""
             UPDATE surveys
             SET
@@ -470,9 +552,10 @@ def update_survey(
                 dbh_cm = :dbh,
                 height_m = :height,
                 latitude = :lat,
-                longitude = :lng
+                longitude = :lng,
+                latitude_manual = :latitude_manual,
+                longitude_manual = :longitude_manual
             WHERE id = :id
-            RETURNING id
         """),
         {
             "id": survey_id,
@@ -480,12 +563,11 @@ def update_survey(
             "dbh": payload.get("dbh_cm"),
             "height": payload.get("height_m"),
             "lat": payload.get("latitude"),
-            "lng": payload.get("longitude")
+            "lng": payload.get("longitude"),
+            "latitude_manual": payload.get("latitude_manual"),
+            "longitude_manual": payload.get("longitude_manual")
         }
-    ).fetchone()
-
-    if not result:
-        raise HTTPException(404, "Survey not found")
+    )
 
     db.commit()
 
@@ -494,23 +576,61 @@ def update_survey(
 @router.delete("/{survey_id}")
 def delete_survey(
     survey_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
-    result = db.execute(
+
+    survey = db.execute(
+        text("""
+            SELECT surveyor_id
+            FROM surveys
+            WHERE id = :id
+        """),
+        {"id": survey_id}
+    ).mappings().first()
+
+    if not survey:
+        raise HTTPException(404, "Survey not found")
+
+    user_id = current_user["sub"]
+    role = current_user["role"]
+
+    if role != "admin" and str(survey["surveyor_id"]) != str(user_id):
+        raise HTTPException(403, "Not allowed to delete this survey")
+
+    db.execute(
         text("""
             DELETE FROM surveys
             WHERE id = :id
-            RETURNING id
         """),
         {"id": survey_id}
-    ).fetchone()
-
-    if not result:
-        raise HTTPException(404, "Survey not found")
+    )
 
     db.commit()
 
     return {"deleted": survey_id}
+
+# @router.post("/{survey_id}/photos-single")
+# def save_survey_photos_single(
+#     survey_id: int,
+#     payload: dict,
+#     db: Session = Depends(get_db)
+# ):
+#     db.execute(text("""
+#         DELETE FROM survey_photos
+#         WHERE survey_id = :sid
+#     """), {"sid": survey_id})
+
+#     for key in ["photo1","photo2","photo3"]:
+#         url = payload.get(key)
+#         if url:
+#             db.execute(text("""
+#                 INSERT INTO survey_photos (survey_id, photo_url)
+#                 VALUES (:sid, :url)
+#             """), {"sid": survey_id, "url": url})
+
+#     db.commit()
+#     return {"status":"ok"}
 
 @router.post("/{survey_id}/photos-single")
 def save_survey_photos_single(
@@ -518,18 +638,31 @@ def save_survey_photos_single(
     payload: dict,
     db: Session = Depends(get_db)
 ):
-    db.execute(text("""
-        DELETE FROM survey_photos
-        WHERE survey_id = :sid
-    """), {"sid": survey_id})
 
-    for key in ["photo1","photo2","photo3"]:
-        url = payload.get(key)
-        if url:
-            db.execute(text("""
-                INSERT INTO survey_photos (survey_id, photo_url)
-                VALUES (:sid, :url)
-            """), {"sid": survey_id, "url": url})
+    for slot in ["photo1","photo2","photo3"]:
+        url = payload.get(slot)
+
+        if not url:
+            continue
+
+        db.execute(text("""
+            DELETE FROM survey_photos
+            WHERE survey_id = :sid
+            AND photo_slot = :slot
+        """), {
+            "sid": survey_id,
+            "slot": slot
+        })
+
+        db.execute(text("""
+            INSERT INTO survey_photos (survey_id, photo_slot, photo_url)
+            VALUES (:sid, :slot, :url)
+        """), {
+            "sid": survey_id,
+            "slot": slot,
+            "url": url
+        })
 
     db.commit()
-    return {"status":"ok"}
+
+    return {"status": "ok"}
