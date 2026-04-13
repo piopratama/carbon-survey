@@ -116,7 +116,7 @@ window.AdminApp = (function () {
         el.innerText = "Menghitung...";
 
         const res = await fetch(
-            `${API_BASE}/sampling/preview/${CURRENT_PROJECT_ID}?spacing=${spacing}`
+            `${API_BASE}/preview/${CURRENT_PROJECT_ID}?spacing=${spacing}`
         );
 
         if (!res.ok) {
