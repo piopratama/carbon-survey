@@ -127,7 +127,7 @@ def generate_sampling(
         {"pid": project_id},
     )
 
-    # insert new grid points (manual grid)
+    # insert new points
     db.execute(
         text("""
         WITH proj AS (
@@ -148,18 +148,15 @@ def generate_sampling(
         grid AS (
             SELECT
                 b.id,
-                ST_Transform(
-                    ST_Centroid(
-                        ST_MakeEnvelope(
-                            xmin + i * :spacing,
-                            ymin + j * :spacing,
-                            xmin + (i+1) * :spacing,
-                            ymin + (j+1) * :spacing,
-                            3857
-                        )
-                    ),
-                    4326
-                ) AS wgs_geom,
+                ST_Centroid(
+                    ST_MakeEnvelope(
+                        xmin + i * :spacing,
+                        ymin + j * :spacing,
+                        xmin + (i+1) * :spacing,
+                        ymin + (j+1) * :spacing,
+                        3857
+                    )
+                ) AS pt_3857,
                 b.geom
             FROM bounds b,
             generate_series(0, CEIL((xmax - xmin)/:spacing)::int) AS i,
@@ -174,12 +171,12 @@ def generate_sampling(
         )
         SELECT
             id,
-            wgs_geom,
-            ST_Y(wgs_geom),
-            ST_X(wgs_geom),
+            ST_Transform(pt_3857, 4326),
+            ST_Y(ST_Transform(pt_3857, 4326)),
+            ST_X(ST_Transform(pt_3857, 4326)),
             'open'
         FROM grid
-        WHERE ST_Contains(geom, ST_Transform(wgs_geom, 3857));
+        WHERE ST_Intersects(geom, pt_3857);
         """),
         {
             "pid": project_id,
