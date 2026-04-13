@@ -212,6 +212,50 @@
               </div>
             </div>
 
+            <!-- SPECIES PHOTOS -->
+            <div id="speciesPhotos" class="mt-2" style="display: none">
+              <div class="row g-2">
+                <div class="col-4 text-center">
+                  <div class="small text-muted">Leaf</div>
+                  <img
+                    id="speciesLeaf"
+                    class="img-fluid rounded shadow-sm"
+                    style="
+                      cursor: pointer;
+                      max-height: 120px;
+                      object-fit: cover;
+                    "
+                  />
+                </div>
+
+                <div class="col-4 text-center">
+                  <div class="small text-muted">Bark</div>
+                  <img
+                    id="speciesTrunk"
+                    class="img-fluid rounded shadow-sm"
+                    style="
+                      cursor: pointer;
+                      max-height: 120px;
+                      object-fit: cover;
+                    "
+                  />
+                </div>
+
+                <div class="col-4 text-center">
+                  <div class="small text-muted">Tree</div>
+                  <img
+                    id="speciesTree"
+                    class="img-fluid rounded shadow-sm"
+                    style="
+                      cursor: pointer;
+                      max-height: 120px;
+                      object-fit: cover;
+                    "
+                  />
+                </div>
+              </div>
+            </div>
+
             <!-- ============================= -->
             <!-- TREE MEASUREMENT -->
             <!-- ============================= -->
@@ -522,7 +566,23 @@
               return;
             }
 
+            // document.getElementById("speciesDetailBox").style.display = "block";
             document.getElementById("speciesDetailBox").style.display = "block";
+            document.getElementById("speciesPhotos").style.display = "block";
+
+            // Set images
+            document.getElementById("speciesLeaf").src = s.leaf_photo_url;
+            document.getElementById("speciesTrunk").src = s.trunk_photo_url;
+            document.getElementById("speciesTree").src = s.tree_photo_url;
+
+            // Click to preview (reuse your modal)
+            document.getElementById("speciesLeaf").onclick = () =>
+              showImage(s.leaf_photo_url);
+            document.getElementById("speciesTrunk").onclick = () =>
+              showImage(s.trunk_photo_url);
+            document.getElementById("speciesTree").onclick = () =>
+              showImage(s.tree_photo_url);
+
             document.getElementById("speciesName").innerText = s.local_name;
             document.getElementById("speciesScientific").innerText =
               s.scientific_name;
