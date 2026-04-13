@@ -179,7 +179,7 @@ def generate_sampling(
             ST_X(wgs_geom),
             'open'
         FROM grid
-        WHERE ST_Contains(geom, wgs_geom);
+        WHERE ST_Contains(geom, ST_Transform(wgs_geom, 3857));
         """),
         {
             "pid": project_id,
