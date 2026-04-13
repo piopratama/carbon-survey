@@ -25,6 +25,22 @@
         display: flex !important;
         justify-content: flex-end !important;
       }
+
+      #imageModal {
+        z-index: 2000 !important;
+      }
+
+      /* #imageModal .modal-backdrop {
+        z-index: 1990 !important;
+      } */
+
+      #imageModal {
+        z-index: 2000 !important;
+      }
+
+      .modal-backdrop.show {
+        z-index: 1990 !important;
+      }
     </style>
     <link
       rel="stylesheet"
@@ -35,7 +51,7 @@
   <body class="d-flex flex-column min-vh-100">
     <div id="header"></div>
 
-    <div class="modal fade" id="imageModal" tabindex="-1">
+    <!-- <div class="modal fade" id="imageModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content bg-dark">
           <div class="modal-body text-center p-0">
@@ -43,7 +59,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div class="container py-4 flex-grow-1">
       <!-- SAMPLING POINT DETAIL -->
@@ -1055,13 +1071,37 @@
 
         window.showImage = function (url) {
           const img = document.getElementById("modalImage");
+          const imageModalEl = document.getElementById("imageModal");
+
           img.src = url;
 
-          const imageModal = new bootstrap.Modal(
-            document.getElementById("imageModal"),
-          );
+          // Ensure modal is attached to body (important)
+          if (imageModalEl.parentNode !== document.body) {
+            document.body.appendChild(imageModalEl);
+          }
+
+          const imageModal = bootstrap.Modal.getOrCreateInstance(imageModalEl, {
+            backdrop: true,
+            keyboard: true,
+          });
 
           imageModal.show();
+
+          // Force it to be above other modals
+          imageModalEl.addEventListener(
+            "shown.bs.modal",
+            function () {
+              imageModalEl.style.zIndex = "2000";
+
+              const backdrops = document.querySelectorAll(
+                ".modal-backdrop.show",
+              );
+              if (backdrops.length) {
+                backdrops[backdrops.length - 1].style.zIndex = "1990";
+              }
+            },
+            { once: true },
+          );
         };
 
         async function loadAssignedSurveyors() {
