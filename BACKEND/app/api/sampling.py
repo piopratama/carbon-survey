@@ -453,45 +453,72 @@ def delete_sampling_by_project(
 #         "count": count
 #     }
 
+from fastapi import APIRouter, Depends, Query, HTTPException
+from sqlalchemy.orm import Session
+from sqlalchemy import text
+import traceback
+
+router = APIRouter()
+
 @router.get("/preview/{project_id}")
 def preview_sampling_points(
     project_id: str,
     spacing: int = Query(50, ge=10),
     db: Session = Depends(get_db)
 ):
-    sql = text("""
-        WITH proj AS (
-            SELECT 
-                id,
-                ST_Transform(aoi, 3857) AS aoi_3857
-            FROM projects
-            WHERE id = :project_id
-        )
-        SELECT COUNT(*) AS count
-        FROM proj p
-        JOIN LATERAL (
-            SELECT ST_Centroid(g.geom) AS centroid
-            FROM ST_SquareGrid(
-                :spacing::double precision,
-                p.aoi_3857
-            ) AS g
-            WHERE ST_Contains(
-                p.aoi_3857,
-                ST_Centroid(g.geom)
+    try:
+        sql = text("""
+            WITH proj AS (
+                SELECT 
+                    id,
+                    ST_Transform(aoi, 3857) AS aoi_3857
+                FROM projects
+                WHERE id = :project_id
             )
-        ) AS c ON TRUE;
-    """)
+            SELECT COUNT(*) AS count
+            FROM proj p
+            JOIN LATERAL (
+                SELECT ST_Centroid(g.geom) AS centroid
+                FROM ST_SquareGrid(
+                    :spacing::double precision,
+                    p.aoi_3857
+                ) AS g
+                WHERE ST_Contains(
+                    p.aoi_3857,
+                    ST_Centroid(g.geom)
+                )
+            ) AS c ON TRUE;
+        """)
 
-    result = db.execute(sql, {
-        "project_id": project_id,
-        "spacing": spacing
-    }).scalar()
+        result = db.execute(sql, {
+            "project_id": project_id,
+            "spacing": spacing
+        }).scalar()
 
-    return {
-        "project_id": project_id,
-        "spacing_m": spacing,
-        "count": result
-    }
+        return {
+            "project_id": project_id,
+            "spacing_m": spacing,
+            "count": result
+        }
+
+    except Exception as e:
+        # print full error in logs
+        print("=== ERROR DEBUG ===")
+        print("project_id:", project_id)
+        print("spacing:", spacing)
+        print("error:", str(e))
+        traceback.print_exc()
+
+        # return useful error to frontend
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "Failed to generate sampling preview",
+                "error": str(e),
+                "project_id": project_id,
+                "spacing": spacing
+            }
+        )
 
 @router.put("/setup/{point_id}")
 def setup_survey_point(
