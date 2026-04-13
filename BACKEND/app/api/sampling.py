@@ -419,6 +419,40 @@ def delete_sampling_by_project(
 # ===============================
 # PREVIEW COUNT
 # ===============================
+# @router.get("/preview/{project_id}")
+# def preview_sampling_points(
+#     project_id: str,
+#     spacing: int = Query(50, ge=10),
+#     db: Session = Depends(get_db)
+# ):
+#     sql = text("""
+#         SELECT COUNT(*) AS count
+#         FROM projects p
+#         JOIN LATERAL (
+#             SELECT ST_Centroid(g.geom) AS centroid
+#             FROM ST_SquareGrid(
+#               :spacing,
+#               ST_Transform(p.aoi, 3857)
+#             ) AS g
+#             WHERE ST_Contains(
+#               ST_Transform(p.aoi, 3857),
+#               ST_Centroid(g.geom)
+#             )
+#         ) AS c ON TRUE
+#         WHERE p.id = :project_id;
+#     """)
+
+#     count = db.execute(sql, {
+#         "project_id": project_id,
+#         "spacing": spacing
+#     }).scalar()
+
+#     return {
+#         "project_id": project_id,
+#         "spacing_m": spacing,
+#         "count": count
+#     }
+
 @router.get("/preview/{project_id}")
 def preview_sampling_points(
     project_id: str,
@@ -426,23 +460,29 @@ def preview_sampling_points(
     db: Session = Depends(get_db)
 ):
     sql = text("""
+        WITH proj AS (
+            SELECT 
+                id,
+                ST_Transform(aoi, 3857) AS aoi_3857
+            FROM projects
+            WHERE id = :project_id
+        )
         SELECT COUNT(*) AS count
-        FROM projects p
+        FROM proj p
         JOIN LATERAL (
             SELECT ST_Centroid(g.geom) AS centroid
             FROM ST_SquareGrid(
-              :spacing,
-              ST_Transform(p.aoi, 3857)
+                :spacing::double precision,
+                p.aoi_3857
             ) AS g
             WHERE ST_Contains(
-              ST_Transform(p.aoi, 3857),
-              ST_Centroid(g.geom)
+                p.aoi_3857,
+                ST_Centroid(g.geom)
             )
-        ) AS c ON TRUE
-        WHERE p.id = :project_id;
+        ) AS c ON TRUE;
     """)
 
-    count = db.execute(sql, {
+    result = db.execute(sql, {
         "project_id": project_id,
         "spacing": spacing
     }).scalar()
@@ -450,7 +490,7 @@ def preview_sampling_points(
     return {
         "project_id": project_id,
         "spacing_m": spacing,
-        "count": count
+        "count": result
     }
 
 @router.put("/setup/{point_id}")
