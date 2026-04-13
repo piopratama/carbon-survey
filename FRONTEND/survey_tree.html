@@ -1071,37 +1071,19 @@
 
         window.showImage = function (url) {
           const img = document.getElementById("modalImage");
-          const imageModalEl = document.getElementById("imageModal");
-
           img.src = url;
 
-          // Ensure modal is attached to body (important)
-          if (imageModalEl.parentNode !== document.body) {
-            document.body.appendChild(imageModalEl);
-          }
+          const imageModalEl = document.getElementById("imageModal");
 
-          const imageModal = bootstrap.Modal.getOrCreateInstance(imageModalEl, {
+          // Move modal to body (important for stacking)
+          document.body.appendChild(imageModalEl);
+
+          const imageModal = new bootstrap.Modal(imageModalEl, {
             backdrop: true,
             keyboard: true,
           });
 
           imageModal.show();
-
-          // Force it to be above other modals
-          imageModalEl.addEventListener(
-            "shown.bs.modal",
-            function () {
-              imageModalEl.style.zIndex = "2000";
-
-              const backdrops = document.querySelectorAll(
-                ".modal-backdrop.show",
-              );
-              if (backdrops.length) {
-                backdrops[backdrops.length - 1].style.zIndex = "1990";
-              }
-            },
-            { once: true },
-          );
         };
 
         async function loadAssignedSurveyors() {
