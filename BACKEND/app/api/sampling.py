@@ -22,6 +22,84 @@ def get_db():
 # ===============================
 # GENERATE GRID SAMPLING
 # ===============================
+# @router.post("/generate/{project_id}")
+# def generate_sampling(
+#     project_id: str,
+#     spacing_m: int = 50,
+#     db: Session = Depends(get_db),
+# ):
+#     if spacing_m < 10:
+#         raise HTTPException(400, "spacing terlalu kecil")
+
+#     project = db.execute(
+#         text("SELECT id FROM projects WHERE id = :id"),
+#         {"id": project_id},
+#     ).first()
+
+#     if not project:
+#         raise HTTPException(404, "Project tidak ditemukan")
+
+#     db.execute(
+#         text("""
+#             DELETE FROM sampling_points
+#             WHERE project_id = :pid
+#             AND status = 'open';
+#         """),
+#         {"pid": project_id},
+#     )
+
+#     db.execute(
+#         text("""
+#         INSERT INTO sampling_points (
+#             project_id,
+#             geom,
+#             latitude,
+#             longitude,
+#             status
+#         )
+#         SELECT
+#             p.id,
+#             wgs_geom,
+#             ST_Y(wgs_geom) AS latitude,
+#             ST_X(wgs_geom) AS longitude,
+#             'open'
+#         FROM projects p
+#         JOIN LATERAL (
+#             SELECT
+#                 ST_Transform(ST_Centroid(g.geom), 4326) AS wgs_geom
+#             FROM ST_SquareGrid(
+#                 :spacing,
+#                 ST_Transform(p.aoi, 3857)
+#             ) AS g
+#             WHERE ST_Intersects(
+#                 ST_Transform(p.aoi, 3857),
+#                 g.geom
+#             )
+#         ) sub ON TRUE
+#         WHERE p.id = :pid;
+#         """),
+#         {
+#             "pid": project_id,
+#             "spacing": spacing_m,
+#         },
+#     )
+
+#     db.commit()
+
+#     count = db.execute(
+#         text("""
+#           SELECT COUNT(*) FROM sampling_points
+#           WHERE project_id = :pid
+#         """),
+#         {"pid": project_id},
+#     ).scalar()
+
+#     return {
+#         "project_id": project_id,
+#         "spacing_m": spacing_m,
+#         "total_points": count,
+#     }
+
 @router.post("/generate/{project_id}")
 def generate_sampling(
     project_id: str,
@@ -39,6 +117,7 @@ def generate_sampling(
     if not project:
         raise HTTPException(404, "Project tidak ditemukan")
 
+    # delete old points
     db.execute(
         text("""
             DELETE FROM sampling_points
@@ -48,8 +127,44 @@ def generate_sampling(
         {"pid": project_id},
     )
 
+    # insert new grid points (manual grid)
     db.execute(
         text("""
+        WITH proj AS (
+            SELECT id, ST_Transform(aoi, 3857) AS geom
+            FROM projects
+            WHERE id = :pid
+        ),
+        bounds AS (
+            SELECT
+                id,
+                geom,
+                ST_XMin(geom) AS xmin,
+                ST_XMax(geom) AS xmax,
+                ST_YMin(geom) AS ymin,
+                ST_YMax(geom) AS ymax
+            FROM proj
+        ),
+        grid AS (
+            SELECT
+                b.id,
+                ST_Transform(
+                    ST_Centroid(
+                        ST_MakeEnvelope(
+                            xmin + i * :spacing,
+                            ymin + j * :spacing,
+                            xmin + (i+1) * :spacing,
+                            ymin + (j+1) * :spacing,
+                            3857
+                        )
+                    ),
+                    4326
+                ) AS wgs_geom,
+                b.geom
+            FROM bounds b,
+            generate_series(0, CEIL((xmax - xmin)/:spacing)::int) AS i,
+            generate_series(0, CEIL((ymax - ymin)/:spacing)::int) AS j
+        )
         INSERT INTO sampling_points (
             project_id,
             geom,
@@ -58,25 +173,13 @@ def generate_sampling(
             status
         )
         SELECT
-            p.id,
+            id,
             wgs_geom,
-            ST_Y(wgs_geom) AS latitude,
-            ST_X(wgs_geom) AS longitude,
+            ST_Y(wgs_geom),
+            ST_X(wgs_geom),
             'open'
-        FROM projects p
-        JOIN LATERAL (
-            SELECT
-                ST_Transform(ST_Centroid(g.geom), 4326) AS wgs_geom
-            FROM ST_SquareGrid(
-                :spacing,
-                ST_Transform(p.aoi, 3857)
-            ) AS g
-            WHERE ST_Intersects(
-                ST_Transform(p.aoi, 3857),
-                g.geom
-            )
-        ) sub ON TRUE
-        WHERE p.id = :pid;
+        FROM grid
+        WHERE ST_Contains(geom, wgs_geom);
         """),
         {
             "pid": project_id,
@@ -88,8 +191,9 @@ def generate_sampling(
 
     count = db.execute(
         text("""
-          SELECT COUNT(*) FROM sampling_points
-          WHERE project_id = :pid
+            SELECT COUNT(*)
+            FROM sampling_points
+            WHERE project_id = :pid
         """),
         {"pid": project_id},
     ).scalar()
