@@ -426,21 +426,63 @@ def preview_sampling_points(
     spacing: int = Query(50, ge=10),
     db: Session = Depends(get_db)
 ):
+    # sql = text("""
+    #     SELECT COUNT(*) AS count
+    #     FROM projects p
+    #     JOIN LATERAL (
+    #         SELECT ST_Centroid(g.geom) AS centroid
+    #         FROM ST_SquareGrid(
+    #           :spacing,
+    #           ST_Transform(p.aoi, 3857)
+    #         ) AS g
+    #         WHERE ST_Contains(
+    #           ST_Transform(p.aoi, 3857),
+    #           ST_Centroid(g.geom)
+    #         )
+    #     ) AS c ON TRUE
+    #     WHERE p.id = :project_id;
+    # """)
+
     sql = text("""
-        SELECT COUNT(*) AS count
-        FROM projects p
-        JOIN LATERAL (
-            SELECT ST_Centroid(g.geom) AS centroid
-            FROM ST_SquareGrid(
-              :spacing,
-              ST_Transform(p.aoi, 3857)
-            ) AS g
-            WHERE ST_Contains(
-              ST_Transform(p.aoi, 3857),
-              ST_Centroid(g.geom)
-            )
-        ) AS c ON TRUE
-        WHERE p.id = :project_id;
+        WITH proj AS (
+            SELECT ST_Transform(aoi, 3857) AS geom
+            FROM projects
+            WHERE id = :project_id
+        ),
+        bounds AS (
+            SELECT
+                ST_XMin(geom) AS xmin,
+                ST_XMax(geom) AS xmax,
+                ST_YMin(geom) AS ymin,
+                ST_YMax(geom) AS ymax,
+                geom
+            FROM proj
+        ),
+        grid AS (
+            SELECT
+                ST_Centroid(
+                    ST_MakeEnvelope(
+                        xmin + i * :spacing,
+                        ymin + j * :spacing,
+                        xmin + (i+1) * :spacing,
+                        ymin + (j+1) * :spacing,
+                        3857
+                    )
+                ) AS pt,
+                geom
+            FROM bounds,
+            generate_series(
+                0,
+                CEIL((xmax - xmin)/:spacing)::int
+            ) AS i,
+            generate_series(
+                0,
+                CEIL((ymax - ymin)/:spacing)::int
+            ) AS j
+        )
+        SELECT COUNT(*) AS count 
+        FROM grid
+        WHERE ST_Contains(geom, pt);
     """)
 
     count = db.execute(sql, {
