@@ -21,6 +21,8 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
     />
+
+    <script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
   </head>
 
   <style>
@@ -242,6 +244,24 @@
                     placeholder="Contoh: Labuan Bajo Carbon Study"
                   />
                 </div>
+
+                <hr />
+
+                <h6 class="mb-2">Import AOI</h6>
+
+                <input
+                  type="file"
+                  id="importFileInput"
+                  class="form-control form-control-sm mb-2"
+                  accept=".kml,.geojson,.json,.csv,.txt"
+                />
+
+                <button
+                  class="btn btn-outline-primary btn-sm w-100 mb-2"
+                  onclick="handleImportAOI()"
+                >
+                  Process File
+                </button>
 
                 <hr />
 

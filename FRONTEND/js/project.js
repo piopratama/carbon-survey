@@ -52,8 +52,13 @@ function startNewProject() {
         aoiLayer = null;
     }
 
-    if (!marker) {
-        alert("Cari lokasi terlebih dahulu");
+    // if (!marker) {
+    //     alert("Cari lokasi terlebih dahulu");
+    //     return;
+    // }
+
+    if (!marker && !aoiLayer) {
+        alert("Cari lokasi ATAU import AOI terlebih dahulu");
         return;
     }
 

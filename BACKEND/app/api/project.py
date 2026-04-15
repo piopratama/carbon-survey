@@ -7,6 +7,8 @@ from shapely.geometry import shape
 from app.db.session import SessionLocal
 from app.models.project import Project
 
+from shapely.geometry import Polygon, MultiPolygon
+
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -19,14 +21,70 @@ def get_db():
         db.close()
 
 
-# ================= CREATE PROJECT =================
+# # ================= CREATE PROJECT =================
+# @router.post("/")
+# def create_project(payload: dict, db: Session = Depends(get_db)):
+#     geom = shape(payload["geometry"])
+
+#     project = Project(
+#         name=payload["name"],
+#         aoi=from_shape(geom, srid=4326),
+#         year=payload["year"],
+#         months=payload["months"],
+#         cloud=payload.get("cloud", 20),
+#     )
+
+#     db.add(project)
+#     db.commit()
+#     db.refresh(project)
+
+#     return {
+#         "id": str(project.id),
+#         "name": project.name,
+#     }
+
+def drop_z(geom):
+    # ---------- POLYGON ----------
+    if geom.geom_type == "Polygon":
+        exterior = [(x, y) for x, y, *_ in geom.exterior.coords]
+
+        interiors = []
+        for interior in geom.interiors:
+            interiors.append([(x, y) for x, y, *_ in interior.coords])
+
+        return Polygon(exterior, interiors)
+
+    # ---------- MULTIPOLYGON ----------
+    elif geom.geom_type == "MultiPolygon":
+        new_polys = []
+
+        for poly in geom.geoms:
+            exterior = [(x, y) for x, y, *_ in poly.exterior.coords]
+
+            interiors = []
+            for interior in poly.interiors:
+                interiors.append([(x, y) for x, y, *_ in interior.coords])
+
+            new_polys.append(Polygon(exterior, interiors))
+
+        return MultiPolygon(new_polys)
+
+    # ---------- OTHER ----------
+    return geom
+
 @router.post("/")
 def create_project(payload: dict, db: Session = Depends(get_db)):
+
     geom = shape(payload["geometry"])
+
+    # FIX HERE
+    geom = drop_z(geom)
+
+    aoi = from_shape(geom, srid=4326)
 
     project = Project(
         name=payload["name"],
-        aoi=from_shape(geom, srid=4326),
+        aoi=aoi,
         year=payload["year"],
         months=payload["months"],
         cloud=payload.get("cloud", 20),
@@ -40,7 +98,6 @@ def create_project(payload: dict, db: Session = Depends(get_db)):
         "id": str(project.id),
         "name": project.name,
     }
-
 
 # ================= LIST PROJECTS =================
 @router.get("/")
