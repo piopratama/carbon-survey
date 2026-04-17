@@ -159,9 +159,9 @@
       <div class="d-md-none p-3 bg-light border-bottom">
         <h6 class="mb-2">Project</h6>
         <select
-          id="projectSelect"
+          id="projectSelectMobile"
           class="form-select form-select-sm"
-          onchange="SurveyorApp.selectProject()"
+          onchange="SurveyorApp.selectProject(this.value)"
         >
           <option value="">-- Select Project --</option>
         </select>
@@ -182,7 +182,7 @@
                 <select
                   id="projectSelectDesktop"
                   class="form-select form-select-sm"
-                  onchange="SurveyorApp.selectProject()"
+                  onchange="SurveyorApp.selectProject(this.value)"
                 >
                   <option value="">-- Select Project --</option>
                 </select>

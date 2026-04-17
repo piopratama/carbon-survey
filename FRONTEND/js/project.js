@@ -173,8 +173,7 @@ function selectProject() {
             style: {
                 color: "#dc3545", // merah (area fokus)
                 weight: 2,
-                fillOpacity: 0.05,
-                dashArray: "4,4",
+                fillOpacity: 0.05
             },
         },
     ).addTo(map);

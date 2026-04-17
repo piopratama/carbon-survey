@@ -65,4 +65,7 @@ async function loadSamplingToLayer(projectId, layer, mapInstance) {
 
     }
 
+    console.log("GEOJSON:", geojson);
+    console.log("Layers after add:", layer.getLayers());
+
 }

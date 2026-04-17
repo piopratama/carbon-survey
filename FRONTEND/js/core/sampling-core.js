@@ -30,6 +30,17 @@ function samplingIcon(p) {
     });
 }
 
+// function createSamplingLayer(onEachFeatureCallback) {
+//     return L.geoJSON(null, {
+//         pointToLayer: (feature, latlng) => {
+//             return L.marker(latlng, {
+//                 icon: samplingIcon(feature.properties),
+//             });
+//         },
+//         onEachFeature: onEachFeatureCallback,
+//     });
+// }
+
 function createSamplingLayer(onEachFeatureCallback) {
     return L.geoJSON(null, {
         pointToLayer: (feature, latlng) => {
@@ -37,6 +48,17 @@ function createSamplingLayer(onEachFeatureCallback) {
                 icon: samplingIcon(feature.properties),
             });
         },
+
+        // 🔥 TAMBAHKAN INI
+        style: function (feature) {
+            return {
+                color: "#0d6efd",
+                weight: 2,
+                fillColor: "#0d6efd",
+                fillOpacity: 0.1
+            };
+        },
+
         onEachFeature: onEachFeatureCallback,
     });
 }
