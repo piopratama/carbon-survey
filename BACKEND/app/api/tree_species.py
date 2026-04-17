@@ -14,7 +14,7 @@ router = APIRouter(prefix="/tree-species", tags=["Tree Species"])
 
 DEFAULT_BIOMASS_FORMULA = (
     "exp(-1.803 - 0.976 * log(wood_density) + "
-    "2.673 * log(dbh) - 0.0299 * (log(dbh)**2))"
+    "2.673 * log(dbh_cm) - 0.0299 * (log(dbh_cm)**2))"
 )
 
 
