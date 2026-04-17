@@ -942,6 +942,59 @@
         //   ).hide();
         // };
 
+        async function compressImage(file, maxSizeKB = 200) {
+          return new Promise((resolve) => {
+            const img = new Image();
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+              img.src = e.target.result;
+            };
+
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+
+              let width = img.width;
+              let height = img.height;
+
+              const maxWidth = 1280;
+              if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, width, height);
+
+              let quality = 0.9;
+
+              const attempt = () => {
+                canvas.toBlob(
+                  (blob) => {
+                    if (blob.size / 1024 > maxSizeKB && quality > 0.1) {
+                      quality -= 0.1;
+                      attempt();
+                    } else {
+                      resolve(
+                        new File([blob], file.name, { type: "image/jpeg" }),
+                      );
+                    }
+                  },
+                  "image/jpeg",
+                  quality,
+                );
+              };
+
+              attempt();
+            };
+
+            reader.readAsDataURL(file);
+          });
+        }
+
         window.saveTree = async function () {
           alert("START SAVE");
 
@@ -965,18 +1018,6 @@
           const photo1File = document.getElementById("photo1").files[0];
           const photo2File = document.getElementById("photo2").files[0];
           const photo3File = document.getElementById("photo3").files[0];
-
-          alert(
-            "FILE CHECK:\n" +
-              "P1: " +
-              (photo1File ? "OK" : "NULL") +
-              "\n" +
-              "P2: " +
-              (photo2File ? "OK" : "NULL") +
-              "\n" +
-              "P3: " +
-              (photo3File ? "OK" : "NULL"),
-          );
 
           if (!editingId) {
             if (!photo1File) return alert("Photo 1 is required");
@@ -1002,8 +1043,6 @@
           const method = editingId ? "PUT" : "POST";
           const token = localStorage.getItem("token");
 
-          alert("📡 SENDING DATA...");
-
           const res = await fetch(url, {
             method,
             headers: {
@@ -1015,8 +1054,6 @@
 
           const result = await res.json();
 
-          alert("SAVE RESPONSE:\n" + JSON.stringify(result));
-
           if (!res.ok) {
             alert(result.detail || "Failed to save");
             return;
@@ -1024,67 +1061,72 @@
 
           const surveyId = editingId || result.survey_id || result.id;
 
-          alert("SURVEY ID: " + surveyId);
+          if (!surveyId) {
+            alert("Survey ID not returned");
+            return;
+          }
 
           /* ========================= */
-          /* UPLOAD FILES             */
+          /* UPLOAD FILES              */
           /* ========================= */
 
           const photo1Url = await uploadFile("photo1");
-          alert("PHOTO1 URL: " + photo1Url);
-
           const photo2Url = await uploadFile("photo2");
-          alert("PHOTO2 URL: " + photo2Url);
-
           const photo3Url = await uploadFile("photo3");
-          alert("PHOTO3 URL: " + photo3Url);
 
-          const photoPayload = {};
+          // rollback jika gagal upload
+          if (!photo1Url || !photo2Url || !photo3Url) {
+            alert("Upload failed, deleting survey");
 
-          if (photo1Url) photoPayload.photo1 = photo1Url;
-          if (photo2Url) photoPayload.photo2 = photo2Url;
-          if (photo3Url) photoPayload.photo3 = photo3Url;
-
-          alert("PHOTO PAYLOAD:\n" + JSON.stringify(photoPayload));
-
-          if (Object.keys(photoPayload).length > 0) {
-            alert("📡 SENDING PHOTO API...");
-
-            const uploadRes = await fetch(
-              `${API_BASE}/survey/${surveyId}/photos-single`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(photoPayload),
+            await fetch(`${API_BASE}/survey/${surveyId}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
               },
-            );
+            });
 
-            const uploadResult = await uploadRes.json();
+            return;
+          }
 
-            alert("📥 PHOTO RESPONSE:\n" + JSON.stringify(uploadResult));
+          const photoPayload = {
+            photo1: photo1Url,
+            photo2: photo2Url,
+            photo3: photo3Url,
+          };
 
-            if (!uploadRes.ok) {
-              alert("❌ PHOTO FAILED");
-              return;
-            }
+          const uploadRes = await fetch(
+            `${API_BASE}/survey/${surveyId}/photos-single`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(photoPayload),
+            },
+          );
 
-            alert("PHOTO SUCCESS");
-          } else {
-            alert("PHOTO PAYLOAD EMPTY");
+          if (!uploadRes.ok) {
+            alert("Photo API failed, deleting survey");
+
+            await fetch(`${API_BASE}/survey/${surveyId}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            return;
           }
 
           await new Promise((resolve) => setTimeout(resolve, 500));
-
           await loadTrees();
-
-          alert("DONE");
 
           bootstrap.Modal.getOrCreateInstance(
             document.getElementById("treeModal"),
           ).hide();
+
+          alert("Saved successfully");
         };
 
         /* ========================= */
@@ -1181,12 +1223,41 @@
           `;
         }
 
+        // async function uploadFile(inputId) {
+        //   const input = document.getElementById(inputId);
+        //   if (!input.files.length) return null;
+
+        //   const formData = new FormData();
+        //   formData.append("file", input.files[0]);
+
+        //   const token = localStorage.getItem("token");
+
+        //   const res = await fetch(`${API_BASE}/upload?category=surveys`, {
+        //     method: "POST",
+        //     headers: {
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //     body: formData,
+        //   });
+
+        //   const data = await res.json();
+        //   return data.url;
+        // }
+
         async function uploadFile(inputId) {
           const input = document.getElementById(inputId);
-          if (!input.files.length) return null;
+
+          if (!input.files || !input.files[0]) {
+            return null;
+          }
+
+          let file = input.files[0];
+
+          // compress ke max 200KB
+          file = await compressImage(file, 200);
 
           const formData = new FormData();
-          formData.append("file", input.files[0]);
+          formData.append("file", file);
 
           const token = localStorage.getItem("token");
 
@@ -1197,6 +1268,10 @@
             },
             body: formData,
           });
+
+          if (!res.ok) {
+            return null;
+          }
 
           const data = await res.json();
           return data.url;
