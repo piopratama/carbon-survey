@@ -643,6 +643,7 @@
 
             const tbody = document.getElementById("treeTable");
             tbody.innerHTML = "";
+            table.find("tbody").empty();
 
             /* ========================= */
             /* BUILD ROWS               */
@@ -825,7 +826,6 @@
         /* ========================= */
 
         window.saveTree = async function () {
-          alert("SAVE CLICKED");
           const speciesId = speciesSelect.value;
           const dbh = dbhInput.value;
           const height = heightInput.value;
@@ -930,8 +930,11 @@
             });
           }
 
-          modal.hide();
-          loadTrees();
+          // modal.hide();
+          await loadTrees();
+          bootstrap.Modal.getInstance(
+            document.getElementById("treeModal"),
+          )?.hide();
         };
 
         /* ========================= */
