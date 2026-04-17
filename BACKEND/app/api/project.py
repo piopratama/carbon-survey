@@ -9,6 +9,8 @@ from app.models.project import Project
 
 from shapely.geometry import Polygon, MultiPolygon
 
+from app.services.auth import require_admin
+
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -73,7 +75,7 @@ def drop_z(geom):
     return geom
 
 @router.post("/")
-def create_project(payload: dict, db: Session = Depends(get_db)):
+def create_project(payload: dict, db: Session = Depends(get_db), user = Depends(require_admin)):
 
     geom = shape(payload["geometry"])
 

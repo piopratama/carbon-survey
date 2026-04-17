@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
+from app.db.session import SessionLocal
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_THIS"
@@ -22,14 +24,50 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+# def get_current_user(token: str = Depends(oauth2_scheme)):
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+#         if payload.get("sub") is None:
+#             raise HTTPException(status_code=401, detail="Invalid token")
+
+#         return payload
+
+#     except JWTError:
+#         raise HTTPException(status_code=401, detail="Invalid token")
+
 def get_current_user(token: str = Depends(oauth2_scheme)):
+    db = SessionLocal()
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
-        if payload.get("sub") is None:
+        user_id = payload.get("sub")
+        if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-        return payload
+        user = db.query(User).filter(User.id == user_id).first()
+
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+
+        return {
+            "sub": str(user.id),
+            "role": user.role,
+            "name": user.name
+        }
 
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+    finally:
+        db.close()
+
+def require_admin(user=Depends(get_current_user)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return user
+
+def require_surveyor(user=Depends(get_current_user)):
+    if user["role"] != "surveyor":
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return user

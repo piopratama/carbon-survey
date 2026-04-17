@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.services.auth import verify_password, create_access_token
+from app.services.auth import get_current_user, verify_password, create_access_token
 from app.models.user import User
 from app.db.session import SessionLocal
 
@@ -52,3 +52,12 @@ def generate_hash(password: str):
         "plain": password,
         "hashed": hash_password(password)
     }
+
+@router.get("/me")
+def get_me(current_user = Depends(get_current_user)):
+    return current_user
+
+def require_admin(user=Depends(get_current_user)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return user
