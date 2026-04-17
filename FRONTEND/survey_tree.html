@@ -824,7 +824,127 @@
         /* SAVE                     */
         /* ========================= */
 
+        // window.saveTree = async function () {
+        //   const speciesId = speciesSelect.value;
+        //   const dbh = dbhInput.value;
+        //   const height = heightInput.value;
+        //   const lat = latInput.value;
+        //   const lng = lngInput.value;
+        //   const latManual = latInputManual.value;
+        //   const lngManual = lngInputManual.value;
+
+        //   if (!speciesId) return alert("Please select tree species");
+        //   if (!dbh) return alert("DBH required");
+        //   if (dbh <= 0) return alert("DBH must be greater than 0");
+        //   if (height && height <= 0)
+        //     return alert("Height must be greater than 0");
+        //   if ((!lat || !lng) && (!latManual || !lngManual)) {
+        //     return alert("Device GPS or Manual GPS required");
+        //   }
+        //   const photo1File = document.getElementById("photo1").files[0];
+        //   const photo2File = document.getElementById("photo2").files[0];
+        //   const photo3File = document.getElementById("photo3").files[0];
+
+        //   if (!editingId) {
+        //     if (!photo1File) return alert("Photo 1 is required");
+        //     if (!photo2File) return alert("Photo 2 is required");
+        //     if (!photo3File) return alert("Photo 3 is required");
+        //   }
+
+        //   const payload = {
+        //     surveyor_id: currentUser.id,
+        //     tree_species_id: Number(speciesId),
+        //     dbh_cm: Number(dbh),
+        //     height_m: height ? Number(height) : null,
+
+        //     latitude: lat ? Number(lat) : null,
+        //     longitude: lng ? Number(lng) : null,
+
+        //     latitude_manual: latManual ? Number(latManual) : null,
+        //     longitude_manual: lngManual ? Number(lngManual) : null,
+        //   };
+
+        //   const url = editingId
+        //     ? `${API_BASE}/survey/${editingId}`
+        //     : `${API_BASE}/survey/tree/${POINT_ID}`;
+
+        //   const method = editingId ? "PUT" : "POST";
+
+        //   const token = localStorage.getItem("token");
+
+        //   const res = await fetch(url, {
+        //     method,
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //     body: JSON.stringify(payload),
+        //   });
+
+        //   const result = await res.json();
+
+        //   if (!res.ok) {
+        //     alert(result.detail || "Failed to save");
+        //     return;
+        //   }
+
+        //   const surveyId = editingId || result.survey_id;
+
+        //   /* ========================= */
+        //   /* UPLOAD PHOTOS             */
+        //   /* ========================= */
+
+        //   const photo1Url = await uploadFile("photo1");
+        //   const photo2Url = await uploadFile("photo2");
+        //   const photo3Url = await uploadFile("photo3");
+
+        //   // if (photo1Url || photo2Url || photo3Url) {
+        //   //   await fetch(`${API_BASE}/survey/${surveyId}/photos-single`, {
+        //   //     method: "POST",
+        //   //     headers: { "Content-Type": "application/json" },
+        //   //     body: JSON.stringify({
+        //   //       photo1: photo1Url,
+        //   //       photo2: photo2Url,
+        //   //       photo3: photo3Url,
+        //   //     }),
+        //   //   });
+        //   // }
+
+        //   const photoPayload = {};
+
+        //   if (photo1Url) photoPayload.photo1 = photo1Url;
+        //   if (photo2Url) photoPayload.photo2 = photo2Url;
+        //   if (photo3Url) photoPayload.photo3 = photo3Url;
+
+        //   if (Object.keys(photoPayload).length > 0) {
+        //     const token = localStorage.getItem("token");
+
+        //     await fetch(`${API_BASE}/survey/${surveyId}/photos-single`, {
+        //       method: "POST",
+        //       headers: {
+        //         "Content-Type": "application/json",
+        //         Authorization: `Bearer ${token}`,
+        //       },
+        //       body: JSON.stringify(photoPayload),
+        //     });
+        //   }
+
+        //   // modal.hide();
+        //   // kasih waktu backend commit & query siap
+        //   await new Promise((resolve) => setTimeout(resolve, 500));
+
+        //   // reload data
+        //   await loadTrees();
+
+        //   // baru close modal
+        //   bootstrap.Modal.getOrCreateInstance(
+        //     document.getElementById("treeModal"),
+        //   ).hide();
+        // };
+
         window.saveTree = async function () {
+          alert("START SAVE");
+
           const speciesId = speciesSelect.value;
           const dbh = dbhInput.value;
           const height = heightInput.value;
@@ -841,9 +961,22 @@
           if ((!lat || !lng) && (!latManual || !lngManual)) {
             return alert("Device GPS or Manual GPS required");
           }
+
           const photo1File = document.getElementById("photo1").files[0];
           const photo2File = document.getElementById("photo2").files[0];
           const photo3File = document.getElementById("photo3").files[0];
+
+          alert(
+            "FILE CHECK:\n" +
+              "P1: " +
+              (photo1File ? "OK" : "NULL") +
+              "\n" +
+              "P2: " +
+              (photo2File ? "OK" : "NULL") +
+              "\n" +
+              "P3: " +
+              (photo3File ? "OK" : "NULL"),
+          );
 
           if (!editingId) {
             if (!photo1File) return alert("Photo 1 is required");
@@ -856,10 +989,8 @@
             tree_species_id: Number(speciesId),
             dbh_cm: Number(dbh),
             height_m: height ? Number(height) : null,
-
             latitude: lat ? Number(lat) : null,
             longitude: lng ? Number(lng) : null,
-
             latitude_manual: latManual ? Number(latManual) : null,
             longitude_manual: lngManual ? Number(lngManual) : null,
           };
@@ -869,8 +1000,9 @@
             : `${API_BASE}/survey/tree/${POINT_ID}`;
 
           const method = editingId ? "PUT" : "POST";
-
           const token = localStorage.getItem("token");
+
+          alert("📡 SENDING DATA...");
 
           const res = await fetch(url, {
             method,
@@ -883,32 +1015,29 @@
 
           const result = await res.json();
 
+          alert("SAVE RESPONSE:\n" + JSON.stringify(result));
+
           if (!res.ok) {
             alert(result.detail || "Failed to save");
             return;
           }
 
-          const surveyId = editingId || result.survey_id;
+          const surveyId = editingId || result.survey_id || result.id;
+
+          alert("SURVEY ID: " + surveyId);
 
           /* ========================= */
-          /* UPLOAD PHOTOS             */
+          /* UPLOAD FILES             */
           /* ========================= */
 
           const photo1Url = await uploadFile("photo1");
-          const photo2Url = await uploadFile("photo2");
-          const photo3Url = await uploadFile("photo3");
+          alert("PHOTO1 URL: " + photo1Url);
 
-          // if (photo1Url || photo2Url || photo3Url) {
-          //   await fetch(`${API_BASE}/survey/${surveyId}/photos-single`, {
-          //     method: "POST",
-          //     headers: { "Content-Type": "application/json" },
-          //     body: JSON.stringify({
-          //       photo1: photo1Url,
-          //       photo2: photo2Url,
-          //       photo3: photo3Url,
-          //     }),
-          //   });
-          // }
+          const photo2Url = await uploadFile("photo2");
+          alert("PHOTO2 URL: " + photo2Url);
+
+          const photo3Url = await uploadFile("photo3");
+          alert("PHOTO3 URL: " + photo3Url);
 
           const photoPayload = {};
 
@@ -916,27 +1045,43 @@
           if (photo2Url) photoPayload.photo2 = photo2Url;
           if (photo3Url) photoPayload.photo3 = photo3Url;
 
-          if (Object.keys(photoPayload).length > 0) {
-            const token = localStorage.getItem("token");
+          alert("PHOTO PAYLOAD:\n" + JSON.stringify(photoPayload));
 
-            await fetch(`${API_BASE}/survey/${surveyId}/photos-single`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+          if (Object.keys(photoPayload).length > 0) {
+            alert("📡 SENDING PHOTO API...");
+
+            const uploadRes = await fetch(
+              `${API_BASE}/survey/${surveyId}/photos-single`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(photoPayload),
               },
-              body: JSON.stringify(photoPayload),
-            });
+            );
+
+            const uploadResult = await uploadRes.json();
+
+            alert("📥 PHOTO RESPONSE:\n" + JSON.stringify(uploadResult));
+
+            if (!uploadRes.ok) {
+              alert("❌ PHOTO FAILED");
+              return;
+            }
+
+            alert("PHOTO SUCCESS");
+          } else {
+            alert("PHOTO PAYLOAD EMPTY");
           }
 
-          // modal.hide();
-          // kasih waktu backend commit & query siap
           await new Promise((resolve) => setTimeout(resolve, 500));
 
-          // reload data
           await loadTrees();
 
-          // baru close modal
+          alert("DONE");
+
           bootstrap.Modal.getOrCreateInstance(
             document.getElementById("treeModal"),
           ).hide();
