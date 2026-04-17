@@ -214,7 +214,8 @@ def create_tree_survey(
             "height_m": height if height else 0.0,
             "wood_density": wd if wd else 0.0
         }
-
+        print("FORMULA:", formula)
+        print("VARIABLES:", variables)
         biomass = safe_eval_formula(formula, variables)
 
     # ===============================
