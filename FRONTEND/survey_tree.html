@@ -643,7 +643,6 @@
 
             const tbody = document.getElementById("treeTable");
             tbody.innerHTML = "";
-            table.find("tbody").empty();
 
             /* ========================= */
             /* BUILD ROWS               */
@@ -931,10 +930,16 @@
           }
 
           // modal.hide();
+          // kasih waktu backend commit & query siap
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          // reload data
           await loadTrees();
-          bootstrap.Modal.getInstance(
+
+          // baru close modal
+          bootstrap.Modal.getOrCreateInstance(
             document.getElementById("treeModal"),
-          )?.hide();
+          ).hide();
         };
 
         /* ========================= */
