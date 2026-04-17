@@ -996,8 +996,6 @@
         }
 
         window.saveTree = async function () {
-          alert("START SAVE");
-
           const speciesId = speciesSelect.value;
           const dbh = dbhInput.value;
           const height = heightInput.value;
@@ -1074,49 +1072,49 @@
           const photo2Url = await uploadFile("photo2");
           const photo3Url = await uploadFile("photo3");
 
-          // rollback jika gagal upload
-          if (!photo1Url || !photo2Url || !photo3Url) {
-            alert("Upload failed, deleting survey");
+          // ADD → wajib semua
+          if (!editingId) {
+            if (!photo1Url || !photo2Url || !photo3Url) {
+              alert("Upload failed, deleting survey");
 
-            await fetch(`${API_BASE}/survey/${surveyId}`, {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
+              await fetch(`${API_BASE}/survey/${surveyId}`, {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
 
-            return;
+              return;
+            }
           }
 
-          const photoPayload = {
-            photo1: photo1Url,
-            photo2: photo2Url,
-            photo3: photo3Url,
-          };
+          // EDIT → hanya kirim yang ada
+          const photoPayload = {};
 
-          const uploadRes = await fetch(
-            `${API_BASE}/survey/${surveyId}/photos-single`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+          if (photo1Url) photoPayload.photo1 = photo1Url;
+          if (photo2Url) photoPayload.photo2 = photo2Url;
+          if (photo3Url) photoPayload.photo3 = photo3Url;
+
+          if (Object.keys(photoPayload).length > 0) {
+            const uploadRes = await fetch(
+              `${API_BASE}/survey/${surveyId}/photos-single`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(photoPayload),
               },
-              body: JSON.stringify(photoPayload),
-            },
-          );
+            );
 
-          if (!uploadRes.ok) {
-            alert("Photo API failed, deleting survey");
+            if (!uploadRes.ok) {
+              alert("Photo upload failed");
 
-            await fetch(`${API_BASE}/survey/${surveyId}`, {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-
-            return;
+              // rollback edit → reload data lama
+              await loadTrees();
+              return;
+            }
           }
 
           await new Promise((resolve) => setTimeout(resolve, 500));
@@ -1163,6 +1161,30 @@
         /* EDIT                     */
         /* ========================= */
 
+        // window.editTree = function (id) {
+        //   const survey = SURVEY_DATA.find((s) => s.survey_id == id);
+        //   if (!survey) return;
+
+        //   editingId = id;
+
+        //   speciesSelect.value = survey.tree_species_id;
+        //   speciesSelect.dispatchEvent(new Event("change"));
+
+        //   dbhInput.value = survey.dbh_cm;
+        //   heightInput.value = survey.height_m || "";
+        //   latInput.value = survey.latitude;
+        //   lngInput.value = survey.longitude;
+        //   latInputManual.value = survey.latitude_manual || "";
+        //   lngInputManual.value = survey.longitude_manual || "";
+
+        //   // SHOW EXISTING PHOTOS
+        //   showExistingPreview("preview1", survey.photo1);
+        //   showExistingPreview("preview2", survey.photo2);
+        //   showExistingPreview("preview3", survey.photo3);
+
+        //   modal.show();
+        // };
+
         window.editTree = function (id) {
           const survey = SURVEY_DATA.find((s) => s.survey_id == id);
           if (!survey) return;
@@ -1179,7 +1201,12 @@
           latInputManual.value = survey.latitude_manual || "";
           lngInputManual.value = survey.longitude_manual || "";
 
-          // SHOW EXISTING PHOTOS
+          // reset file input (penting)
+          document.getElementById("photo1").value = "";
+          document.getElementById("photo2").value = "";
+          document.getElementById("photo3").value = "";
+
+          // preview foto lama
           showExistingPreview("preview1", survey.photo1);
           showExistingPreview("preview2", survey.photo2);
           showExistingPreview("preview3", survey.photo3);
