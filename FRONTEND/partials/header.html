@@ -1,73 +1,9 @@
-<!-- ===============================
-AUTH & ROLE PROTECTION
-=============================== -->
-<script>
-  const token = localStorage.getItem("token");
-  const userData = localStorage.getItem("user");
-  const currentUser = userData ? JSON.parse(userData) : null;
-
-  if (!token || !currentUser) {
-    window.location.href = "index.html";
-  }
-
-  if (window.REQUIRED_ROLE) {
-    const allowed = Array.isArray(window.REQUIRED_ROLE)
-      ? window.REQUIRED_ROLE
-      : [window.REQUIRED_ROLE];
-
-    if (!allowed.includes(currentUser.role)) {
-      alert("Unauthorized");
-      window.location.href = "index.html";
-    }
-  }
-</script>
-
-<style>
-  .custom-navbar {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-  }
-
-  .navbar-brand {
-    font-size: 1.1rem;
-  }
-
-  .nav-link {
-    color: rgba(255, 255, 255, 0.8) !important;
-    font-size: 0.9rem;
-  }
-
-  .nav-link.active {
-    font-weight: 600;
-    color: #ffffff !important;
-  }
-
-  .user-section {
-    display: flex;
-    align-items: center;
-    font-size: 0.85rem;
-  }
-
-  .user-name {
-    background: rgba(255, 255, 255, 0.15);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-  }
-
-  @media (max-width: 991px) {
-    .user-section {
-      margin-top: 10px;
-    }
-  }
-</style>
-
-<!-- ===============================
-HEADER
-=============================== -->
 <header class="custom-navbar shadow-sm">
   <nav class="navbar navbar-expand-lg navbar-dark container px-3">
     <!-- BRAND -->
-    <a class="navbar-brand fw-semibold" href="main.html"> Carbon Monitoring </a>
+    <a class="navbar-brand fw-semibold" href="#" onclick="goHome(event)">
+      Carbon Monitoring
+    </a>
 
     <!-- TOGGLER -->
     <button
@@ -103,9 +39,10 @@ HEADER
         </li>
       </ul>
 
-      <!-- USER SECTION -->
+      <!-- USER -->
       <div class="user-section">
         <span id="userInfo" class="user-name"></span>
+
         <button class="btn btn-sm btn-light ms-2" onclick="logout()">
           Logout
         </button>
@@ -113,32 +50,3 @@ HEADER
     </div>
   </nav>
 </header>
-
-<script>
-  if (currentUser) {
-    document.getElementById("userInfo").innerText =
-      currentUser.name + " (" + currentUser.role + ")";
-
-    if (currentUser.role !== "admin") {
-      document.querySelectorAll(".admin-only").forEach((el) => el.remove());
-    }
-
-    if (currentUser.role !== "surveyor") {
-      document.querySelectorAll(".surveyor-only").forEach((el) => el.remove());
-    }
-  }
-
-  const currentPage = window.location.pathname.split("/").pop();
-
-  document.querySelectorAll(".nav-link").forEach((link) => {
-    if (link.getAttribute("href") === currentPage) {
-      link.classList.add("active");
-    }
-  });
-
-  function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "index.html";
-  }
-</script>

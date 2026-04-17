@@ -1,3 +1,27 @@
+const token = localStorage.getItem("token");
+const userData = localStorage.getItem("user");
+const currentUser = userData ? JSON.parse(userData) : null;
+
+// wajib login
+if (!token || !currentUser) {
+    window.location.href = "index.html";
+}
+
+// wajib role
+if (!window.REQUIRED_ROLE) {
+    alert("Access denied");
+    window.location.href = "index.html";
+} else {
+    const allowed = Array.isArray(window.REQUIRED_ROLE)
+        ? window.REQUIRED_ROLE
+        : [window.REQUIRED_ROLE];
+
+    if (!allowed.includes(currentUser.role)) {
+        alert("Unauthorized");
+        window.location.href = "index.html";
+    }
+}
+
 async function loadPartial(id, file) {
     const res = await fetch(file);
     const html = await res.text();
@@ -45,6 +69,25 @@ window.logout = function () {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "index.html";
+};
+
+window.goHome = function (e) {
+    e.preventDefault();
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    if (user.role === "admin") {
+        window.location.href = "main.html";
+    } else if (user.role === "surveyor") {
+        window.location.href = "surveyor_main.html";
+    } else {
+        window.location.href = "index.html";
+    }
 };
 
 loadPartial("header", "partials/header.html");
