@@ -492,7 +492,12 @@ def list_surveys_by_point(point_id: int, db: Session = Depends(get_db)):
                 SELECT photo_url
                 FROM survey_photos
                 WHERE survey_id = :sid
-                ORDER BY id ASC
+                ORDER BY
+                    CASE photo_slot
+                        WHEN 'photo1' THEN 1
+                        WHEN 'photo2' THEN 2
+                        WHEN 'photo3' THEN 3
+                    END
             """),
             {"sid": r["survey_id"]}
         ).scalars().all()
