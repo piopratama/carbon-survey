@@ -4,8 +4,8 @@
     <script>
       window.REQUIRED_ROLE = ["surveyor", "admin"];
     </script>
-    <script src="js/config.js"></script>
-    <script src="js/layout.js"></script>
+    <script src="js/config.js?v=1.1"></script>
+    <script src="js/layout.js?v=1.1"></script>
 
     <script>
       fetch("partials/head.html")
@@ -672,50 +672,50 @@
                 t.surveyor_id === currentUser.id;
 
               tr.innerHTML = `
-<td>${t.survey_id}</td>
-<td>${t.tree_species?.local_name || "-"}</td>
-<td>${t.dbh_cm || "-"}</td>
-<td>${t.height_m || "-"}</td>
-<td>${t.biomass.toFixed(2) || "-"}</td>
-<td>${t.latitude ? Number(t.latitude).toFixed(2) : "-"}</td>
-<td>${t.longitude ? Number(t.longitude).toFixed(2) : "-"}</td>
-<td>${t.latitude_manual ? Number(t.latitude_manual).toFixed(2) : "-"}</td>
-<td>${t.longitude_manual ? Number(t.longitude_manual).toFixed(2) : "-"}</td>
-<td>${distance}</td>
-<td>${t.input_by_name || "-"}</td>
-<td>${inputDate}</td>
-<td>
-  ${thumb(t.photo1)}
-  ${thumb(t.photo2)}
-  ${thumb(t.photo3)}
-</td>
-<td style="min-width:130px;">
-  <div class="d-flex flex-column gap-2">
+              <td>${t.survey_id}</td>
+              <td>${t.tree_species?.local_name || "-"}</td>
+              <td>${t.dbh_cm || "-"}</td>
+              <td>${t.height_m || "-"}</td>
+              <td>${t.biomass.toFixed(2) || "-"}</td>
+              <td>${t.latitude ? Number(t.latitude).toFixed(2) : "-"}</td>
+              <td>${t.longitude ? Number(t.longitude).toFixed(2) : "-"}</td>
+              <td>${t.latitude_manual ? Number(t.latitude_manual).toFixed(2) : "-"}</td>
+              <td>${t.longitude_manual ? Number(t.longitude_manual).toFixed(2) : "-"}</td>
+              <td>${distance}</td>
+              <td>${t.input_by_name || "-"}</td>
+              <td>${inputDate}</td>
+              <td>
+                ${thumb(t.photo1)}
+                ${thumb(t.photo2)}
+                ${thumb(t.photo3)}
+              </td>
+              <td style="min-width:130px;">
+                <div class="d-flex flex-column gap-2">
 
-    <button class="btn btn-sm btn-info w-100"
-      onclick="navigateTree(${Number(t.latitude)}, ${Number(t.longitude)})">
-      Navigate
-    </button>
+                  <button class="btn btn-sm btn-info w-100"
+                    onclick="navigateTree(${Number(t.latitude)}, ${Number(t.longitude)})">
+                    Navigate
+                  </button>
 
-    ${
-      canEdit
-        ? `
-        <button class="btn btn-sm btn-warning w-100"
-          onclick="editTree(${t.survey_id})">
-          Edit
-        </button>
+                  ${
+                    canEdit
+                      ? `
+                      <button class="btn btn-sm btn-warning w-100"
+                        onclick="editTree(${t.survey_id})">
+                        Edit
+                      </button>
 
-        <button class="btn btn-sm btn-danger w-100"
-          onclick="deleteTree(${t.survey_id})">
-          Delete
-        </button>
-        `
-        : `<span class="badge bg-secondary text-center">Read Only</span>`
-    }
+                      <button class="btn btn-sm btn-danger w-100"
+                        onclick="deleteTree(${t.survey_id})">
+                        Delete
+                      </button>
+                      `
+                      : `<span class="badge bg-secondary text-center">Read Only</span>`
+                  }
 
-  </div>
-</td>
-`;
+                </div>
+              </td>
+              `;
 
               tbody.appendChild(tr);
             });
