@@ -1088,45 +1088,52 @@ def review_sampling_point(
 
 @router.get("/export/{project_id}")
 def export_sampling(project_id: str, db: Session = Depends(get_db)):
+    try:
+        rows = db.execute(
+            text("""
+                SELECT
+                    id,
+                    latitude,
+                    longitude
+                FROM sampling_points
+                WHERE project_id = :pid
+                ORDER BY id ASC
+            """),
+            {"pid": project_id}
+        ).mappings().all()
 
-    rows = db.execute(
-        text("""
-            SELECT
-                id,
-                latitude,
-                longitude
-            FROM sampling_points
-            WHERE project_id = :pid
-            ORDER BY id ASC
-        """),
-        {"pid": project_id}
-    ).mappings().all()
+        # Create Excel
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Sampling"
 
-    # Create Excel
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Sampling"
+        # Header
+        ws.append(["sample id", "lat", "lng"])
 
-    # Header
-    ws.append(["sample id", "lat", "lng"])
+        # Data (SAFE)
+        for r in rows:
+            lat = r["latitude"]
+            lng = r["longitude"]
 
-    # Data
-    for r in rows:
-        ws.append([
-            r["id"],
-            float(r["latitude"]),
-            float(r["longitude"])
-        ])
+            ws.append([
+                r["id"],
+                float(lat) if lat is not None else None,
+                float(lng) if lng is not None else None
+            ])
 
-    # Save to memory
-    stream = io.BytesIO()
-    wb.save(stream)
-    stream.seek(0)
+        # Save to memory
+        stream = io.BytesIO()
+        wb.save(stream)
+        stream.seek(0)
 
-    return StreamingResponse(
-        stream,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={
-            "Content-Disposition": "attachment; filename=sampling_points.xlsx"
-        }
-    )
+        return StreamingResponse(
+            stream,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": "attachment; filename=sampling_points.xlsx"
+            }
+        )
+
+    except Exception as e:
+        traceback.print_exc()  # important for logs
+        raise HTTPException(500, "Failed to export sampling data")
