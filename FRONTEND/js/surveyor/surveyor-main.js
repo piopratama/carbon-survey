@@ -18,8 +18,24 @@ window.SurveyorApp = (function () {
         map,
     );
 
+    // let samplingLayer = createSamplingLayer((feature, layer) => {
+    //     layer.bindPopup(buildPopup(feature.properties, currentUser));
+    // }).addTo(map);
     let samplingLayer = createSamplingLayer((feature, layer) => {
-        layer.bindPopup(buildPopup(feature.properties, currentUser));
+        const p = feature.properties;
+
+        layer.bindPopup(buildPopup(p, currentUser));
+
+        // ADD THESE 4 LINES ONLY
+        layer.unbindTooltip();
+
+        if (window.SurveyorApp?.showPointId !== false) {
+            layer.bindTooltip(`${p.id}`, {
+                permanent: true,
+                direction: "top"
+            });
+        }
+
     }).addTo(map);
 
     /* ============================= */
@@ -316,3 +332,13 @@ window.SurveyorApp = (function () {
     };
 
 })();
+
+
+window.SurveyorApp = window.SurveyorApp || {};
+window.SurveyorApp.showPointId =
+    localStorage.getItem("showPointId") !== "false";
+
+window.SurveyorApp.togglePointIdVisibility = function (isVisible) {
+    localStorage.setItem("showPointId", isVisible); // save state
+    location.reload();
+};

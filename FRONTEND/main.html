@@ -38,6 +38,14 @@
       width: 100%;
       height: calc(100vh - 120px);
     }
+
+    .point-label {
+      font-size: 10px;
+      font-weight: bold;
+      background: white;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
   </style>
 
   <body class="d-flex flex-column min-vh-100">
@@ -375,6 +383,19 @@
                     >
                       Generate Sampling
                     </button>
+                  </div>
+
+                  <div class="form-check mb-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="togglePointId"
+                      checked
+                      onchange="AdminApp.togglePointIdVisibility(this.checked)"
+                    />
+                    <label class="form-check-label small">
+                      Show Point ID on Map
+                    </label>
                   </div>
 
                   <div id="samplingPreview" class="text-muted small mb-2">

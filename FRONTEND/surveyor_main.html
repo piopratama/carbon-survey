@@ -30,6 +30,14 @@
       .row {
         height: 100%;
       }
+
+      .point-label {
+        font-size: 10px;
+        font-weight: bold;
+        background: white;
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
     </style>
   </head>
 
@@ -167,6 +175,17 @@
         >
           <option value="">-- Select Project --</option>
         </select>
+
+        <!-- ADD THIS (e.g. under Project section) -->
+        <div class="form-check mt-2">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            checked
+            onchange="SurveyorApp.togglePointIdVisibility(this.checked)"
+          />
+          <label class="form-check-label small"> Show Point ID </label>
+        </div>
       </div>
 
       <div class="row g-0 h-100">
@@ -188,6 +207,17 @@
                 >
                   <option value="">-- Select Project --</option>
                 </select>
+
+                <!-- ADD THIS (e.g. under Project section) -->
+                <div class="form-check mt-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    checked
+                    onchange="SurveyorApp.togglePointIdVisibility(this.checked)"
+                  />
+                  <label class="form-check-label small"> Show Point ID </label>
+                </div>
               </div>
             </div>
           </div>
