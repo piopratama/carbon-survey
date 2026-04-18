@@ -298,8 +298,20 @@ window.SurveyorApp = (function () {
         alert("Joined successfully");
 
         // reload current project layer
+        // if (CURRENT_PROJECT_ID) {
+        //     selectProject();
+        // }
         if (CURRENT_PROJECT_ID) {
-            selectProject();
+            await loadSamplingToLayer(CURRENT_PROJECT_ID, samplingLayer, map);
+
+            // reopen the same popup with updated data
+            const layer = samplingLayer.getLayers().find(l =>
+                l.feature?.properties?.id === pointId
+            );
+
+            if (layer) {
+                layer.openPopup();
+            }
         }
     };
 
@@ -320,8 +332,12 @@ window.SurveyorApp = (function () {
 
         alert("Left successfully");
 
+        // if (CURRENT_PROJECT_ID) {
+        //     selectProject();
+        // }
+
         if (CURRENT_PROJECT_ID) {
-            selectProject();
+            selectProject(CURRENT_PROJECT_ID);
         }
     };
 
