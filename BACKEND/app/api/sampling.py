@@ -1,4 +1,8 @@
+import io
+
 from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi.responses import StreamingResponse
+from openpyxl import Workbook
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.db.session import SessionLocal
@@ -1082,3 +1086,47 @@ def review_sampling_point(
     return {"status": action}
 
 
+@router.get("/export/{project_id}")
+def export_sampling(project_id: str, db: Session = Depends(get_db)):
+
+    rows = db.execute(
+        text("""
+            SELECT
+                id,
+                latitude,
+                longitude
+            FROM sampling_points
+            WHERE project_id = :pid
+            ORDER BY id ASC
+        """),
+        {"pid": project_id}
+    ).mappings().all()
+
+    # Create Excel
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Sampling"
+
+    # Header
+    ws.append(["sample id", "lat", "lng"])
+
+    # Data
+    for r in rows:
+        ws.append([
+            r["id"],
+            float(r["latitude"]),
+            float(r["longitude"])
+        ])
+
+    # Save to memory
+    stream = io.BytesIO()
+    wb.save(stream)
+    stream.seek(0)
+
+    return StreamingResponse(
+        stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=sampling_points.xlsx"
+        }
+    )

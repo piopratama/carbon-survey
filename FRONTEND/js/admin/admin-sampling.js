@@ -413,6 +413,37 @@ window.AdminApp = (function () {
             "Lokasi ditemukan. Klik Project Baru untuk mulai.";
     }
 
+    async function exportSampling() {
+        if (!CURRENT_PROJECT_ID) {
+            alert("Pilih project terlebih dahulu");
+            return;
+        }
+
+        try {
+            const res = await fetch(
+                `${API_BASE}/sampling/export/${CURRENT_PROJECT_ID}`
+            );
+
+            if (!res.ok) {
+                alert("Gagal export");
+                return;
+            }
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "sampling_points.xlsx";
+            a.click();
+
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error(err);
+            alert("Export gagal");
+        }
+    }
+
 
     return {
         samplingLayer,
@@ -429,7 +460,8 @@ window.AdminApp = (function () {
         onSamplingModeChange,
         openSurveyTreePage,
         saveSurveySetup,
-        searchLocation
+        searchLocation,
+        exportSampling
     };
 
 })();
