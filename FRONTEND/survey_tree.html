@@ -1048,11 +1048,11 @@
           const photo2File = document.getElementById("photo2").files[0];
           const photo3File = document.getElementById("photo3").files[0];
 
-          if (!editingId) {
-            if (!photo1File) return alert("Photo 1 is required");
-            if (!photo2File) return alert("Photo 2 is required");
-            if (!photo3File) return alert("Photo 3 is required");
-          }
+          // if (!editingId) {
+          //   if (!photo1File) return alert("Photo 1 is required");
+          //   if (!photo2File) return alert("Photo 2 is required");
+          //   if (!photo3File) return alert("Photo 3 is required");
+          // }
 
           const payload = {
             surveyor_id: currentUser.id,
@@ -1094,17 +1094,21 @@
             alert("Survey ID not returned");
             return;
           }
+          if (
+            !editingId &&
+            photo1File != undefined &&
+            photo2File != undefined &&
+            photo3File != undefined
+          ) {
+            /* ========================= */
+            /* UPLOAD FILES              */
+            /* ========================= */
 
-          /* ========================= */
-          /* UPLOAD FILES              */
-          /* ========================= */
+            const photo1Url = await uploadFile("photo1");
+            const photo2Url = await uploadFile("photo2");
+            const photo3Url = await uploadFile("photo3");
 
-          const photo1Url = await uploadFile("photo1");
-          const photo2Url = await uploadFile("photo2");
-          const photo3Url = await uploadFile("photo3");
-
-          // ADD → wajib semua
-          if (!editingId) {
+            // ADD → wajib semua
             if (!photo1Url || !photo2Url || !photo3Url) {
               alert("Upload failed, deleting survey");
 
@@ -1117,34 +1121,34 @@
 
               return;
             }
-          }
+          } else if (editingId) {
+            // EDIT → hanya kirim yang ada
+            const photoPayload = {};
 
-          // EDIT → hanya kirim yang ada
-          const photoPayload = {};
+            if (photo1Url) photoPayload.photo1 = photo1Url;
+            if (photo2Url) photoPayload.photo2 = photo2Url;
+            if (photo3Url) photoPayload.photo3 = photo3Url;
 
-          if (photo1Url) photoPayload.photo1 = photo1Url;
-          if (photo2Url) photoPayload.photo2 = photo2Url;
-          if (photo3Url) photoPayload.photo3 = photo3Url;
-
-          if (Object.keys(photoPayload).length > 0) {
-            const uploadRes = await fetch(
-              `${API_BASE}/survey/${surveyId}/photos-single`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
+            if (Object.keys(photoPayload).length > 0) {
+              const uploadRes = await fetch(
+                `${API_BASE}/survey/${surveyId}/photos-single`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify(photoPayload),
                 },
-                body: JSON.stringify(photoPayload),
-              },
-            );
+              );
 
-            if (!uploadRes.ok) {
-              alert("Photo upload failed");
+              if (!uploadRes.ok) {
+                alert("Photo upload failed");
 
-              // rollback edit → reload data lama
-              await loadTrees();
-              return;
+                // rollback edit → reload data lama
+                await loadTrees();
+                return;
+              }
             }
           }
 
