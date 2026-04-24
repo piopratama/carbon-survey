@@ -945,7 +945,7 @@
         // };
 
         async function compressImage(file, maxSizeKB = 200) {
-          return new Promise((resolve) => {
+          return new Promise((resolve, reject) => {
             const img = new Image();
             const reader = new FileReader();
 
@@ -953,12 +953,16 @@
               img.src = e.target.result;
             };
 
+            reader.onerror = reject;
+
             img.onload = () => {
               const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
 
               let width = img.width;
               let height = img.height;
 
+              // 🔹 Resize awal (biar gak terlalu besar dari awal)
               const maxWidth = 1280;
               if (width > maxWidth) {
                 height *= maxWidth / width;
@@ -967,25 +971,51 @@
 
               canvas.width = width;
               canvas.height = height;
-
-              const ctx = canvas.getContext("2d");
               ctx.drawImage(img, 0, 0, width, height);
 
-              let quality = 0.9;
+              let quality = 0.8;
+              let format = "image/webp"; // lebih kecil dari jpeg
 
               const attempt = () => {
                 canvas.toBlob(
                   (blob) => {
-                    if (blob.size / 1024 > maxSizeKB && quality > 0.1) {
-                      quality -= 0.1;
+                    if (!blob) {
+                      reject(new Error("Compression failed"));
+                      return;
+                    }
+
+                    const sizeKB = blob.size / 1024;
+
+                    if (sizeKB > maxSizeKB) {
+                      // 🔻 Step 1: turunin quality dulu
+                      if (quality > 0.1) {
+                        quality -= 0.1;
+                      }
+                      // 🔻 Step 2: kalau quality mentok → kecilkan dimensi
+                      else if (width > 300) {
+                        width *= 0.8;
+                        height *= 0.8;
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        quality = 0.8; // reset quality
+                      }
+                      // 🔻 Step 3: kalau masih gagal → paksa keluar
+                      else {
+                        return resolve(
+                          new File([blob], file.name, { type: format }),
+                        );
+                      }
+
                       attempt();
                     } else {
-                      resolve(
-                        new File([blob], file.name, { type: "image/jpeg" }),
-                      );
+                      resolve(new File([blob], file.name, { type: format }));
                     }
                   },
-                  "image/jpeg",
+                  format,
                   quality,
                 );
               };
@@ -993,6 +1023,7 @@
               attempt();
             };
 
+            img.onerror = reject;
             reader.readAsDataURL(file);
           });
         }
